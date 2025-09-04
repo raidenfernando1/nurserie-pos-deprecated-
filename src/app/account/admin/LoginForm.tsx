@@ -19,7 +19,7 @@ export default function AdminLogin() {
 
   return (
     <button
-      className="text-lg font-bold cursor-pointer border-1 px-10 py-5"
+      className="text-lg font-bold cursor-pointer border-2 rounded-2xl px-12 py-8"
       onClick={signIn}
     >
       Sign in with Google
