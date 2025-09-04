@@ -1,95 +1,71 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
 
-export default function Home() {
+import React from "react";
+import useError from "@/store/useError";
+
+const cardList = [
+  { name: "cashier", path: "/account/cashier" },
+  { name: "warehouse", path: "/account/warehouse" },
+];
+
+function SquareCard({ name, path }: { name: string; path: string }) {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <a
+      className="size-80 border-2 rounded-2xl flex items-center justify-center text-2xl"
+      href={path}
+    >
+      {name}
+    </a>
+  );
+}
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+export default function Entry() {
+  const { healthDB, setHealthDB } = useError();
+
+  React.useEffect(() => {
+    async function fetchHealth() {
+      try {
+        const res = await fetch("/api/health");
+        const data = await res.json();
+        setHealthDB(data.healthDB);
+      } catch (e) {
+        console.error(e);
+        setHealthDB(false);
+      }
+    }
+    fetchHealth();
+  }, [setHealthDB]);
+
+  return (
+    <main className="w-full h-full">
+      <div className="w-full h-1/6 fixed flex items-center justify-center text-7xl">
+        <h1>nurserie</h1>
+      </div>
+      <div className="w-full h-full flex justify-evenly items-center">
+        {cardList.map(({ name, path }, index) => (
+          <SquareCard key={index} name={name} path={path} />
+        ))}
+      </div>
+      <div className="absolute bottom-4 w-full text-center">
+        <p className="text-lg">
+          DB Status:{" "}
+          <span
+            className={
+              healthDB
+                ? "text-green-500"
+                : healthDB === false
+                ? "text-red-500"
+                : ""
+            }
           >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+            {healthDB === undefined
+              ? "Checking..."
+              : healthDB
+              ? "Healthy"
+              : "Down"}
+          </span>
+        </p>
+      </div>
+    </main>
   );
 }
