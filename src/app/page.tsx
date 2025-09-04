@@ -5,7 +5,7 @@ import useError from "@/store/useError";
 
 const cardList = [
   { name: "cashier", path: "/account/cashier" },
-  { name: "warehouse", path: "/account/warehouse" },
+  { name: "staff", path: "/account/staff" },
 ];
 
 function SquareCard({ name, path }: { name: string; path: string }) {
@@ -62,7 +62,7 @@ export default function Entry() {
               ? "Checking..."
               : healthDB
               ? "Healthy"
-              : "Down"}
+              : "Down!"}
           </span>
         </p>
       </div>
