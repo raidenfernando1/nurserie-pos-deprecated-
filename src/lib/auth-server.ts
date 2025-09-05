@@ -18,7 +18,6 @@ export const auth = betterAuth({
     },
   },
 
-  basePath: "/api/auth",
   baseUrl: "http://localhost:3000",
 });
 

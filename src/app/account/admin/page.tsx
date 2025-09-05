@@ -1,4 +1,6 @@
-import AdminLogin from "./LoginForm";
+"use client";
+
+import AdminLoginPage from "./LoginForm";
 
 export default function Admin() {
   return (
@@ -7,7 +9,7 @@ export default function Admin() {
         <h1 className="text-7xl tracking-tight">nurserie</h1>
         <h2 className=" text-red-500">Administrator</h2>
       </div>
-      <AdminLogin />
+      <AdminLoginPage />
     </main>
   );
 }

@@ -1,5 +1,7 @@
 import { create } from "zustand";
 
+interface CurrentPageTypes {}
+
 interface AdminStoreTypes {
   adminUsername: string | undefined;
   setAdminUsername: (status: string) => void;
