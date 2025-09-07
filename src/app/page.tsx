@@ -2,24 +2,39 @@
 
 import React from "react";
 import useError from "@/store/useError";
+import LoginForm from "@/components/LoginPage";
 
 const cardList = [
-  { name: "cashier", path: "/account/cashier" },
-  { name: "staff", path: "/account/staff" },
+  { name: "cashier", role: "cashier" },
+  { name: "staff", role: "staff" },
+  { name: "admin", role: "admin" },
 ];
 
-function SquareCard({ name, path }: { name: string; path: string }) {
+function SquareCard({
+  name,
+  role,
+  onSelect,
+}: {
+  name: string;
+  role: string;
+  onSelect: (role: string) => void;
+}) {
+  function handleClick() {
+    onSelect(role);
+  }
+
   return (
-    <a
-      className="size-80 border-2 rounded-2xl flex items-center justify-center text-2xl"
-      href={path}
+    <button
+      onClick={handleClick}
+      className="cursor-pointer size-80 border-2 rounded-2xl flex items-center justify-center text-2xl"
     >
       {name}
-    </a>
+    </button>
   );
 }
 
 export default function Entry() {
+  const [selectedRole, setSelectedRole] = React.useState<string | null>(null);
   const { healthDB, setHealthDB } = useError();
 
   React.useEffect(() => {
@@ -36,14 +51,43 @@ export default function Entry() {
     fetchHealth();
   }, [setHealthDB]);
 
+  function renderContent(selectedRole: string) {
+    switch (selectedRole) {
+      case "admin":
+        return (
+          <LoginForm title="nurserie" subTitle="administrator" role="admin" />
+        );
+      case "cashier":
+        return <LoginForm title="nurserie" subTitle="cashier" role="cashier" />;
+      case "staff":
+        return <LoginForm title="nurserie" subTitle="staff" role="staff" />;
+      default:
+        // 0 chance to get to null but bad practice anyways
+        return null;
+    }
+  }
+
+  if (selectedRole) {
+    return (
+      <main className="w-full h-full flex items-center justify-center">
+        {renderContent(selectedRole)}
+      </main>
+    );
+  }
+
   return (
     <main className="w-full h-full">
       <div className="w-full h-1/6 fixed flex items-center justify-center text-7xl">
         <h1>nurserie</h1>
       </div>
       <div className="w-full h-full flex justify-evenly items-center">
-        {cardList.map(({ name, path }, index) => (
-          <SquareCard key={index} name={name} path={path} />
+        {cardList.map(({ name, role }, index) => (
+          <SquareCard
+            key={index}
+            name={name}
+            role={role}
+            onSelect={setSelectedRole}
+          />
         ))}
       </div>
       <div className="absolute bottom-4 w-full text-center">
