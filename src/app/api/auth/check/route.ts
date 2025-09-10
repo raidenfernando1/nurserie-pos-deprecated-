@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
-
-export async function GET() {
-  return NextResponse.json({
-    name: "raiden",
-    message: "woo",
-  });
-}
+import auth from "@/lib/auth-server";
+import { headers } from "next/headers";
 
 export async function POST(req: Request) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const { sessionEmail } = await req.json();
 

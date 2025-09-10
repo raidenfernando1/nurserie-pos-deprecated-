@@ -1,8 +1,9 @@
 "use client";
-
 import { useAdminAuth } from "@/lib/admin/login";
 import React, { useState } from "react";
 import { Roles } from "@/app/types/roles";
+import { useCashierAuth } from "@/lib/cashier/login";
+import { authClient } from "@/lib/auth-client";
 
 interface LoginFormProps {
   title?: string;
@@ -16,20 +17,19 @@ export default function LoginForm({ title, subTitle, role }: LoginFormProps) {
   const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
   const { Login } = useAdminAuth();
+  const { Login: CashierLogin } = useCashierAuth();
 
   async function handleLogin(event?: React.FormEvent) {
     event?.preventDefault();
     setLoading(true);
     setLoginError("");
-
     try {
       if (role === "admin") {
         const response = await Login();
         console.log("Admin login response:", response);
       } else if (role === "cashier") {
-        alert(`Cashier login: ${username}`);
-      } else if (role === "staff") {
-        alert(`Staff login: ${username}`);
+        const response = await CashierLogin({ email: username, password });
+        console.log("Cashier login response:", response);
       }
     } catch (err) {
       console.error(err);
@@ -39,6 +39,11 @@ export default function LoginForm({ title, subTitle, role }: LoginFormProps) {
     }
   }
 
+  //async function testLog() {
+  //  const response = await authClient.getSession();
+  //  console.log(response);
+  //}
+
   return (
     <main className="flex flex-col items-center justify-center h-full gap-32">
       <div className="flex flex-col items-center justify-center gap-32">
@@ -46,7 +51,6 @@ export default function LoginForm({ title, subTitle, role }: LoginFormProps) {
           <h1 className="text-7xl tracking-tight">{title}</h1>
           <h2 className="opacity-30 text-center">{subTitle}</h2>
         </div>
-
         {role === "admin" ? (
           <button
             className="text-lg font-bold cursor-pointer border-2 rounded-2xl px-12 py-8"
@@ -82,6 +86,7 @@ export default function LoginForm({ title, subTitle, role }: LoginFormProps) {
               >
                 {loading ? "Loading..." : "Submit"}
               </button>
+
               {loginError && <p className="text-red-500">{loginError}</p>}
             </div>
           </form>

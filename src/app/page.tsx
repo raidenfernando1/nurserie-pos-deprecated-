@@ -6,7 +6,6 @@ import LoginForm from "@/components/LoginPage";
 
 const cardList = [
   { name: "cashier", role: "cashier" },
-  { name: "staff", role: "staff" },
   { name: "admin", role: "admin" },
 ];
 

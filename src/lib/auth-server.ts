@@ -6,11 +6,18 @@ export const auth = betterAuth({
   database: new Pool({
     connectionString: process.env.NEON_DATABASE_URL,
   }),
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        defaultValue: "cashier",
+      },
+    },
+  },
   emailAndPassword: {
     enabled: true,
   },
   plugins: [username()],
-
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID!,

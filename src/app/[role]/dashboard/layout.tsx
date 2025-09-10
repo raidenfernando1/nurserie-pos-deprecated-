@@ -6,15 +6,6 @@ const adminItems = [
   { name: "Inventory", path: "/dashboard/inventory" },
   { name: "Settings", path: "/dashboard/settings" },
   { name: "Settings", path: "/dashboard/settings" },
-
-  { name: "Staff", path: "/dashboard/users" },
-];
-
-const staffItems = [
-  { name: "Analytics", path: "/account/admin/dashboard/analytics" },
-  { name: "Inventory", path: "/account/admin/dashboard/inventory" },
-  { name: "Settings", path: "/account/admin/dashboard/settings" },
-  { name: "Staff", path: "/account/admin/dashboard/users" },
 ];
 
 const cashierItems = [
@@ -26,7 +17,6 @@ const cashierItems = [
 
 const DASHBOARD_ITEMS: Record<string, { name: string; path: string }[]> = {
   admin: adminItems,
-  staff: staffItems,
   cashier: cashierItems,
 };
 
@@ -42,8 +32,6 @@ export default function DashboardLayout({
   if (!(role in DASHBOARD_ITEMS)) {
     notFound();
   }
-
-  const items = DASHBOARD_ITEMS[role];
 
   return (
     <main className="flex flex-col">
