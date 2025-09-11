@@ -11,6 +11,7 @@ export const auth = betterAuth({
       role: {
         type: "string",
         defaultValue: "cashier",
+        input: false,
       },
     },
   },
