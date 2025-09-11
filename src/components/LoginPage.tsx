@@ -3,7 +3,6 @@ import { useAdminAuth } from "@/lib/admin/login";
 import React from "react";
 import { Roles } from "@/app/types/roles";
 import { useCashierAuth } from "@/lib/cashier/login";
-import { authClient } from "@/lib/auth-client";
 
 interface LoginFormProps {
   title?: string;
