@@ -5,16 +5,26 @@ import useError from "@/store/useError";
 export function useCashierAuth() {
   const { addError } = useError.getState();
 
-  async function Login({ email, password }) {
+  async function Login({
+    email,
+    password,
+  }: {
+    email: string;
+    password: string;
+  }) {
     try {
       const result = await authClient.signIn.email({
-        email: email,
+        email: `${email}@placeholder.com`,
         password: password,
       });
 
+      if (result) {
+        window.location.href = "/cashier/dashboard";
+      }
+
       return result;
     } catch (error) {
-      addError(error.message || "Login failed. Please check your credentials.");
+      addError("Login failed. Please check your credentials.");
       throw error;
     }
   }

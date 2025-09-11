@@ -1,7 +1,24 @@
 "use client";
 
-import { authClient } from "@/lib/auth-client";
 import { notFound } from "next/navigation";
+import DashboardCard from "@/components/DashboardCard";
+import React from "react";
+import { authClient } from "@/lib/auth-client";
+import useRole from "@/store/useRole";
+
+const adminItems = [
+  { name: "Analytics", path: "/dashboard/analytics" },
+  { name: "Inventory", path: "/dashboard/inventory" },
+  { name: "Settings", path: "/dashboard/settings" },
+  { name: "Settings", path: "/dashboard/settings" },
+];
+
+const cashierItems = [
+  { name: "Analytics", path: "/account/admin/dashboard/analytics" },
+  { name: "Inventory", path: "/account/admin/dashboard/inventory" },
+  { name: "Settings", path: "/account/admin/dashboard/settings" },
+  { name: "Inventory", path: "/account/admin/dashboard/inventory" },
+];
 
 export default function DashboardPage({
   params,
@@ -9,25 +26,26 @@ export default function DashboardPage({
   params: { role: string };
 }) {
   const DASHBOARD_VALID_ROLES = ["admin", "cashier"];
+  const { role, setRole } = useRole();
 
   if (!DASHBOARD_VALID_ROLES.includes(params.role)) {
     notFound();
   }
 
-  async function testMake() {
-    const res = await authClient.signUp.email({
-      email: "test@placeholder.com",
-      name: "test user",
-      password: "supersecurepassword",
+  React.useEffect(() => {
+    authClient.getSession().then((session) => {
+      const role = session.data?.user.role;
+      if (role === "admin" || role === "cashier") {
+        setRole(role);
+      }
     });
+  }, []);
 
-    console.log(res);
+  if (role === "admin") {
+    return <h1>admin</h1>;
   }
 
-  return (
-    <>
-      <h1>{params.role} dashboard</h1>
-      <button onClick={() => testMake()}>qweqw</button>
-    </>
-  );
+  if (role === "cashier") {
+    return <h1>cashier</h1>;
+  }
 }

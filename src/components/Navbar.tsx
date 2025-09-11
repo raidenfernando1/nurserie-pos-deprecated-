@@ -1,8 +1,24 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
+import { authClient } from "@/lib/auth-client";
+import useRole from "@/store/useRole";
+import useError from "@/store/useError";
 
 export default function Navbar() {
+  const { addError } = useError();
+
+  async function Logout() {
+    try {
+      await authClient.signOut();
+      window.location.href = "/";
+      return true;
+    } catch (e) {
+      addError(`CATCH ERROR: oauth admin signout error | ${e}`);
+      return false;
+    }
+  }
+
   const [loading, setLoading] = React.useState(false);
 
   return (
@@ -13,6 +29,7 @@ export default function Navbar() {
         <p className="flex items-center">Welcome, test</p>
         <button
           disabled={loading}
+          onClick={() => Logout()}
           className={`font-semibold cursor-pointer border-2 px-4 py-2 rounded ${
             loading
               ? "bg-red-500 border-red-700 text-red-900 cursor-not-allowed"
