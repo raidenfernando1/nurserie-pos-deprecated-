@@ -58,8 +58,6 @@ export default function Entry() {
         );
       case "cashier":
         return <LoginForm title="nurserie" subTitle="cashier" role="cashier" />;
-      case "staff":
-        return <LoginForm title="nurserie" subTitle="staff" role="staff" />;
       default:
         // 0 chance to get to null but bad practice anyways
         return null;
