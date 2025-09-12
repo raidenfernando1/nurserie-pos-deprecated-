@@ -15,11 +15,6 @@ export default async function Logout(role: Roles): Promise<boolean> {
     switch (role) {
       case "admin":
       case "cashier":
-      case "staff":
-        console.log(res);
-
-        window.location.href = "/";
-        break;
       default:
         console.error(`Unknown role during logout: ${role}`);
         console.log(res);
