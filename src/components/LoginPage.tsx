@@ -1,6 +1,6 @@
 "use client";
 import { useAdminAuth } from "@/lib/admin/login";
-import React, { useState } from "react";
+import React from "react";
 import { Roles } from "@/app/types/roles";
 import { useCashierAuth } from "@/lib/cashier/login";
 
@@ -11,10 +11,10 @@ interface LoginFormProps {
 }
 
 export default function LoginForm({ title, subTitle, role }: LoginFormProps) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [loginError, setLoginError] = useState("");
+  const [username, setUsername] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
+  const [loginError, setLoginError] = React.useState("");
   const { Login } = useAdminAuth();
   const { Login: CashierLogin } = useCashierAuth();
 
