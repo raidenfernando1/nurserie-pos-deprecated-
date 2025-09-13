@@ -61,7 +61,6 @@ export default function Entry() {
       case "staff":
         return <LoginForm title="nurserie" subTitle="staff" role="staff" />;
       default:
-        // 0 chance to get to null but bad practice anyways
         return null;
     }
   }
@@ -91,7 +90,7 @@ export default function Entry() {
       </div>
       <div className="absolute bottom-4 w-full text-center">
         <p className="text-lg">
-          DB Status:{" "}
+          Database Status:{" "}
           <span
             className={
               healthDB
@@ -104,8 +103,8 @@ export default function Entry() {
             {healthDB === undefined
               ? "Checking..."
               : healthDB
-              ? "Healthy"
-              : "Down!"}
+              ? "Online"
+              : "Offline"}
           </span>
         </p>
       </div>
