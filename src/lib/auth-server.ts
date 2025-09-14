@@ -13,6 +13,10 @@ export const auth = betterAuth({
         defaultValue: "cashier",
         input: false,
       },
+      admin_id: {
+        type: "string",
+        defaultValue: null,
+      },
     },
   },
   emailAndPassword: {

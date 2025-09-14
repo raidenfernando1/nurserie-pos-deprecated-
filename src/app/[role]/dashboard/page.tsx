@@ -5,7 +5,10 @@ import React from "react";
 import { authClient } from "@/lib/auth-client";
 import useRole from "@/store/useRole";
 
-const adminItems = [{ name: "Warehouse", path: "/admin/warehouse" }];
+const adminItems = [
+  { name: "Warehouse", path: "/admin/warehouse" },
+  { name: "Staff", path: "/admin/staff" },
+];
 
 const cashierItems = [
   { name: "Analytics", path: "/account/admin/dashboard/analytics" },
