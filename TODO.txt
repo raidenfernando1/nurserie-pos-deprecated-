@@ -1,0 +1,35 @@
+🔹 Warehouse API Methods
+
+Get all warehouses for my company (admin only)
+
+GET /api/warehouses
+
+Returns all warehouses tied to the logged-in admin’s company.
+
+Get a single warehouse by ID (admin only)
+
+GET /api/warehouses/:id
+
+Must validate that the warehouse belongs to the admin’s company.
+
+Create a warehouse (admin only)
+
+POST /api/warehouses
+
+Body: { warehouse_name: string }
+
+Auto-assign company_id from the logged-in admin’s company.
+
+Update a warehouse (admin only)
+
+PUT /api/warehouses/:id
+
+Editable fields: e.g., warehouse_name.
+
+Must validate ownership.
+
+Delete a warehouse (admin only)
+
+DELETE /api/warehouses/:id
+
+Must validate ownership.

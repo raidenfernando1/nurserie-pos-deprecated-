@@ -1,16 +1,13 @@
 "use client";
 
 import { notFound } from "next/navigation";
-import DashboardCard from "@/components/DashboardCard";
 import React from "react";
 import { authClient } from "@/lib/auth-client";
 import useRole from "@/store/useRole";
 
 const adminItems = [
-  { name: "Analytics", path: "/dashboard/analytics" },
-  { name: "Inventory", path: "/dashboard/inventory" },
-  { name: "Settings", path: "/dashboard/settings" },
-  { name: "Settings", path: "/dashboard/settings" },
+  { name: "Warehouse", path: "/admin/warehouse" },
+  { name: "Staff", path: "/admin/staff" },
 ];
 
 const cashierItems = [
@@ -42,7 +39,17 @@ export default function DashboardPage({
   }, []);
 
   if (role === "admin") {
-    return <h1>admin</h1>;
+    return (
+      <>
+        {adminItems.map((data, index) => {
+          return (
+            <a key={index} href={data.path}>
+              {data.name}
+            </a>
+          );
+        })}
+      </>
+    );
   }
 
   if (role === "cashier") {
