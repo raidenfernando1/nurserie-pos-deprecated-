@@ -6,20 +6,21 @@ import useRole from "@/store/useRole";
 import useError from "@/store/useError";
 
 export default function Navbar() {
+  const [loading, setLoading] = React.useState(false);
   const { addError } = useError();
 
   async function Logout() {
     try {
+      setLoading(true);
       await authClient.signOut();
       window.location.href = "/";
       return true;
     } catch (e) {
       addError(`CATCH ERROR: oauth admin signout error | ${e}`);
+      setLoading(false);
       return false;
     }
   }
-
-  const [loading, setLoading] = React.useState(false);
 
   return (
     <nav className="w-full flex items-center justify-between px-6 py-4 border-b-2">

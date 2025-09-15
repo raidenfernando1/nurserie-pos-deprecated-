@@ -7,7 +7,7 @@ export async function GET() {
 
     return NextResponse.json({
       healthDB: ok,
-      message: ok ? "Database is healthy" : "Database is down",
+      message: ok ? "Database is Online" : "Database is Offline",
     });
   } catch (e) {
     console.error(e);
