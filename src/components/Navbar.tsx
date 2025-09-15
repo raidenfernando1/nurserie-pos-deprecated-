@@ -10,12 +10,13 @@ export default function Navbar() {
 
   async function Logout() {
     try {
+      setLoading(true);
       await authClient.signOut();
       window.location.href = "/";
       return true;
     } catch (e) {
       addError(`CATCH ERROR: oauth admin signout error | ${e}`);
-      return false;
+      setLoading(false);
     }
   }
 
