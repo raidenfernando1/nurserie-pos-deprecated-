@@ -14,7 +14,6 @@ export default function DashboardPage({
   const DASHBOARD_VALID_ROLES = ["admin", "cashier"];
   const { role, setRole } = useRole();
 
-  // Unwrap the params Promise
   const { role: paramRole } = React.use(params);
 
   if (!DASHBOARD_VALID_ROLES.includes(paramRole)) {
