@@ -18,9 +18,17 @@ export default function Staff() {
     return response.json();
   };
 
+  const fetchCashiers = async () => {
+    const response = await fetch("/api/admin/staff");
+    const data = await response.json();
+    return data;
+  };
+
   return (
     <>
       <button onClick={() => TestCreateUser()}>Create cashier</button>
+      <button onClick={() => fetchCashiers()}>test cashier</button>
+
       <button>Delete cashier</button>
       <button></button>
     </>

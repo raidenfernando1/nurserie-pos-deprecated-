@@ -6,7 +6,6 @@ export async function POST(req: Request) {
   try {
     console.log("---- POST /api/admin/cashier called ----");
 
-    // Get session
     const session = await auth.api.getSession({ headers: await headers() });
     console.log("Session:", session);
 
@@ -15,7 +14,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Admin check
     if (session.user.role !== "admin") {
       console.warn("Unauthorized: user is not admin", session.user);
       return NextResponse.json(
@@ -26,7 +24,6 @@ export async function POST(req: Request) {
 
     const userID = session.user.id;
 
-    // Read request body
     const body = await req.json();
     console.log("Request body:", body);
 

@@ -38,11 +38,6 @@ export default function LoginForm({ title, subTitle, role }: LoginFormProps) {
     }
   }
 
-  //async function testLog() {
-  //  const response = await authClient.getSession();
-  //  console.log(response);
-  //}
-
   return (
     <main className="flex flex-col items-center justify-center h-full gap-32">
       <div className="flex flex-col items-center justify-center gap-32">
