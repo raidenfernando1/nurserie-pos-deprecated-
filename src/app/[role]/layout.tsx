@@ -13,7 +13,7 @@ export default function DashboardLayout({
     <ProtectedRoute>
       <main className="flex flex-col">
         <Navbar />
-        <section className="flex-1 p-4">{children}</section>
+        <section>{children}</section>
       </main>
     </ProtectedRoute>
   );
