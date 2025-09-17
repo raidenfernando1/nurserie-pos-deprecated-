@@ -1,5 +1,12 @@
 import React from "react";
+import WarehouseContainer from "./_component/WarehouseContainer";
+import ProductContainer from "./_component/ProductContainer";
 
 export default function Warehouse() {
-  return <h1>warehouse</h1>;
+  return (
+    <main className="flex flex-col gap-6">
+      <WarehouseContainer />
+      <ProductContainer />
+    </main>
+  );
 }
