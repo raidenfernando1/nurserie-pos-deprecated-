@@ -5,7 +5,6 @@ import "./globals.css";
 import { authClient } from "@/lib/auth-client";
 import React from "react";
 import { useRouter, usePathname } from "next/navigation";
-import Sidebar from "@/components/Navbar";
 
 const MainFont = DM_Sans({
   variable: "--font-geist-sans",
@@ -41,7 +40,6 @@ export default function RootLayout({
     };
 
     checkRoleAndRedirect();
-    // run once on mount
   }, []);
 
   return (
