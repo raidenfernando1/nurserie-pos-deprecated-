@@ -4,6 +4,7 @@ import React from "react";
 import useError from "@/store/useError";
 import LoginForm from "@/components/LoginPage";
 import { useAdminAuth } from "@/lib/admin/login";
+import { Button } from "@/components/ui/button";
 
 const cardList = [
   { name: "cashier", role: "cashier" },
@@ -73,9 +74,9 @@ export default function Entry() {
   }
 
   return (
-    <main className="min-h-screen w-full flex flex-col bg-[#f9f6f3]">
+    <main className="min-h-screen w-full flex flex-col bg-black">
       <div className="hidden md:flex flex-row gap-2 sm:gap-4 justify-end px-4 sm:px-10 py-4">
-        <button
+        {/* <button
           className="border rounded px-4 py-2 w-full sm:w-auto cursor-pointer 
              hover:bg-blue-500 hover:text-white transition duration-200"
           onClick={() => setSelectedRole("cashier")}
@@ -89,26 +90,40 @@ export default function Entry() {
           onClick={() => useAdminAuth().Login()}
         >
           Admin
-        </button>
+        </button> */}
+        <div className="flex flex-wrap items-center gap-2 md:flex-row rounded">
+          <Button
+            className="rounded hover:bg-blue-500 hover:text-white transition duration-200"
+            onClick={() => setSelectedRole("cashier")}
+          >
+            Cashier
+          </Button>
+        </div>
+        <div className="flex flex-wrap items-center gap-2 md:flex-row">
+          <Button
+            className="rounded hover:bg-red-500 hover:text-white transition duration-200"
+            onClick={() => useAdminAuth().Login()}
+          >
+            Admin
+          </Button>
+        </div>
       </div>
 
       <div className="flex-grow flex flex-col items-center justify-center text-center md:items-start md:justify-start md:text-left px-4 sm:px-10 lg:px-20 py-10">
         <h1 className="text-4xl sm:text-6xl lg:text-8xl font-bold">
-          NURSERIE 👶🏿
+          Oracle POS
         </h1>
-        <p className="max-w-md py-5 text-lg sm:text-2xl lg:text-4xl mt-2">
-          We are Nurserie
-        </p>
 
-        <div className=" space-y-2 text-sm sm:text-base lg:text-lg">
+        <div className=" space-y-2 text-sm sm:text-base lg:text-lg py-10">
           <p>
             We are a young, family-owned, parent-operated company at the heart
             of Metro Manila.
           </p>
           <p>
-            We started looking for the best of the best products for our girls,
-            and we hope that, through us, you find thoughtful, functional,
-            well-made products for your little ones.
+            This all-in-one POS handles everything from tracking transactions to
+            managing inventory, so you can focus on what matters. The best part?
+            You can customize the look to match your brand. It's powerful, and
+            it's personal
           </p>
         </div>
       </div>
