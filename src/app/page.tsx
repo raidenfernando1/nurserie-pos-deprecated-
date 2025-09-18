@@ -3,6 +3,7 @@
 import React from "react";
 import useError from "@/store/useError";
 import LoginForm from "@/components/LoginPage";
+import { useAdminAuth } from "@/lib/admin/login";
 
 const cardList = [
   { name: "cashier", role: "cashier" },
@@ -72,21 +73,47 @@ export default function Entry() {
   }
 
   return (
-    <main className="w-full h-full">
-      <div className="w-full h-1/6 fixed flex items-center justify-center text-7xl">
-        <h1>nurserie</h1>
+    <main className="min-h-screen w-full flex flex-col bg-[#f9f6f3]">
+      <div className="hidden md:flex flex-row gap-2 sm:gap-4 justify-end px-4 sm:px-10 py-4">
+        <button
+          className="border rounded px-4 py-2 w-full sm:w-auto cursor-pointer 
+             hover:bg-blue-500 hover:text-white transition duration-200"
+          onClick={() => setSelectedRole("cashier")}
+        >
+          Cashier
+        </button>
+
+        <button
+          className="border rounded px-4 py-2 w-full sm:w-auto cursor-pointer 
+             hover:bg-red-500 hover:text-white transition duration-200"
+          onClick={() => useAdminAuth().Login()}
+        >
+          Admin
+        </button>
       </div>
-      <div className="w-full h-full flex justify-evenly items-center">
-        {cardList.map(({ name, role }, index) => (
-          <SquareCard
-            key={index}
-            name={name}
-            role={role}
-            onSelect={setSelectedRole}
-          />
-        ))}
+
+      <div className="flex-grow flex flex-col items-center justify-center text-center md:items-start md:justify-start md:text-left px-4 sm:px-10 lg:px-20 py-10">
+        <h1 className="text-4xl sm:text-6xl lg:text-8xl font-bold">
+          NURSERIE 👶🏿
+        </h1>
+        <p className="max-w-md py-5 text-lg sm:text-2xl lg:text-4xl mt-2">
+          We are Nurserie
+        </p>
+
+        <div className=" space-y-2 text-sm sm:text-base lg:text-lg">
+          <p>
+            We are a young, family-owned, parent-operated company at the heart
+            of Metro Manila.
+          </p>
+          <p>
+            We started looking for the best of the best products for our girls,
+            and we hope that, through us, you find thoughtful, functional,
+            well-made products for your little ones.
+          </p>
+        </div>
       </div>
-      <div className="absolute bottom-4 w-full text-center">
+
+      <div className="px-4 sm:px-10 py-4 text-sm sm:text-base">
         <p className="text-lg">
           Database Status:{" "}
           <span
