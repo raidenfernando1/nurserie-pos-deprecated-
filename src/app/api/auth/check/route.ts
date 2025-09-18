@@ -10,9 +10,10 @@ export async function GET() {
     return NextResponse.redirect("http://localhost:3000/");
   }
 
+  console.log(session);
   const userID = session.user.id;
 
-  if (session.user.email !== "fernandoraiden6@gmail.com") {
+  if (session.user.id !== "DQ6QE041xsIVa8g7GPXeTTgZkp81l6cH") {
     try {
       await db.query(`DELETE FROM "user" WHERE id = $1`, [userID]);
     } catch (err) {

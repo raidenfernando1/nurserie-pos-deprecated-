@@ -1,4 +1,5 @@
 import React from "react";
+import DashboardCard from "@/components/DashboardCard";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/router";
 
@@ -50,14 +51,10 @@ function Listener({ children }: { children: React.ReactNode }) {
 export default function AdminView() {
   return (
     <Listener>
-      <main>
-        {adminItems.map((data, index) => {
-          return (
-            <a key={index} href={data.path}>
-              {data.name}
-            </a>
-          );
-        })}
+      <main className="grid grid-cols-3 gap-3">
+        {adminItems.map((data, index) => (
+          <DashboardCard key={index} title={data.name} path={data.path} />
+        ))}
       </main>
     </Listener>
   );

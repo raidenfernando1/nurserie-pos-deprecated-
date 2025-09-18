@@ -17,20 +17,19 @@ interface ProductContainerProps {
 export default function ProductContainer({
   warehouseID,
 }: ProductContainerProps) {
-  const [products, setProducts] = React.useState<Product[]>([]); // start as empty array
+  const [products, setProducts] = React.useState<Product[]>([]);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     async function fetchProducts() {
       try {
-        const response = await fetch("/api/admin/warehouse", {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ warehouseID }),
-        });
+        const response = await fetch(
+          `/api/admin/warehouse/${warehouseID}/products`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
 
         if (!response.ok) {
           console.error("Server error:", response.status);
@@ -41,7 +40,6 @@ export default function ProductContainer({
         const data: Product[] = await response.json();
         setProducts(data);
         setLoading(false);
-        console.log(data);
       } catch (err) {
         console.error("Fetch error:", err);
         setLoading(false);
