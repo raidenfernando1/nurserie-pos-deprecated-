@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
+import { useWarehouse } from "@/store/useWarehouse";
 
 import {
   createColumnHelper,
@@ -20,20 +21,7 @@ import {
 } from "@/components/ui/table";
 
 import Filters from "./Filters";
-
-interface Product {
-  warehouse_id: number;
-  warehouse_name: string;
-  product_id: number;
-  product_name: string;
-  variant_id: number;
-  variant_name: string;
-  total_stock: number;
-  stock_threshold: number;
-  variant_price: number;
-  variant_sku: string;
-  status: "in-stock" | "low-stock" | "out-of-stock";
-}
+import { Product } from "@/store/useWarehouse";
 
 const columnHelper = createColumnHelper<Product>();
 
@@ -74,8 +62,8 @@ const ProductTable: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [globalFilter, setGlobalFilter] = useState("");
   const [variantFilter, setVariantFilter] = useState("");
+  const { setTotalProducts } = useWarehouse();
 
-  // Fetch products from API
   useEffect(() => {
     async function fetchProducts() {
       try {
@@ -85,21 +73,26 @@ const ProductTable: React.FC = () => {
           setLoading(false);
           return;
         }
-        const productsFromApi: Product[] = await res.json();
 
-        // Add status based on stock
-        // Add status based on stock vs threshold
+        const productsFromApi: any[] = await res.json();
         const productsWithStatus = productsFromApi.map((p) => ({
           ...p,
           status:
-            p.total_stock === 0
+            Number(p.total_stock) === 0
               ? "out-of-stock"
-              : p.total_stock < p.stock_threshold
+              : Number(p.total_stock) < p.stock_threshold
               ? "low-stock"
-              : "in-stock", // TypeScript sees this as string
-        })) as Product[]; // <-- cast to Product[]
+              : "in-stock",
+        })) as any[];
 
+        const totalStockSum = productsWithStatus.reduce(
+          (sum, product) => sum + Number(product.total_stock),
+          0
+        );
+
+        setTotalProducts(totalStockSum);
         setData(productsWithStatus);
+
         setLoading(false);
       } catch (err) {
         console.error("Fetch error:", err);
@@ -108,15 +101,7 @@ const ProductTable: React.FC = () => {
     }
 
     fetchProducts();
-  }, []);
-
-  const totalStock = data.reduce((sum, p) => sum + p.total_stock, 0);
-  const lowStock = data
-    .filter((p) => p.status === "low-stock")
-    .reduce((sum, p) => sum + p.total_stock, 0);
-  const outOfStock = data
-    .filter((p) => p.status === "out-of-stock")
-    .reduce((sum, p) => sum + p.total_stock, 0);
+  }, [setTotalProducts]);
 
   const filteredData = useMemo(() => {
     return data.filter((item) => {
@@ -172,6 +157,7 @@ const ProductTable: React.FC = () => {
                 </TableRow>
               ))}
             </TableHeader>
+
             <TableBody>
               {table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>

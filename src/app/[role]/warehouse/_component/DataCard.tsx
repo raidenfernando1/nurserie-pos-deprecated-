@@ -1,14 +1,9 @@
 import React from "react";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 
 interface DataCardProps {
   label: string;
-  value: string | number;
+  value: number;
 }
 
 const DataCard: React.FC<DataCardProps> = ({ label, value }) => {
