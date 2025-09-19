@@ -10,19 +10,13 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Skeleton } from "@/components/ui/skeleton";
-
-type Warehouse = {
-  id: string;
-  company_id: number;
-  warehouse_name: string;
-  total_stock: number;
-};
+import { useWarehouse } from "@/store/useWarehouse";
 
 export default function WarehouseContainer() {
-  const [warehouses, setWarehouses] = React.useState<Warehouse[]>([]);
+  const [warehouses, setWarehouses] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+  const { totalProducts } = useWarehouse();
 
   const getWarehouses = async () => {
     try {
@@ -36,7 +30,7 @@ export default function WarehouseContainer() {
         throw new Error(error || message || "Failed to fetch warehouses");
       }
 
-      const data: Warehouse[] = await response.json();
+      const data: any[] = await response.json();
       setWarehouses(data);
     } catch (err: any) {
       setError(err.message);
@@ -49,7 +43,7 @@ export default function WarehouseContainer() {
     getWarehouses();
   }, []);
 
-  const totalStock = warehouses.length;
+  const totalWarehouse = warehouses.length;
 
   if (loading) return <main className="p-4">Loading warehouses...</main>;
   if (error) return <main className="p-4 text-red-600">Error: {error}</main>;
@@ -60,15 +54,13 @@ export default function WarehouseContainer() {
     <main className="flex flex-col gap-6">
       <h1 className="text-xl font-bold mb-4">Warehouse Analytics</h1>
 
-      {/* Data Cards */}
       <div className="grid grid-cols-4 gap-6">
-        <DataCard label="Total warehouses" value={totalStock} />
-        <DataCard label="Total stock" value={3981} />
+        <DataCard label="Total warehouses" value={totalWarehouse} />
+        <DataCard label="Total stock" value={totalProducts} />
         <DataCard label="Total stock" value={3981} />
         <DataCard label="Total stock" value={3981} />
       </div>
 
-      {/* Warehouse Cards */}
       <Carousel className="relative">
         <CarouselContent className="space-x-4 px-8">
           {warehouses.map((w) => (

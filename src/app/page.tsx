@@ -76,21 +76,6 @@ export default function Entry() {
   return (
     <main className="min-h-screen w-full flex flex-col bg-black">
       <div className="hidden md:flex flex-row gap-2 sm:gap-4 justify-end px-4 sm:px-10 py-4">
-        {/* <button
-          className="border rounded px-4 py-2 w-full sm:w-auto cursor-pointer 
-             hover:bg-blue-500 hover:text-white transition duration-200"
-          onClick={() => setSelectedRole("cashier")}
-        >
-          Cashier
-        </button>
-
-        <button
-          className="border rounded px-4 py-2 w-full sm:w-auto cursor-pointer 
-             hover:bg-red-500 hover:text-white transition duration-200"
-          onClick={() => useAdminAuth().Login()}
-        >
-          Admin
-        </button> */}
         <div className="flex flex-wrap items-center gap-2 md:flex-row rounded">
           <Button
             className="rounded hover:bg-blue-500 hover:text-white transition duration-200"

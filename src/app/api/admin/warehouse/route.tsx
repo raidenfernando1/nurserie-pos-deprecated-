@@ -15,8 +15,6 @@ export async function GET() {
 
     const userID = session.user.id;
 
-    console.log(userID);
-
     const response = await db`
     SELECT 
       w.id,
