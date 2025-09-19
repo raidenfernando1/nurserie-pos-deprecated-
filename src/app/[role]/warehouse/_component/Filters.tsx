@@ -49,6 +49,7 @@ const Filters: React.FC<FiltersProps> = ({
           </option>
         ))}
       </select>
+
       <div className="flex gap-8 w-2/4 justify-end items-center mt-2">
         <Button
           variant="secondary"

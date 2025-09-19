@@ -20,17 +20,22 @@ export async function GET(
 
   try {
     const response = await db`
-      SELECT 
-        ws.product_id,
-        p.name AS product_name,
-        SUM(ws.total_stock_amount) AS total_stock_in_warehouse
-      FROM warehouse_stock ws
-      JOIN product p ON ws.product_id = p.id
-      JOIN warehouse w ON ws.warehouse_id = w.id
-      JOIN company c ON w.company_id = c.id
-      WHERE ws.warehouse_id = ${warehouseID}
-        AND c.admin_id = ${userID}
-      GROUP BY ws.product_id, p.name;
+SELECT 
+    ws.product_id,
+    p.name AS product_name,
+    p.brand,
+    p.description,
+    p.barcode,
+    p.stock_threshold,
+    p.img_url,
+    SUM(ws.total_stock_amount) AS total_stock_in_warehouse
+FROM warehouse_stock ws
+JOIN product p ON ws.product_id = p.id
+JOIN warehouse w ON ws.warehouse_id = w.id
+JOIN company c ON w.company_id = c.id
+WHERE ws.warehouse_id = ${warehouseID}
+  AND c.admin_id = ${userID}
+GROUP BY ws.product_id, p.name, p.brand, p.description, p.barcode, p.stock_threshold, p.img_url;
     `;
 
     return NextResponse.json(response);

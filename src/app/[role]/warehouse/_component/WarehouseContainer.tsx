@@ -10,13 +10,11 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { useWarehouse } from "@/store/useWarehouse";
 
 export default function WarehouseContainer() {
   const [warehouses, setWarehouses] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
-  const { totalProducts } = useWarehouse();
 
   const getWarehouses = async () => {
     try {
@@ -52,19 +50,17 @@ export default function WarehouseContainer() {
 
   return (
     <main className="flex flex-col gap-6">
-      <h1 className="text-xl font-bold mb-4">Warehouse Analytics</h1>
-
       <div className="grid grid-cols-4 gap-6">
         <DataCard label="Total warehouses" value={totalWarehouse} />
-        <DataCard label="Total stock" value={totalProducts} />
+        <DataCard label="Total stock" value={3981} />
         <DataCard label="Total stock" value={3981} />
         <DataCard label="Total stock" value={3981} />
       </div>
 
-      <Carousel className="relative">
-        <CarouselContent className="space-x-4 px-8">
+      <Carousel className="relative ">
+        <CarouselContent>
           {warehouses.map((w) => (
-            <CarouselItem key={w.id} className="w-64 flex-shrink-0">
+            <CarouselItem key={w.id}>
               <WarehouseCard
                 id={w.id}
                 name={w.warehouse_name}

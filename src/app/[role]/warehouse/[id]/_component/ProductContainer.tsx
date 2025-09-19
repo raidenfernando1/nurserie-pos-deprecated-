@@ -8,6 +8,11 @@ interface Product {
   product_variants_id?: number;
   variant_name?: string;
   total_stock_in_warehouse?: number;
+  brand?: string;
+  description?: string;
+  barcode?: number;
+  stock_threshold?: number;
+  img_url?: string;
 }
 
 interface ProductContainerProps {
@@ -60,8 +65,21 @@ export default function ProductContainer({
             <strong>Product:</strong> {p.product_name}
           </p>
           <p>
+            <strong>Brand:</strong> {p.brand}
+          </p>
+          <p>
+            <strong>Description:</strong> {p.description}
+          </p>
+          <p>
+            <strong>Barcode:</strong> {p.barcode}
+          </p>
+          <p>
+            <strong>Stock Threshold:</strong> {p.stock_threshold}
+          </p>
+          <p>
             <strong>Total Stock:</strong> {p.total_stock_in_warehouse}
           </p>
+          <img src={p.img_url} />
         </div>
       ))}
     </div>

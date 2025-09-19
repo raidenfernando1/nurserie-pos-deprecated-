@@ -1,8 +1,7 @@
 "use client";
-
 import React, { useState, useEffect, useMemo } from "react";
-import { useWarehouse } from "@/store/useWarehouse";
-
+import { ColumnDef } from "@tanstack/react-table";
+import dummydata from "./dummydata.json";
 import {
   createColumnHelper,
   useReactTable,
@@ -10,171 +9,187 @@ import {
   getPaginationRowModel,
   flexRender,
 } from "@tanstack/react-table";
-
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import Filters from "./Filters";
-import { Product } from "@/store/useWarehouse";
 
-const columnHelper = createColumnHelper<Product>();
+interface Product {
+  product_id: number;
+  product_name: string;
+  variant_id?: number;
+  variant_name?: string;
+  total_stock?: number | string; // API might send as string
+  stock_threshold?: number | string;
+  variant_price?: number;
+  variant_sku?: string;
+  warehouse_id?: number;
+  warehouse_name?: string;
+  brand?: string;
+  description?: string;
+  barcode?: number | string;
+  img_url?: string;
+}
 
-const columns = [
-  columnHelper.accessor("product_name", {
-    header: "Name",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("variant_name", { header: "Variant" }),
-  columnHelper.accessor("total_stock", { header: "Stock" }),
-  columnHelper.accessor("stock_threshold", { header: "Threshold" }), // <-- new column
-  columnHelper.accessor("variant_sku", { header: "SKU" }),
-  columnHelper.accessor("variant_price", {
+// Fix the columns to match your actual data structure
+export const totalStockColumns: ColumnDef<Product>[] = [
+  {
+    id: "image",
+    header: "Image",
+    cell: ({ row }) => (
+      <div className="w-10 h-10">
+        <img
+          src={row.original.img_url}
+          className="w-full h-full object-cover rounded"
+        />
+      </div>
+    ),
+  },
+  {
+    accessorKey: "product_name",
+    header: "Product Name",
+  },
+  {
+    accessorKey: "variant_name",
+    header: "Variant",
+  },
+  {
+    accessorKey: "warehouse_name",
+    header: "Warehouse",
+  },
+  {
+    accessorKey: "variant_sku",
+    header: "SKU",
+  },
+  {
+    accessorKey: "variant_price",
     header: "Price",
-    cell: (info) => `₱${info.getValue().toFixed(2)}`,
-  }),
-  columnHelper.accessor("status", {
+    cell: ({ getValue }) => `$${getValue()}`,
+  },
+  {
+    accessorKey: "total_stock",
+    header: "Stock",
+  },
+  {
+    accessorKey: "stock_threshold",
+    header: "Stock Threshold",
+  },
+  {
     header: "Status",
-    cell: (info) => {
-      const value = info.getValue();
-      const color =
-        value === "in-stock"
-          ? "bg-green-700"
-          : value === "low-stock"
-          ? "bg-yellow-500"
-          : "bg-red-500";
-      return (
-        <span className={`px-2 py-1 rounded text-white ${color}`}>
-          {value.replace("-", " ")}
-        </span>
-      );
+    cell: ({ row }) => {
+      const stock = Number(row.original.total_stock ?? 0);
+      const threshold = Number(row.original.stock_threshold ?? 0);
+
+      if (stock === 0) {
+        return (
+          <span className="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">
+            Out of Stock
+          </span>
+        );
+      } else if (stock <= threshold) {
+        return (
+          <span className="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
+            Low Stock
+          </span>
+        );
+      } else {
+        return (
+          <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+            In Stock
+          </span>
+        );
+      }
     },
-  }),
+  },
 ];
 
 const ProductTable: React.FC = () => {
   const [data, setData] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [globalFilter, setGlobalFilter] = useState("");
-  const [variantFilter, setVariantFilter] = useState("");
-  const { setTotalProducts } = useWarehouse();
 
   useEffect(() => {
-    async function fetchProducts() {
+    const fetchProducts = async () => {
       try {
         const res = await fetch("/api/admin/warehouse/products");
-        if (!res.ok) {
-          console.error("Failed to fetch products:", res.status);
-          setLoading(false);
-          return;
-        }
-
-        const productsFromApi: any[] = await res.json();
-        const productsWithStatus = productsFromApi.map((p) => ({
-          ...p,
-          status:
-            Number(p.total_stock) === 0
-              ? "out-of-stock"
-              : Number(p.total_stock) < p.stock_threshold
-              ? "low-stock"
-              : "in-stock",
-        })) as any[];
-
-        const totalStockSum = productsWithStatus.reduce(
-          (sum, product) => sum + Number(product.total_stock),
-          0
-        );
-
-        setTotalProducts(totalStockSum);
-        setData(productsWithStatus);
-
+        const json: Product[] = await res.json();
+        const normalized = json.map((item: any) => ({
+          ...item,
+          total_stock: Number(item.total_stock),
+          stock_threshold: Number(item.stock_threshold),
+          variant_price: Number(item.variant_price),
+        }));
+        setData(normalized);
         setLoading(false);
+        console.log(normalized);
       } catch (err) {
-        console.error("Fetch error:", err);
+        console.error("Failed to fetch products", err);
         setLoading(false);
       }
-    }
+    };
 
     fetchProducts();
-  }, [setTotalProducts]);
-
-  const filteredData = useMemo(() => {
-    return data.filter((item) => {
-      const matchesSearch = item.product_name
-        .toLowerCase()
-        .includes(globalFilter.toLowerCase());
-      const matchesVariant = variantFilter
-        ? item.variant_name === variantFilter
-        : true;
-      return matchesSearch && matchesVariant;
-    });
-  }, [data, globalFilter, variantFilter]);
+  }, []);
 
   const table = useReactTable({
-    data: filteredData,
-    columns,
+    data: data,
+    columns: totalStockColumns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    initialState: {
-      pagination: { pageIndex: 0, pageSize: 8 },
-    },
   });
 
-  const variants = Array.from(new Set(data.map((d) => d.variant_name)));
-
-  if (loading) return <p>Loading products...</p>;
-  if (!data.length) return <p>No products found.</p>;
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <div className="w-full space-y-4">
-      <Filters
-        table={table}
-        globalFilter={globalFilter}
-        setGlobalFilter={setGlobalFilter}
-        categoryFilter={variantFilter}
-        setCategoryFilter={setVariantFilter}
-        categories={variants}
-      />
-      <div className="w-full px-4">
-        <div className="overflow-x-auto">
-          <Table className="w-full border-collapse ">
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id}>
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              ))}
-            </TableHeader>
-
-            <TableBody>
-              {table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </div>
+    <div className="w-full">
+      <Table>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => {
+                return (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                );
+              })}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow key={row.id}>
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell
+                colSpan={totalStockColumns.length}
+                className="h-24 text-center"
+              >
+                No results.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
     </div>
   );
 };
