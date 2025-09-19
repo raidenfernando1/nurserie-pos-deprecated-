@@ -12,8 +12,8 @@ const WarehouseCard = ({
   stock: number;
 }) => {
   return (
-    <Link className=" w-full" href={`/admin/warehouse/${id}`}>
-      <Card className="rounded-2xl hover:shadow-lg transition-shadow duration-200 w-full">
+    <Link href={`/admin/warehouse/${id}`}>
+      <Card className="p-8 rounded-2xl hover:shadow-lg transition-shadow duration-200 w-full">
         <CardHeader>
           <CardTitle className="text-lg">{name}</CardTitle>
         </CardHeader>
