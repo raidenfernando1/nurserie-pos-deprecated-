@@ -3,7 +3,10 @@
 import React from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import useRole from "@/store/useRole";
-import Sidebar from "@/components/Navbar";
+
+// shadcn sidebar
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
 
 export default function DashboardLayout({
   params,
@@ -16,10 +19,13 @@ export default function DashboardLayout({
 
   return (
     <ProtectedRoute>
-      <div className="flex">
-        <Sidebar />
-        <main className="flex-1 p-6">{children}</main>
-      </div>
+      <SidebarProvider>
+        <AppSidebar />
+        <main className="flex justify-center">
+          <SidebarTrigger />
+          {children}
+        </main>
+      </SidebarProvider>
     </ProtectedRoute>
   );
 }
