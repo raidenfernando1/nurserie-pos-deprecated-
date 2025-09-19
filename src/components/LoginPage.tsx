@@ -3,6 +3,9 @@ import { useAdminAuth } from "@/lib/admin/login";
 import React from "react";
 import { Roles } from "@/app/types/roles";
 import { useCashierAuth } from "@/lib/cashier/login";
+import { Input } from "@/components/ui/input";
+import { Button } from "./ui/button";
+import { Loader2Icon } from "lucide-react";
 
 interface LoginFormProps {
   title?: string;
@@ -59,27 +62,24 @@ export default function LoginForm({ title, subTitle, role }: LoginFormProps) {
             onSubmit={handleLogin}
           >
             <div className="flex flex-col gap-4 justify-center">
-              <input
+              <Input
                 className="p-3 text-xl border-2 rounded"
-                placeholder="username"
+                placeholder="Username"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
-              <input
+              <Input
                 className="p-3 text-xl border-2 rounded"
-                placeholder="password"
+                placeholder="Password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <button
-                className="p-2 border-2 bg-green-400 text-black border-green-600 cursor-pointer duration-200 hover:opacity-80"
-                type="submit"
-                disabled={loading}
-              >
-                {loading ? "Loading..." : "Submit"}
-              </button>
+              <Button className="rounded" type="submit" disabled={loading}>
+                {loading ? <Loader2Icon className="animate-spin" /> : "Login"}
+                {loading && "Please wait"}
+              </Button>
 
               {loginError && <p className="text-red-500">{loginError}</p>}
             </div>
