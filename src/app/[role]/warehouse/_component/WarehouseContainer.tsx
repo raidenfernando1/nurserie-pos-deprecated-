@@ -10,6 +10,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function WarehouseContainer() {
   const [warehouses, setWarehouses] = React.useState<any[]>([]);
@@ -43,7 +44,17 @@ export default function WarehouseContainer() {
 
   const totalWarehouse = warehouses.length;
 
-  if (loading) return <main className="p-4">Loading warehouses...</main>;
+  if (loading)
+    return (
+      <main className="flex flex-col gap-6">
+        <div className="grid grid-cols-4 gap-6">
+          <Skeleton className="h-[125px] w-[250px] rounded-2xl" />
+          <Skeleton className="h-[125px] w-[250px] rounded-2xl" />
+          <Skeleton className="h-[125px] w-[250px] rounded-2xl" />
+          <Skeleton className="h-[125px] w-[250px] rounded-2xl" />
+        </div>
+      </main>
+    );
   if (error) return <main className="p-4 text-red-600">Error: {error}</main>;
   if (warehouses.length === 0)
     return <main className="p-4">No warehouses found.</main>;
@@ -69,8 +80,8 @@ export default function WarehouseContainer() {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className="absolute left-0 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 shadow-md z-10" />
-        <CarouselNext className="absolute right-0 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 shadow-md z-10" />
+        <CarouselPrevious className="absolute left-0 top-1/2 -translate-y-1/2 z-10 rounded-full p-2 shadow-md bg-black text-white hover:bg-gray-800" />
+        <CarouselNext className="absolute right-0 top-1/2 -translate-y-1/2 z-10 rounded-full p-2 shadow-md bg-black text-white hover:bg-gray-800" />
       </Carousel>
     </main>
   );

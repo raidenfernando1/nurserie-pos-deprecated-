@@ -3,7 +3,10 @@
 import React from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import useRole from "@/store/useRole";
-import Sidebar from "@/components/Navbar";
+
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
+import { AppBreadcrumbs } from "@/components/app-breadcrumbs";
 
 export default function DashboardLayout({
   params,
@@ -16,10 +19,17 @@ export default function DashboardLayout({
 
   return (
     <ProtectedRoute>
-      <div className="flex">
-        <Sidebar />
-        <main className="flex-1 p-6">{children}</main>
-      </div>
+      <SidebarProvider>
+        <AppSidebar />
+        <main className="flex flex-1 flex-col gap-4 p-4 pt-0">
+          <SidebarTrigger />
+
+          {/* Breadcrumbs */}
+          <AppBreadcrumbs />
+
+          {children}
+        </main>
+      </SidebarProvider>
     </ProtectedRoute>
   );
 }

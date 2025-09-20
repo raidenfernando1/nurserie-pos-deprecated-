@@ -95,7 +95,9 @@ export default function Entry() {
       </div>
 
       <div className="flex-grow flex flex-col items-center justify-center text-center md:items-start md:justify-start md:text-left px-4 sm:px-10 lg:px-20 py-10">
-        <h1 className="text-4xl sm:text-6xl lg:text-8xl font-bold">POS</h1>
+        <h1 className="text-4xl sm:text-6xl lg:text-8xl font-bold">
+          Oracle POS
+        </h1>
 
         <div className=" space-y-2 text-sm sm:text-base lg:text-lg py-10">
           <p>
