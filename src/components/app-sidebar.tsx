@@ -27,14 +27,14 @@ import {
 } from "lucide-react";
 
 // Define role-based menus
-const adminItems = [
+export const adminItems = [
   { name: "Dashboard", path: "/admin/dashboard", icon: Home },
   { name: "Analytics", path: "/admin/analytics", icon: ChartSpline },
   { name: "Warehouses", path: "/admin/warehouse", icon: Warehouse },
   { name: "Staff", path: "/admin/staff", icon: Users },
 ];
 
-const cashierItems = [
+export const cashierItems = [
   { name: "Cashier Dashboard", path: "/cashier", icon: Home },
   { name: "Settings", path: "/cashier/settings", icon: Settings },
 ];
