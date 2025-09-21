@@ -21,14 +21,7 @@ export default function DashboardLayout({
     <ProtectedRoute>
       <SidebarProvider>
         <AppSidebar />
-        <main className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <SidebarTrigger />
-
-          {/* Breadcrumbs */}
-          <AppBreadcrumbs />
-
-          {children}
-        </main>
+        <main className="flex flex-1 flex-col gap-4 p-8">{children}</main>
       </SidebarProvider>
     </ProtectedRoute>
   );

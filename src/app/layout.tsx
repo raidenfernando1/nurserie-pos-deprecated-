@@ -5,11 +5,14 @@ import "./globals.css";
 import { authClient } from "@/lib/auth-client";
 import React from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const MainFont = DM_Sans({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
+
+const queryClient = new QueryClient();
 
 export default function RootLayout({
   children,
@@ -44,8 +47,10 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body className={`${MainFont.variable} ${MainFont.variable}`}>
-        {children}
+      <body className={`${MainFont.variable} ${MainFont.variable} `}>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
       </body>
     </html>
   );

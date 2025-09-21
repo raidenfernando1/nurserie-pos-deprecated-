@@ -20,7 +20,8 @@ SELECT
   w.warehouse_name,
   p.id AS product_id,
   p.name AS product_name,
-  p.img_url, -- ✅ Added img_url from product table
+  p.category, -- ✅ Added category from product table
+  p.img_url, -- ✅ Already included
   pv.id AS variant_id,
   pv.variant_name,
   SUM(ws.total_stock_amount) AS total_stock,
@@ -35,7 +36,7 @@ JOIN company c ON w.company_id = c.id
 WHERE c.admin_id = ${adminId}
 GROUP BY
   w.id, w.warehouse_name,
-  p.id, p.name, p.img_url, -- ✅ Added to GROUP BY
+  p.id, p.name, p.category, p.img_url, -- ✅ Added category here
   pv.id, pv.variant_name,
   pv.variant_stock_threshold,
   pv.variant_price,

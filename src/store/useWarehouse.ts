@@ -1,3 +1,5 @@
+import { create } from "zustand";
+
 export interface Product {
   id: number;
   name: string;
@@ -18,3 +20,19 @@ export interface Variant {
   sku: string;
   stock: number;
 }
+
+interface WarehouseStoreTypes {
+  stockCount: number;
+  setStockCount: (value: number) => void;
+  warehouseStock: number;
+  setWarehouseStock: (value: number) => void;
+}
+
+const useWarehouseStore = create<WarehouseStoreTypes>((set) => ({
+  stockCount: 0,
+  setStockCount: (value) => set({ stockCount: value }),
+  warehouseStock: 0,
+  setWarehouseStock: (value) => set({ warehouseStock: value }),
+}));
+
+export default useWarehouseStore;

@@ -64,8 +64,19 @@ export function AppSidebar() {
     fetchRole();
   }, []);
 
-  if (loading || !role) {
-    return null; // prevent flashing
+  if (loading) {
+    return (
+      <Sidebar>
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupLabel>Oracle POS</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <div className="p-4 text-sm text-gray-500">Loading menu…</div>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+      </Sidebar>
+    );
   }
 
   const itemsToRender =

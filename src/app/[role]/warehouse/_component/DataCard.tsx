@@ -1,14 +1,13 @@
-import React from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 
-interface DataCardProps {
+interface DataCardProps extends React.HTMLAttributes<HTMLDivElement> {
   label: string;
-  value: number;
+  value: string | number;
 }
 
 const DataCard: React.FC<DataCardProps> = ({ label, value }) => {
   return (
-    <Card className="rounded-2xl">
+    <Card className="w-full rounded-2xl">
       <CardHeader>{label}</CardHeader>
       <CardContent>{value}</CardContent>
     </Card>
