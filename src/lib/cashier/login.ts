@@ -1,7 +1,6 @@
 import { authClient } from "../auth-client";
 import useError from "@/store/useError";
 
-// this function has ongoing changes
 export function useCashierAuth() {
   const { addError } = useError.getState();
 

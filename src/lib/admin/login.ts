@@ -11,7 +11,7 @@ export function useAdminAuth() {
     try {
       const response = await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/admin/dashboard",
+        callbackURL: "/api/auth/check",
       });
 
       if (!response) return;

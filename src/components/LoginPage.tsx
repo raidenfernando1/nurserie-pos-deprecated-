@@ -1,8 +1,11 @@
 "use client";
 import { useAdminAuth } from "@/lib/admin/login";
-import React, { useState } from "react";
+import React from "react";
 import { Roles } from "@/app/types/roles";
 import { useCashierAuth } from "@/lib/cashier/login";
+import { Input } from "@/components/ui/input";
+import { Button } from "./ui/button";
+import { Loader2Icon } from "lucide-react";
 
 interface LoginFormProps {
   title?: string;
@@ -11,10 +14,10 @@ interface LoginFormProps {
 }
 
 export default function LoginForm({ title, subTitle, role }: LoginFormProps) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [loginError, setLoginError] = useState("");
+  const [username, setUsername] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
+  const [loginError, setLoginError] = React.useState("");
   const { Login } = useAdminAuth();
   const { Login: CashierLogin } = useCashierAuth();
 
@@ -38,11 +41,6 @@ export default function LoginForm({ title, subTitle, role }: LoginFormProps) {
     }
   }
 
-  //async function testLog() {
-  //  const response = await authClient.getSession();
-  //  console.log(response);
-  //}
-
   return (
     <main className="flex flex-col items-center justify-center h-full gap-32">
       <div className="flex flex-col items-center justify-center gap-32">
@@ -64,27 +62,24 @@ export default function LoginForm({ title, subTitle, role }: LoginFormProps) {
             onSubmit={handleLogin}
           >
             <div className="flex flex-col gap-4 justify-center">
-              <input
+              <Input
                 className="p-3 text-xl border-2 rounded"
-                placeholder="username"
+                placeholder="Username"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
-              <input
+              <Input
                 className="p-3 text-xl border-2 rounded"
-                placeholder="password"
+                placeholder="Password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <button
-                className="p-2 border-2 bg-green-400 text-black border-green-600 cursor-pointer duration-200 hover:opacity-80"
-                type="submit"
-                disabled={loading}
-              >
-                {loading ? "Loading..." : "Submit"}
-              </button>
+              <Button className="rounded" type="submit" disabled={loading}>
+                {loading ? <Loader2Icon className="animate-spin" /> : "Login"}
+                {loading && "Please wait"}
+              </Button>
 
               {loginError && <p className="text-red-500">{loginError}</p>}
             </div>

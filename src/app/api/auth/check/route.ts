@@ -1,33 +1,53 @@
-import { NextResponse } from "next/server";
 import auth from "@/lib/auth-server";
+import { NextResponse } from "next/server";
 import { headers } from "next/headers";
+import { db } from "@/lib/db-client";
 
-export async function POST(req: Request) {
+export async function GET() {
   const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  if (!session || !session.user) {
+    return NextResponse.redirect("http://localhost:3000/");
   }
 
-  try {
-    const { sessionEmail } = await req.json();
+  console.log(session);
+  const userID = session.user.id;
 
-    if (sessionEmail === "fernandoraiden6@gmail.com") {
-      return NextResponse.json({
-        status: "success",
-        verified: true,
-      });
-    } else {
+  if (session.user.id !== "DQ6QE041xsIVa8g7GPXeTTgZkp81l6cH") {
+    try {
+      await db.query(`DELETE FROM "user" WHERE id = $1`, [userID]);
+    } catch (err) {
+      console.error("Failed to delete user:", err);
       return NextResponse.json(
-        {
-          status: "failed",
-          verified: false,
-        },
-        { status: 401 }
+        { error: "Failed to delete user" },
+        { status: 500 }
       );
     }
-  } catch (error) {
+
+    return NextResponse.redirect("http://localhost:3000/404");
+  }
+
+  return NextResponse.redirect("http://localhost:3000/admin/dashboard");
+}
+
+export async function POST(req: Request) {
+  const body = await req.json();
+  const { email } = body;
+
+  if (email !== "fernandoraiden6@gmail.com") {
     return NextResponse.json(
-      { status: "error", message: "Invalid request" },
+      {
+        message: "Authorized",
+        authorized: true,
+      },
+      { status: 200 }
+    );
+  } else {
+    return NextResponse.json(
+      {
+        message: "Unauthorized",
+        authorized: false,
+      },
       { status: 400 }
     );
   }

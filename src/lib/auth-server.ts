@@ -1,17 +1,22 @@
-import { betterAuth } from "better-auth";
-import { username, admin } from "better-auth/plugins";
+import { betterAuth, jwt } from "better-auth";
+import { username, createAuthMiddleware } from "better-auth/plugins";
 import { Pool } from "pg";
 
 export const auth = betterAuth({
   database: new Pool({
     connectionString: process.env.NEON_DATABASE_URL,
   }),
+
   user: {
     additionalFields: {
       role: {
         type: "string",
         defaultValue: "cashier",
         input: false,
+      },
+      admin_id: {
+        type: "string",
+        defaultValue: null,
       },
     },
   },
@@ -26,7 +31,7 @@ export const auth = betterAuth({
     },
   },
 
-  baseUrl: "http://localhost:3000",
+  baseURL: "http://localhost:3000",
 });
 
 export default auth;
