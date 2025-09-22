@@ -7,7 +7,7 @@ import { db } from "@/lib/db-client";
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const session = await auth.api.getSession({ headers: await headers() });
 
@@ -20,22 +20,29 @@ export async function GET(
 
   try {
     const response = await db`
-SELECT 
-    ws.product_id,
-    p.name AS product_name,
-    p.brand,
-    p.description,
-    p.barcode,
-    p.stock_threshold,
-    p.img_url,
-    SUM(ws.total_stock_amount) AS total_stock_in_warehouse
-FROM warehouse_stock ws
-JOIN product p ON ws.product_id = p.id
-JOIN warehouse w ON ws.warehouse_id = w.id
-JOIN company c ON w.company_id = c.id
-WHERE ws.warehouse_id = ${warehouseID}
-  AND c.admin_id = ${userID}
-GROUP BY ws.product_id, p.name, p.brand, p.description, p.barcode, p.stock_threshold, p.img_url;
+      SELECT
+          w.id AS warehouse_id,
+          w.warehouse_name,
+          p.id AS product_id,
+          p.name AS product_name,
+          p.brand,
+          p.barcode,
+          p.img_url,
+          p.sku,
+          pv.id AS variant_id,
+          pv.variant_name,
+          pv.variant_stock,
+          pv.variant_stock_threshold,
+          pv.variant_price,
+          pv.variant_sku
+      FROM warehouse_stock ws
+      JOIN warehouse w ON ws.warehouse_id = w.id
+      JOIN product_variant pv ON ws.product_variants_id = pv.id
+      JOIN product p ON pv.product_id = p.id
+      JOIN company c ON w.company_id = c.id
+      WHERE ws.warehouse_id = ${warehouseID}
+        AND c.admin_id = ${userID}
+      ORDER BY p.id, pv.id;
     `;
 
     return NextResponse.json(response);
@@ -44,7 +51,7 @@ GROUP BY ws.product_id, p.name, p.brand, p.description, p.barcode, p.stock_thres
 
     return NextResponse.json(
       { error: "Server error while fetching warehouse products" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

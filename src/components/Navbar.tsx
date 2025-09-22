@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+``;
 import NavbarCard from "./NavbarCard";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";

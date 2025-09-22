@@ -7,7 +7,7 @@ import { db } from "@/lib/db-client";
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   console.log("[WAREHOUSE DETAIL] Incoming request:", req.url, params);
 
@@ -26,19 +26,21 @@ export async function GET(
     console.log("[WAREHOUSE DETAIL] userID:", userID);
     console.log("[WAREHOUSE DETAIL] warehouseID:", warehouseID);
 
+    // for fetching specific warehouse data
     const query = db`
-      SELECT 
-        w.id,
+      SELECT
+        w.id AS warehouse_id,
         w.company_id,
         w.warehouse_name,
-        COALESCE(SUM(ws.total_stock_amount), 0) AS total_stock
+        ws.id AS warehouse_stock_id,
+        ws.product_id,
+        ws.product_variants_id
       FROM warehouse w
       JOIN company c ON w.company_id = c.id
       LEFT JOIN warehouse_stock ws ON ws.warehouse_id = w.id
       WHERE c.admin_id = ${userID}
         AND w.id = ${warehouseID}
-      GROUP BY w.id, w.company_id, w.warehouse_name
-      ORDER BY w.id;
+      ORDER BY ws.id;
     `;
 
     console.log("[WAREHOUSE DETAIL] Running query:", query);
@@ -50,11 +52,11 @@ export async function GET(
     if (!warehouse) {
       console.warn(
         "[WAREHOUSE DETAIL] Warehouse not found or unauthorized:",
-        warehouseID
+        warehouseID,
       );
       return NextResponse.json(
         { error: "Warehouse not found or unauthorized" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -64,7 +66,7 @@ export async function GET(
 
     return NextResponse.json(
       { error: "Server error while fetching warehouse" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

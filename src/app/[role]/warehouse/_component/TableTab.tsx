@@ -1,20 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Card } from "@/components/ui/card";
 
 const Tab = ({
   table,
-  currentPage,
-  lastPage,
   categories,
 }: {
   table: any;
@@ -32,7 +21,7 @@ const Tab = ({
         />
       </div>
 
-      <Button asChild variant="outline">
+      <Button asChild className="rounded-[0.50rem]" variant="outline">
         <select
           className="bg-inherit"
           onChange={(e) =>

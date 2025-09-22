@@ -16,23 +16,20 @@ export async function GET() {
     const userID = session.user.id;
 
     const response = await db`
-    SELECT 
-      w.id,
-      w.company_id,
-      w.warehouse_name,
-      COALESCE(SUM(ws.total_stock_amount), 0) AS total_stock
+      SELECT
+        w.id,
+        w.company_id,
+        w.warehouse_name
       FROM warehouse w
       JOIN company c ON w.company_id = c.id
-      LEFT JOIN warehouse_stock ws ON ws.warehouse_id = w.id
       WHERE c.admin_id = ${userID}
-      GROUP BY w.id, w.company_id, w.warehouse_name
       ORDER BY w.id;
 `;
 
     if (response.length === 0) {
       return NextResponse.json(
         { message: "No warehouses found for this admin" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 

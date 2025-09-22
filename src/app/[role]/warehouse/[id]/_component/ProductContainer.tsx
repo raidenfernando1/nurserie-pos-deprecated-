@@ -5,14 +5,16 @@ import React from "react";
 interface Product {
   product_id: number;
   product_name: string;
-  product_variants_id?: number;
-  variant_name?: string;
-  total_stock_in_warehouse?: number;
   brand?: string;
   description?: string;
   barcode?: number;
-  stock_threshold?: number;
   img_url?: string;
+  variant_id?: number;
+  variant_name?: string;
+  variant_stock?: number;
+  variant_stock_threshold?: number;
+  variant_price?: number;
+  variant_sku?: string;
 }
 
 interface ProductContainerProps {
@@ -33,7 +35,7 @@ export default function ProductContainer({
           {
             method: "GET",
             credentials: "include",
-          }
+          },
         );
 
         if (!response.ok) {
@@ -60,26 +62,48 @@ export default function ProductContainer({
   return (
     <div>
       {products.map((p) => (
-        <div key={p.product_id} style={{ marginBottom: "1rem" }}>
-          <p>
-            <strong>Product:</strong> {p.product_name}
-          </p>
+        <div
+          key={`${p.product_id}-${p.variant_id}`}
+          style={{ marginBottom: "2rem", borderBottom: "1px solid #ccc" }}
+        >
+          <h3>{p.product_name}</h3>
           <p>
             <strong>Brand:</strong> {p.brand}
           </p>
           <p>
-            <strong>Description:</strong> {p.description}
-          </p>
-          <p>
             <strong>Barcode:</strong> {p.barcode}
           </p>
-          <p>
-            <strong>Stock Threshold:</strong> {p.stock_threshold}
-          </p>
-          <p>
-            <strong>Total Stock:</strong> {p.total_stock_in_warehouse}
-          </p>
-          <img src={p.img_url} />
+          {p.img_url && (
+            <img
+              src={p.img_url}
+              alt={p.product_name}
+              style={{
+                maxWidth: "150px",
+                display: "block",
+                margin: "0.5rem 0",
+              }}
+            />
+          )}
+
+          {p.variant_id && (
+            <div style={{ marginLeft: "1rem" }}>
+              <p>
+                <strong>Variant:</strong> {p.variant_name}
+              </p>
+              <p>
+                <strong>Stock:</strong> {p.variant_stock}
+              </p>
+              <p>
+                <strong>Threshold:</strong> {p.variant_stock_threshold}
+              </p>
+              <p>
+                <strong>Price:</strong> {p.variant_price}
+              </p>
+              <p>
+                <strong>SKU:</strong> {p.variant_sku}
+              </p>
+            </div>
+          )}
         </div>
       ))}
     </div>

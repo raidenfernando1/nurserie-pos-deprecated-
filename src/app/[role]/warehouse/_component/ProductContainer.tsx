@@ -1,8 +1,10 @@
 "use client";
+
 import React, { useState, useEffect, useMemo } from "react";
-import Tab from "./TableTab";
 import { useProducts } from "@/hooks/useProducts";
 import { totalStockColumns } from "./TableColumns";
+import Tab from "./TableTab";
+import useWarehouseStore from "@/store/useWarehouse";
 
 import {
   useReactTable,
@@ -19,7 +21,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import useWarehouseStore from "@/store/useWarehouse";
 
 const ProductTable: React.FC = () => {
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
@@ -39,9 +40,7 @@ const ProductTable: React.FC = () => {
   });
 
   const total = useMemo(() => {
-    return (
-      data?.reduce((sum, stock) => sum + Number(stock.total_stock), 0) ?? 0
-    );
+    return data?.length ?? 0;
   }, [data]);
 
   useEffect(() => {
@@ -74,7 +73,7 @@ const ProductTable: React.FC = () => {
                           ? null
                           : flexRender(
                               header.column.columnDef.header,
-                              header.getContext()
+                              header.getContext(),
                             )}
                       </TableHead>
                     );
@@ -90,7 +89,7 @@ const ProductTable: React.FC = () => {
                       <TableCell key={cell.id}>
                         {flexRender(
                           cell.column.columnDef.cell,
-                          cell.getContext()
+                          cell.getContext(),
                         )}
                       </TableCell>
                     ))}

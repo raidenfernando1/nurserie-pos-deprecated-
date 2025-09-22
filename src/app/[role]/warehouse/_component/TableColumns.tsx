@@ -16,17 +16,6 @@ export const totalStockColumns: ColumnDef<ProductType>[] = [
     ),
   },
   {
-    header: "Status",
-    cell: ({ row }) => {
-      return (
-        <StatusBadge
-          stock={Number(row.original.total_stock ?? 0)}
-          threshold={Number(row.original.stock_threshold ?? 0)}
-        />
-      );
-    },
-  },
-  {
     accessorKey: "product_name",
     header: "Name",
     filterFn: "includesString",
@@ -53,13 +42,5 @@ export const totalStockColumns: ColumnDef<ProductType>[] = [
     accessorKey: "variant_price",
     header: "Price",
     cell: ({ getValue }) => `₱${getValue()}`,
-  },
-  {
-    accessorKey: "total_stock",
-    header: "Stock",
-  },
-  {
-    accessorKey: "stock_threshold",
-    header: "Threshold",
   },
 ];

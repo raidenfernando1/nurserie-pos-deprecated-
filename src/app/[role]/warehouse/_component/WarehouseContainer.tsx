@@ -65,9 +65,8 @@ export default function WarehouseContainer() {
     <main className="w-full flex flex-col gap-6 z-15">
       <div className="w-full flexgap-6">
         <div className=" flex min-w-3/4 gap-6">
-          <DataCard label="Total warehouses" value={warehouseStock} />
-          <DataCard label="Total stock" value={stockCount} />
-          <DataCard label="Total stock" value={3981} />
+          <DataCard label="Warehouses" value={warehouseStock} />
+          <DataCard label="Stock" value={stockCount} />
           <Carousel className="">
             <CarouselContent>
               {warehouses.map((w) => (
@@ -81,20 +80,20 @@ export default function WarehouseContainer() {
               ))}
             </CarouselContent>
             <CarouselPrevious
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 
-             h-8 w-8 rounded-full 
-             bg-black/70 text-white 
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10
+             h-8 w-8 rounded-full
+             bg-black/70 text-white
              flex items-center justify-center
-             shadow-md 
+             shadow-md
              transition hover:bg-black/90"
             />
 
             <CarouselNext
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 
-             h-8 w-8 rounded-full 
-             bg-black/70 text-white 
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10
+             h-8 w-8 rounded-full
+             bg-black/70 text-white
              flex items-center justify-center
-             shadow-md 
+             shadow-md
              transition hover:bg-black/90"
             />
           </Carousel>
