@@ -115,7 +115,7 @@ export function AppSidebar() {
         <Button
           disabled={signingOut}
           variant="destructive"
-          className="w-full rounded-[0.3rem]"
+          className="w-full rounded-[0.3rem] cursor-pointer"
           onClick={async () => {
             try {
               setSigningOut(true);

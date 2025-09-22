@@ -76,7 +76,11 @@ export default function LoginForm({ title, subTitle, role }: LoginFormProps) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <Button className="rounded" type="submit" disabled={loading}>
+              <Button
+                className="rounded cursor-pointer"
+                type="submit"
+                disabled={loading}
+              >
                 {loading ? <Loader2Icon className="animate-spin" /> : "Login"}
                 {loading && "Please wait"}
               </Button>
