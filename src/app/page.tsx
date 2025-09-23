@@ -54,12 +54,15 @@ export default function Entry() {
 
   function renderContent(selectedRole: string) {
     switch (selectedRole) {
-      case "admin":
-        return (
-          <LoginForm title="nurserie" subTitle="administrator" role="admin" />
-        );
       case "cashier":
-        return <LoginForm title="nurserie" subTitle="cashier" role="cashier" />;
+        return (
+          <LoginForm
+            title="Oracle POS
+          "
+            subTitle="cashier"
+            role="cashier"
+          />
+        );
       default:
         return null;
     }
@@ -121,15 +124,15 @@ export default function Entry() {
               healthDB
                 ? "text-green-500"
                 : healthDB === false
-                ? "text-red-500"
-                : ""
+                  ? "text-red-500"
+                  : ""
             }
           >
             {healthDB === undefined
               ? "Checking..."
               : healthDB
-              ? "Online"
-              : "Offline"}
+                ? "Online"
+                : "Offline"}
           </span>
         </p>
       </div>
