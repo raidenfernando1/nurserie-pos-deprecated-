@@ -81,7 +81,7 @@ export default function Entry() {
       <div className="hidden md:flex flex-row gap-2 sm:gap-4 justify-end px-4 sm:px-10 py-4">
         <div className="flex flex-wrap items-center gap-2 md:flex-row rounded">
           <Button
-            className="rounded hover:bg-blue-500 hover:text-white transition duration-200"
+            className="rounded hover:bg-blue-500 hover:text-white transition duration-200 cursor-pointer"
             onClick={() => setSelectedRole("cashier")}
           >
             Cashier
@@ -89,7 +89,7 @@ export default function Entry() {
         </div>
         <div className="flex flex-wrap items-center gap-2 md:flex-row">
           <Button
-            className="rounded hover:bg-red-500 hover:text-white transition duration-200"
+            className="rounded hover:bg-red-500 hover:text-white transition duration-200 cursor-pointer"
             onClick={() => useAdminAuth().Login()}
           >
             Admin
