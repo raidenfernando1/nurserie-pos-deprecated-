@@ -6,7 +6,6 @@ import useRole from "@/store/useRole";
 
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
-import { AppBreadcrumbs } from "@/components/app-breadcrumbs";
 
 export default function DashboardLayout({
   params,

@@ -77,32 +77,22 @@ export default function Entry() {
   }
 
   return (
-    <main className="min-h-screen w-full flex flex-col bg-black">
+    <main className="min-h-screen w-full flex flex-col">
       <div className="hidden md:flex flex-row gap-2 sm:gap-4 justify-end px-4 sm:px-10 py-4">
-        <div className="flex flex-wrap items-center gap-2 md:flex-row rounded">
-          <Button
-            className="rounded hover:bg-blue-500 hover:text-white transition duration-200 cursor-pointer"
-            onClick={() => setSelectedRole("cashier")}
-          >
-            Cashier
-          </Button>
+        <div className="flex flex-wrap items-center gap-2 md:flex-row">
+          <Button onClick={() => setSelectedRole("cashier")}>Cashier</Button>
         </div>
         <div className="flex flex-wrap items-center gap-2 md:flex-row">
-          <Button
-            className="rounded hover:bg-red-500 hover:text-white transition duration-200 cursor-pointer"
-            onClick={() => useAdminAuth().Login()}
-          >
-            Admin
-          </Button>
+          <Button onClick={() => useAdminAuth().Login()}>Admin</Button>
         </div>
       </div>
 
       <div className="flex-grow flex flex-col items-center justify-center text-center md:items-start md:justify-start md:text-left px-4 sm:px-10 lg:px-20 py-10">
-        <h1 className="text-4xl sm:text-6xl lg:text-8xl font-bold">
+        <h1 className="scroll-m-20 text-center text-6xl font-extrabold tracking-tight text-balance">
           Oracle POS
         </h1>
 
-        <div className=" space-y-2 text-sm sm:text-base lg:text-lg py-10">
+        <div className="leading-7 [&:not(:first-child)]:mt-6">
           <p>
             We are a young, family-owned, parent-operated company at the heart
             of Metro Manila.
@@ -124,15 +114,15 @@ export default function Entry() {
               healthDB
                 ? "text-green-500"
                 : healthDB === false
-                  ? "text-red-500"
-                  : ""
+                ? "text-red-500"
+                : ""
             }
           >
             {healthDB === undefined
               ? "Checking..."
               : healthDB
-                ? "Online"
-                : "Offline"}
+              ? "Online"
+              : "Offline"}
           </span>
         </p>
       </div>
