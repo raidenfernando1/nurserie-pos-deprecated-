@@ -13,7 +13,7 @@ const WarehouseCard = ({
 }) => {
   return (
     <Link href={`/admin/warehouse/${id}`}>
-      <Card className="p-8 rounded-2xl hover:shadow-lg transition-shadow duration-200 w-full">
+      <Card className="p-8 border-2 rounded-2xl hover:shadow-lg transition-shadow duration-200 w-full">
         <CardHeader>
           <CardTitle className="text-lg">{name}</CardTitle>
         </CardHeader>

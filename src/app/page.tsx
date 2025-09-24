@@ -114,15 +114,15 @@ export default function Entry() {
               healthDB
                 ? "text-green-500"
                 : healthDB === false
-                ? "text-red-500"
-                : ""
+                  ? "text-red-500"
+                  : ""
             }
           >
             {healthDB === undefined
               ? "Checking..."
               : healthDB
-              ? "Online"
-              : "Offline"}
+                ? "Online"
+                : "Offline"}
           </span>
         </p>
       </div>

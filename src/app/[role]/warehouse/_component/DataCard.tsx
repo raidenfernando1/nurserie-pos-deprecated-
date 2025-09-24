@@ -7,7 +7,7 @@ interface DataCardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const DataCard: React.FC<DataCardProps> = ({ label, value }) => {
   return (
-    <Card className="w-full rounded-2xl">
+    <Card className="w-full border-2 rounded-2xl">
       <CardHeader>{label}</CardHeader>
       <CardContent>{value}</CardContent>
     </Card>

@@ -42,7 +42,7 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
+    [],
   );
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
@@ -68,8 +68,9 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex items-center py-4">
+      <div className="flex items-center py-4 rounded-2xl">
         <Input
+          className="rounded border-2 border-black-1000 mr-6"
           placeholder="Search Product"
           value={
             (table.getColumn("product_name")?.getFilterValue() as string) ?? ""
@@ -77,11 +78,10 @@ export function DataTable<TData, TValue>({
           onChange={(event) =>
             table.getColumn("product_name")?.setFilterValue(event.target.value)
           }
-          className="max-w-sm rounded"
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto rounded">
+            <Button variant="outline" className="ml-auto rounded border-2">
               Columns
             </Button>
           </DropdownMenuTrigger>
@@ -102,15 +102,15 @@ export function DataTable<TData, TValue>({
                     {typeof column.columnDef.header === "string"
                       ? column.columnDef.header
                       : column.id === "product_name"
-                      ? "Product Name"
-                      : column.id}
+                        ? "Product Name"
+                        : column.id}
                   </DropdownMenuCheckboxItem>
                 );
               })}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="overflow-hidden rounded-md border">
+      <div className="overflow-hidden rounded-md border-2">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -122,7 +122,7 @@ export function DataTable<TData, TValue>({
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
                   );
@@ -138,10 +138,10 @@ export function DataTable<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell className="border-r-2 border-b-2" key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}

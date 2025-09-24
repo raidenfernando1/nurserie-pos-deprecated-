@@ -13,15 +13,20 @@ const Tab = ({
 }) => {
   return (
     <div className="flex items-center gap-3 w-full">
-      <div className="flex-1">
+      <div className="flex-1 border-2 rounded-md">
         <Input
+          className="border-none"
           placeholder="Search..."
           value={table.getState().globalFilter ?? ""}
           onChange={(e) => table.setGlobalFilter(e.target.value)}
         />
       </div>
 
-      <Button asChild className="rounded-[0.50rem]" variant="outline">
+      <Button
+        asChild
+        className="border-2 cursor-pointer h-full rounded-[0.50rem]"
+        variant="outline"
+      >
         <select
           className="bg-inherit"
           onChange={(e) =>
@@ -41,7 +46,7 @@ const Tab = ({
 
       <Button
         variant="outline"
-        className="rounded"
+        className="rounded border-2 cursor-pointer"
         onClick={() => table.previousPage()}
         disabled={!table.getCanPreviousPage()}
       >
@@ -49,7 +54,7 @@ const Tab = ({
       </Button>
       <Button
         variant="outline"
-        className="rounded"
+        className="rounded border-2 cursor-pointer"
         onClick={() => table.nextPage()}
         disabled={!table.getCanNextPage()}
       >

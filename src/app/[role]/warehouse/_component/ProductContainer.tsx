@@ -60,9 +60,9 @@ const ProductTable: React.FC = () => {
         categories={Array.from(new Set((data ?? []).map((d) => d.category)))}
       />
 
-      <div className="w-full flex h-full border-2">
-        <div className="flex w-full">
-          <Table>
+      <div className="w-full flex h-full border-0">
+        <div className="flex w-full border-2 rounded-md">
+          <Table className="border-none">
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
@@ -86,7 +86,7 @@ const ProductTable: React.FC = () => {
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id}>
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
+                      <TableCell className="border-r-2" key={cell.id}>
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext(),
