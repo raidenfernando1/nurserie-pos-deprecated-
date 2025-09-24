@@ -1,9 +1,6 @@
 import { authClient } from "../auth-client";
-import useError from "@/store/useError";
 
 export function useCashierAuth() {
-  const { addError } = useError.getState();
-
   async function Login({
     email,
     password,
@@ -23,7 +20,6 @@ export function useCashierAuth() {
 
       return result;
     } catch (error) {
-      addError("Login failed. Please check your credentials.");
       throw error;
     }
   }

@@ -2,18 +2,18 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const response = await fetch("https://neonstatus.com/api/v1/summary");
-    const ok = response.ok;
+    const res = await fetch("https://neonstatus.com/api/v1/summary");
+    if (!res.ok) throw new Error();
 
-    return NextResponse.json({
-      healthDB: ok,
-      message: ok ? "Database is Online" : "Database is Offline",
-    });
-  } catch (e) {
-    console.error(e);
-    return NextResponse.json(
-      { healthDB: false, message: "Error checking database" },
-      { status: 500 }
+    const data = await res.json();
+
+    const region = data.subpages?.find(
+      (subpage: any) => subpage.subpage === "aws-asia-pacific-singapore",
     );
+
+    return NextResponse.json({ health: !!region }, { status: 200 });
+  } catch (err) {
+    console.error("❌ Health check failed:", err);
+    return NextResponse.json({ health: false }, { status: 500 });
   }
 }

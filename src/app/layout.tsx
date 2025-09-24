@@ -1,13 +1,13 @@
 "use client";
 
-import { DM_Sans } from "next/font/google";
+import { Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { authClient } from "@/lib/auth-client";
 import React from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-const MainFont = DM_Sans({
+const MainFont = Geist_Mono({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
