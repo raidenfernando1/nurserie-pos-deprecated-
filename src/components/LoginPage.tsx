@@ -44,8 +44,8 @@ export default function LoginForm({ title, subTitle, role }: LoginFormProps) {
 
   return (
     <>
-      <a href="/" className="fixed top-10 left-10">
-        <X width={48} height={48} strokeWidth={2} />
+      <a href="/" className="fixed top-5 left-5 p-3">
+        <X width={28} height={28} strokeWidth={2} />
       </a>
 
       <main className="h-screen flex flex-col items-center justify-center gap-32">

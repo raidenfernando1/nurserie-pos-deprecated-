@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import CreateCashier from "./_component/CreateCashier";
+import LoadingBar from "@/components/LoadingPage";
 import CashierContainer from "./_component/CashierContainer";
 
 const Staff = () => {
@@ -28,25 +29,27 @@ const Staff = () => {
   };
 
   return (
-    <div>
-      <CreateCashier />
-      <CashierContainer />
-
+    <LoadingBar duration={1000}>
       <div>
-        <input
-          type="text"
-          placeholder="Cashier ID"
-          value={cashierID}
-          onChange={(e) => setCashierID(e.target.value)}
-        />
-        <input
-          placeholder="New Password"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-        />
-        <button onClick={handleChangePassword}>Change Password</button>
+        <CreateCashier />
+        <CashierContainer />
+
+        <div>
+          <input
+            type="text"
+            placeholder="Cashier ID"
+            value={cashierID}
+            onChange={(e) => setCashierID(e.target.value)}
+          />
+          <input
+            placeholder="New Password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
+          <button onClick={handleChangePassword}>Change Password</button>
+        </div>
       </div>
-    </div>
+    </LoadingBar>
   );
 };
 

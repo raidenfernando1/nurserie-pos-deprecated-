@@ -22,6 +22,5 @@ export function useProducts() {
   return useQuery<ProductType[], Error>({
     queryKey: ["products"],
     queryFn: fetchProducts,
-    refetchInterval: 5000, // re fetches every 5 seconds this is in milliseconds :)
   });
 }
