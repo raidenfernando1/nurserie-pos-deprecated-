@@ -1,10 +1,11 @@
 import React from "react";
-
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import {
+  SidebarFooter,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
-import useRole from "@/store/useRole";
 import Listener from "./Listener";
-import { Metadata } from "next";
 
 export default function DashboardLayout({
   params,
@@ -16,7 +17,14 @@ export default function DashboardLayout({
   return (
     <Listener>
       <SidebarProvider>
-        <AppSidebar />
+        <div className="flex border-none">
+          <AppSidebar />
+
+          <div className="flex border-2 bg-[var(--sidebar)]">
+            <SidebarTrigger />
+          </div>
+        </div>
+
         <main className="flex flex-1 flex-col gap-4 p-8">{children}</main>
       </SidebarProvider>
     </Listener>
