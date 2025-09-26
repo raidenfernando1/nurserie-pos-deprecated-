@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Product } from "@/store/useWarehouse";
+import { Product } from "@/types/product";
 import useWarehouseStore from "@/store/useWarehouse";
 
 async function fetchProducts(): Promise<Product[]> {
@@ -18,6 +18,7 @@ async function fetchProducts(): Promise<Product[]> {
 }
 
 export function useProducts() {
+  const { setStockCount } = useWarehouseStore();
   const setProducts = useWarehouseStore((state) => state.setProducts);
 
   const query = useQuery<Product[], Error>({
@@ -28,6 +29,12 @@ export function useProducts() {
   useEffect(() => {
     if (query.data) {
       setProducts(query.data);
+
+      const totalStock = query.data.reduce(
+        (acc, product) => acc + Number(product.stock),
+        0
+      );
+      setStockCount(totalStock);
     }
   }, [query.data, setProducts]);
 

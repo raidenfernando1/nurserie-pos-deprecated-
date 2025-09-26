@@ -2,8 +2,8 @@
 
 import React from "react";
 import DashboardCard from "@/components/DashboardCard";
-import Listener from "./Listener";
 import LoadingBar from "@/components/LoadingPage";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 const adminItems = [
   { name: "Warehouse", path: "/admin/warehouse" },
@@ -13,14 +13,14 @@ const adminItems = [
 
 export default function AdminView() {
   return (
-    <LoadingBar duration={1000}>
-      <Listener>
+    <ProtectedRoute intendedRole="admin">
+      <LoadingBar duration={1000}>
         <main className="grid grid-cols-3 gap-3">
           {adminItems.map((data) => (
             <DashboardCard key={data.path} title={data.name} path={data.path} />
           ))}
         </main>
-      </Listener>
-    </LoadingBar>
+      </LoadingBar>
+    </ProtectedRoute>
   );
 }

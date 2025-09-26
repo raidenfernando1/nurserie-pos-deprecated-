@@ -55,8 +55,6 @@ const ProductTable: React.FC = () => {
     <div className="flex flex-col gap-6">
       <Tab
         table={table}
-        currentPage={table.getState().pagination.pageIndex + 1}
-        lastPage={table.getPageCount()}
         categories={Array.from(new Set((data ?? []).map((d) => d.category)))}
       />
 

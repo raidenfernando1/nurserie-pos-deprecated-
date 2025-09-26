@@ -1,31 +1,30 @@
-"use client";
-
 import { authClient } from "@/lib/auth-client";
 import useRole from "@/store/useRole";
-import React, { useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { Roles } from "@/types/user";
+import { useEffect } from "react";
 
-const Listener = ({ children }: { children: React.ReactNode }) => {
-  const { setRole } = useRole();
+const ProtectedRoute = ({
+  intendedRole,
+  children,
+}: {
+  intendedRole: Roles;
+  children: React.ReactNode;
+}) => {
   const router = useRouter();
-  const pathname = usePathname();
+  const { setRole } = useRole();
 
   const checkSession = async () => {
     try {
       const session = await authClient.getSession();
       const role = session.data?.user.role;
 
-      if (!session) {
+      if (!session || !role || role !== intendedRole) {
         router.replace("/error?msg=unauthorized");
         return;
       }
 
-      if (role !== "admin") {
-        router.replace("/error?msg=unauthorized");
-        return;
-      }
-
-      setRole(role);
+      setRole(intendedRole);
     } catch (error) {
       console.error("Error message: " + error);
       router.replace("/error?msg=unauthorized");
@@ -34,9 +33,9 @@ const Listener = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     checkSession();
-  }, [pathname]);
+  }, []);
 
   return <>{children}</>;
 };
 
-export default Listener;
+export default ProtectedRoute;

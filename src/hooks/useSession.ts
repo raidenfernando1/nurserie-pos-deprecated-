@@ -13,6 +13,13 @@ const useSession = () => {
     return { userID: id };
   };
 
+  const getRole = async () => {
+    const session = await authClient.getSession();
+    const role = session.data?.user.role;
+
+    return { role: role };
+  };
+
   const checkSession = async ({
     intendedRole,
   }: {

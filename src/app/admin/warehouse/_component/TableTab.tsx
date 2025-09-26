@@ -2,36 +2,26 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
-const Tab = ({
-  table,
-  categories,
-}: {
-  table: any;
-  currentPage: number;
-  lastPage: number;
-  categories: string[];
-}) => {
+const Tab = ({ table, categories }: { table: any; categories: string[] }) => {
+  const pageIndex = table.getState().pagination.pageIndex + 1; // 0-based index
+  const pageCount = table.getPageCount();
+
   return (
     <div className="flex items-center gap-3 w-full">
       <div className="flex-1 border-2 rounded-md">
         <Input
-          className="border-none"
           placeholder="Search..."
           value={table.getState().globalFilter ?? ""}
           onChange={(e) => table.setGlobalFilter(e.target.value)}
         />
       </div>
 
-      <Button
-        asChild
-        className="border-2 cursor-pointer h-full rounded-[0.50rem]"
-        variant="outline"
-      >
+      <Button asChild variant="outline">
         <select
           className="bg-inherit"
           onChange={(e) =>
             table
-              .getColumn("category")
+              .getColumn("brand_category")
               ?.setFilterValue(e.target.value || undefined)
           }
         >
@@ -46,15 +36,18 @@ const Tab = ({
 
       <Button
         variant="outline"
-        className="rounded border-2 cursor-pointer"
         onClick={() => table.previousPage()}
         disabled={!table.getCanPreviousPage()}
       >
         <ArrowLeft />
       </Button>
+
+      <span className="text-sm">
+        Page {pageIndex} of {pageCount}
+      </span>
+
       <Button
         variant="outline"
-        className="rounded border-2 cursor-pointer"
         onClick={() => table.nextPage()}
         disabled={!table.getCanNextPage()}
       >

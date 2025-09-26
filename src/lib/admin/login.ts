@@ -4,8 +4,7 @@ import useRole from "@/store/useRole";
 export function useAdminAuth() {
   const { setRole } = useRole();
 
-  // change this to lowercase :)
-  async function Login() {
+  async function login() {
     try {
       const response = await authClient.signIn.social({
         provider: "google",
@@ -54,5 +53,5 @@ export function useAdminAuth() {
     }
   };
 
-  return { Login, createCashier };
+  return { login, createCashier };
 }
