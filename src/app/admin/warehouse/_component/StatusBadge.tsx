@@ -1,5 +1,3 @@
-import { CircleCheckBigIcon } from "lucide-react";
-
 interface StatusTypes {
   stock: number;
   threshold: number;

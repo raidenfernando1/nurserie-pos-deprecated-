@@ -16,14 +16,22 @@ export const totalStockColumns: ColumnDef<ProductType>[] = [
     ),
   },
   {
-    accessorKey: "product_name",
+    accessorKey: "name",
     header: "Name",
     filterFn: "includesString",
   },
 
   {
-    accessorKey: "variant_name",
-    header: "Variant",
+    accessorKey: "brand",
+    header: "brand",
+  },
+  {
+    accessorKey: "sku",
+    header: "sku",
+  },
+  {
+    accessorKey: "barcode",
+    header: "barcode",
   },
   {
     accessorKey: "category",
@@ -31,15 +39,15 @@ export const totalStockColumns: ColumnDef<ProductType>[] = [
     filterFn: "includesString",
   },
   {
-    accessorKey: "warehouse_name",
-    header: "Warehouse",
+    accessorKey: "stock",
+    header: "stock",
   },
   {
-    accessorKey: "variant_sku",
-    header: "SKU",
+    accessorKey: "stock_threshold",
+    header: "threshold",
   },
   {
-    accessorKey: "variant_price",
+    accessorKey: "price",
     header: "Price",
     cell: ({ getValue }) => `₱${getValue()}`,
   },

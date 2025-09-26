@@ -1,9 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import WarehouseContainer from "./_component/WarehouseContainer";
 import ProductContainer from "./_component/ProductContainer";
 import LoadingBar from "@/components/LoadingPage";
+import useWarehouseStore from "@/store/useWarehouse";
 
 export default function Warehouse() {
   return (

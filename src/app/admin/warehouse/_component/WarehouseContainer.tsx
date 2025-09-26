@@ -2,16 +2,6 @@
 
 import React from "react";
 import DataCard from "./DataCard";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-} from "@radix-ui/react-dropdown-menu";
 import useWarehouseStore from "@/store/useWarehouse";
 import {
   Carousel,

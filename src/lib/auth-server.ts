@@ -47,11 +47,6 @@ export const auth = betterAuth({
 
   user: {
     additionalFields: {
-      role: {
-        type: "string",
-        defaultValue: "cashier",
-        input: false,
-      },
       admin_id: {
         type: "string",
         defaultValue: null,
@@ -64,8 +59,8 @@ export const auth = betterAuth({
     admin({
       defaultRole: "cashier",
       adminUserIds: [
-        "DQ6QE041xsIVa8g7GPXeTTgZkp81l6cH",
-        "d5zYyaanwqcdcfZGU3cCVC4jB0t0zMxb",
+        "RKvdVdU77zQF230CKUAY8gr2ujYEVWKq",
+        "SrfdQ20gE5uSixwFMserwXMOeNVNxsGl",
       ],
     }),
   ],

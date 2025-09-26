@@ -3,15 +3,14 @@
 import React from "react";
 import Head from "next/head";
 import Link from "next/link";
-import { useAdminAuth } from "@/lib/admin/login";
+import { useAdminAuth } from "@/hooks/useAdmin";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import LoginForm from "@/components/LoginPage";
-import { Separator } from "@/components/ui/separator";
 
 export default function Entry() {
   const [showCashierLogin, setShowCashierLogin] = React.useState(false);
-  const adminAuth = useAdminAuth();
+  const { login } = useAdminAuth();
 
   const PathItems = [
     { name: "Support", path: "/support" },
@@ -51,12 +50,10 @@ export default function Entry() {
       </Head>
 
       <main className="h-screen w-full flex flex-col">
-        {/* Top nav */}
         <div className="hidden md:flex flex-row gap-2 sm:gap-4 justify-between px-4 sm:px-10 py-4">
           <div className="flex items-center gap-6">
             {PathItems.map((item) => (
               <React.Fragment key={item.path}>
-                <Separator orientation="vertical" />
                 <Button
                   variant="link"
                   className="text-lg cursor-pointer"
@@ -74,21 +71,15 @@ export default function Entry() {
             >
               User
             </Button>
-            <Button
-              className="cursor-pointer"
-              onClick={() => adminAuth.Login()}
-            >
+            <Button className="cursor-pointer" onClick={() => login()}>
               Admin
             </Button>
           </div>
         </div>
 
-        {/* Main content */}
         <div className="h-full flex flex-col justify-between p-12">
           {showCashierLogin ? (
-            <div className="w-full h-full flex items-center justify-center">
-              <LoginForm title="Oracle POS" subTitle="cashier" role="cashier" />
-            </div>
+            <div className="w-full h-full flex items-center justify-center"></div>
           ) : (
             <>
               <div className="h-3/4 flex flex-col justify-center gap-12">

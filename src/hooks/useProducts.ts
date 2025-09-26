@@ -1,26 +1,35 @@
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import type { ProductType } from "@/app/types/products";
+import { Product } from "@/store/useWarehouse";
+import useWarehouseStore from "@/store/useWarehouse";
 
-async function fetchProducts(): Promise<ProductType[]> {
+async function fetchProducts(): Promise<Product[]> {
   const res = await fetch("/api/admin/warehouse/products");
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch products");
-  }
+  if (!res.ok) throw new Error("Failed to fetch products");
 
-  const jsonResponse: ProductType[] = await res.json();
+  const jsonResponse: Product[] = await res.json();
 
   return jsonResponse.map((product) => ({
     ...product,
-    total_stock: Number(product.total_stock),
+    total_stock: Number(product.stock),
     stock_threshold: Number(product.stock_threshold),
-    variant_price: Number(product.variant_price),
   }));
 }
 
 export function useProducts() {
-  return useQuery<ProductType[], Error>({
+  const setProducts = useWarehouseStore((state) => state.setProducts);
+
+  const query = useQuery<Product[], Error>({
     queryKey: ["products"],
     queryFn: fetchProducts,
   });
+
+  useEffect(() => {
+    if (query.data) {
+      setProducts(query.data);
+    }
+  }, [query.data, setProducts]);
+
+  return query;
 }

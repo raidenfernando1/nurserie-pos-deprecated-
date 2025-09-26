@@ -15,31 +15,29 @@ export async function GET() {
     const adminId = session.user.id;
 
     const response = await db`
-      SELECT
-        w.id AS warehouse_id,
-        w.warehouse_name,
-        p.id AS product_id,
-        p.name AS product_name,
-        p.category,
-        p.img_url,
-        pv.id AS variant_id,
-        pv.variant_name,
-        pv.variant_stock_threshold,
-        pv.variant_price,
-        pv.variant_sku
-      FROM warehouse_stock ws
-      JOIN warehouse w ON ws.warehouse_id = w.id
-      JOIN product_variant pv ON ws.product_variants_id = pv.id
-      JOIN product p ON pv.product_id = p.id
-      JOIN company c ON w.company_id = c.id
-      WHERE c.admin_id = 'DQ6QE041xsIVa8g7GPXeTTgZkp81l6cH'
-      ORDER BY w.id, p.id, pv.id;
+SELECT 
+  p.id,
+  p.name,
+  p.brand,
+  p.category,
+  p.stock,
+  p.stock_threshold,
+  p.price,
+  p.sku,
+  p.barcode,
+  w.warehouse_name,
+  c.company_name
+FROM products p
+JOIN warehouse w ON p.warehouse_id = w.id
+JOIN company c ON w.company_id = c.id
+JOIN "user" u ON c.admin_id = u.id
+WHERE u.id = ${adminId};
     `;
 
     if (response.length === 0) {
       return NextResponse.json(
         { message: "No products found in any warehouses" },
-        { status: 404 },
+        { status: 404 }
       );
     }
 

@@ -4,8 +4,8 @@ import { headers } from "next/headers";
 import { db } from "@/lib/db-client";
 
 const adminUserIds = [
-  "DQ6QE041xsIVa8g7GPXeTTgZkp81l6cH",
-  "d5zYyaanwqcdcfZGU3cCVC4jB0t0zMxb",
+  "RKvdVdU77zQF230CKUAY8gr2ujYEVWKq",
+  "SrfdQ20gE5uSixwFMserwXMOeNVNxsGl",
 ];
 
 export async function GET(req: Request) {
@@ -22,7 +22,6 @@ export async function GET(req: Request) {
       console.error("Failed to delete unauthorized user:", err);
     }
 
-    // Sign out
     await auth.api.signOut({ headers: await headers() });
     return NextResponse.redirect("http://localhost:3000/admin/unauthorized");
   }

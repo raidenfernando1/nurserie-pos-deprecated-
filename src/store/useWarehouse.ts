@@ -6,9 +6,10 @@ export interface Product {
   price: number;
   stock_threshold: number;
   sku: string;
-  company_id: number;
-  description: string;
-  img_url: string;
+  stock: number;
+  company_id?: number;
+  description?: string;
+  img_url?: string;
   barcode: number;
   brand: string;
   category: string;
@@ -26,6 +27,8 @@ interface WarehouseStoreTypes {
   setStockCount: (value: number) => void;
   warehouseStock: number;
   setWarehouseStock: (value: number) => void;
+  products: Product[];
+  setProducts: (products: Product[]) => void;
 }
 
 const useWarehouseStore = create<WarehouseStoreTypes>((set) => ({
@@ -33,6 +36,8 @@ const useWarehouseStore = create<WarehouseStoreTypes>((set) => ({
   setStockCount: (value) => set({ stockCount: value }),
   warehouseStock: 0,
   setWarehouseStock: (value) => set({ warehouseStock: value }),
+  products: [],
+  setProducts: (products) => set({ products }),
 }));
 
 export default useWarehouseStore;

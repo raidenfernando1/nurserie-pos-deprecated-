@@ -29,7 +29,7 @@ export async function GET() {
     if (response.length === 0) {
       return NextResponse.json(
         { message: "No warehouses found for this admin" },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
