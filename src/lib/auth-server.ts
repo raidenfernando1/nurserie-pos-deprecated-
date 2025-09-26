@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { username } from "better-auth/plugins";
 import { Pool } from "pg";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
+import { admin } from "better-auth/plugins";
 
 export function hashPassword(password: string): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -58,7 +59,16 @@ export const auth = betterAuth({
     },
   },
 
-  plugins: [username()],
+  plugins: [
+    username(),
+    admin({
+      defaultRole: "cashier",
+      adminUserIds: [
+        "DQ6QE041xsIVa8g7GPXeTTgZkp81l6cH",
+        "d5zYyaanwqcdcfZGU3cCVC4jB0t0zMxb",
+      ],
+    }),
+  ],
 
   socialProviders: {
     google: {

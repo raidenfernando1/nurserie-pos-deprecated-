@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import {
   SidebarFooter,
@@ -6,6 +8,7 @@ import {
 } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import Listener from "./Listener";
+import { authClient } from "@/lib/auth-client";
 
 export default function DashboardLayout({
   params,

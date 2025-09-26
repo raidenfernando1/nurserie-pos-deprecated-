@@ -1,8 +1,9 @@
-// /lib/adminAuth.ts
 import { authClient } from "@/lib/auth-client";
 import useRole from "@/store/useRole";
 
 export function useAdminAuth() {
+  const { setRole } = useRole();
+
   async function Login() {
     try {
       const response = await authClient.signIn.social({
