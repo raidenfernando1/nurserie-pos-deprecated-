@@ -1,27 +1,15 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import Link from "next/link";
+import type { WarehouseCard } from "@/types/warehouse";
 
-const WarehouseCard = ({
-  id,
-  name,
-  stock,
-}: {
-  id: string;
-  name: string;
-  stock: number;
-}) => {
+const WarehouseCard = ({ id, name }: WarehouseCard) => {
   return (
     <Link href={`/admin/warehouse/${id}`}>
-      <Card className="p-8 border-2 rounded-2xl hover:shadow-lg transition-shadow duration-200 w-full">
+      <Card className="h-full p-8 border-2 rounded-2xl hover:shadow-lg transition-shadow duration-200 w-full">
         <CardHeader>
           <CardTitle className="text-lg">{name}</CardTitle>
         </CardHeader>
-        <CardContent className="w-full">
-          <p className="text-sm text-muted-foreground">
-            Stock: <span className="font-semibold">{stock}</span>
-          </p>
-        </CardContent>
       </Card>
     </Link>
   );

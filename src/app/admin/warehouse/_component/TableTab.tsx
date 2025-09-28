@@ -33,26 +33,6 @@ const Tab = ({ table, categories }: { table: any; categories: string[] }) => {
           ))}
         </select>
       </Button>
-
-      <Button
-        variant="outline"
-        onClick={() => table.previousPage()}
-        disabled={!table.getCanPreviousPage()}
-      >
-        <ArrowLeft />
-      </Button>
-
-      <span className="text-sm">
-        Page {pageIndex} of {pageCount}
-      </span>
-
-      <Button
-        variant="outline"
-        onClick={() => table.nextPage()}
-        disabled={!table.getCanNextPage()}
-      >
-        <ArrowRight />
-      </Button>
     </div>
   );
 };

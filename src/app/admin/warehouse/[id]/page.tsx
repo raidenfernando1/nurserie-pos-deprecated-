@@ -1,35 +1,57 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import ProductContainer from "./_component/ProductContainer";
+import WarehouseLayout from "../_component/WarehouseLayout";
+import useWarehouseStore from "@/store/useWarehouse";
+import ReusableTable from "../_component/ProductContainer";
+import { totalStockColumns } from "../_component/TableColumns";
+import Tab from "../_component/TableTab";
+import { useWarehouseProducts } from "@/hooks/useProducts";
+import AddProduct from "./_component/AddProduct";
+import { useState } from "react";
 
 export default function WarehousePage({ params }: { params: { id: string } }) {
-  const [warehouseName, setWarehouseName] = useState("");
-  const { id } = params;
+  const [addProductPopup, setAddProductPopup] = useState(false);
+  const [deleteProductPopup, setDeleteProductPopup] = useState("");
+  const [editProductPopup, setEditProductPopup] = useState("");
 
-  const fetchWarehouseName = async () => {
-    try {
-      const response = await fetch(`/api/admin/warehouse/${id}`);
-      if (!response.ok) {
-        console.error("Failed to fetch warehouse:", response.statusText);
-        return;
-      }
+  const { warehouses } = useWarehouseStore();
+  const { data, isLoading, isError } = useWarehouseProducts({
+    warehouseID: Number(params.id),
+  });
 
-      const data = await response.json();
-      setWarehouseName(data.warehouse_name || "hit");
-    } catch (error) {
-      console.error("Error fetching warehouse:", error);
-    }
-  };
+  const warehouseId = Number(params.id);
 
-  useEffect(() => {
-    if (id) fetchWarehouseName();
-  }, [id]);
+  const currentWarehouse = warehouses.find(
+    (w) => Number(w.warehouse_id) === warehouseId,
+  );
 
   return (
-    <div>
-      <h1 className="text-xl font-bold mb-4">Warehouse: {warehouseName}</h1>
-      <ProductContainer warehouseID={Number(id)} />
-    </div>
+    <>
+      {addProductPopup && (
+        <AddProduct
+          warehouseId={Number(params.id)}
+          onClose={() => setAddProductPopup(false)}
+        />
+      )}
+      <WarehouseLayout
+        title={currentWarehouse?.warehouse_name ?? "Warehouse"}
+        companyTotalStock={currentWarehouse?.total_stock || 0}
+        companyTotalProducts={currentWarehouse?.total_products || 0}
+        onAddProduct={() => setAddProductPopup(true)}
+      >
+        <ReusableTable
+          data={data ?? []}
+          columns={totalStockColumns}
+          tabComponent={(table) => (
+            <Tab
+              table={table}
+              categories={Array.from(
+                new Set((data ?? []).map((d) => d.category)),
+              )}
+            />
+          )}
+        />
+      </WarehouseLayout>
+    </>
   );
 }

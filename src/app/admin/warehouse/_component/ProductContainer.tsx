@@ -1,17 +1,11 @@
 "use client";
-
 import React, { useState, useEffect, useMemo } from "react";
-import { useProducts } from "@/hooks/useProducts";
-import { totalStockColumns } from "./TableColumns";
-import Tab from "./TableTab";
-import useWarehouseStore from "@/store/useWarehouse";
-
 import {
   useReactTable,
   getCoreRowModel,
-  flexRender,
   getPaginationRowModel,
   getFilteredRowModel,
+  flexRender,
 } from "@tanstack/react-table";
 import {
   Table,
@@ -22,15 +16,52 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-const ProductTable: React.FC = () => {
-  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+interface ReusableTableProps<T> {
+  data: T[];
+  columns: any;
+  defaultPageSize?: number;
+  minRows?: number;
+  tabComponent?: (table: any) => React.ReactNode; // now a function
+  showActions?: boolean; // new prop
+}
+
+const ReusableTable = <T,>({
+  data,
+  columns,
+  defaultPageSize = 10,
+  minRows = 5,
+  tabComponent,
+  showActions = true, // default to true
+}: ReusableTableProps<T>) => {
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: defaultPageSize,
+  });
   const [globalFilter, setGlobalFilter] = useState<any>([]);
-  const { data, isLoading, isError } = useProducts();
-  const { setStockCount } = useWarehouseStore();
+
+  const calculatePageSize = () => {
+    const viewportHeight = window.innerHeight;
+    const tabHeight = tabComponent ? 80 : 0;
+    const headerHeight = 60;
+    const layoutPadding = 120;
+    const rowHeight = 60;
+    const availableHeight =
+      viewportHeight - tabHeight - headerHeight - layoutPadding;
+    return Math.max(Math.floor(availableHeight / rowHeight), minRows);
+  };
+
+  useEffect(() => {
+    const updatePageSize = () => {
+      setPagination((prev) => ({ ...prev, pageSize: calculatePageSize() }));
+    };
+    updatePageSize();
+    window.addEventListener("resize", updatePageSize);
+    return () => window.removeEventListener("resize", updatePageSize);
+  }, []);
 
   const table = useReactTable({
-    data: data ?? [],
-    columns: totalStockColumns,
+    data,
+    columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -39,55 +70,41 @@ const ProductTable: React.FC = () => {
     onPaginationChange: setPagination,
   });
 
-  const total = useMemo(() => {
-    return data?.length ?? 0;
-  }, [data]);
-
-  useEffect(() => {
-    setStockCount(total);
-  }, [total, setStockCount]);
-
-  if (isLoading) return <div>Loading...</div>;
-  if (isError)
-    return <div className="text-red-500">Error Fetching Products :|</div>;
-
   return (
-    <div className="flex flex-col gap-6">
-      <Tab
-        table={table}
-        categories={Array.from(new Set((data ?? []).map((d) => d.category)))}
-      />
-
-      <div className="w-full flex h-full ">
-        <div className="flex w-full ">
+    <div className="h-full flex flex-col gap-6">
+      {/* Optional tab section */}
+      {tabComponent && (
+        <div className="flex-shrink-0">{tabComponent(table, showActions)}</div>
+      )}
+      {/* Table */}
+      <div className="flex-1 min-h-0 overflow-hidden">
+        <div className="h-full border rounded-lg overflow-auto">
           <Table className="border-none">
-            <TableHeader>
+            <TableHeader className="sticky top-0 bg-background z-10 border-b">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                      </TableHead>
-                    );
-                  })}
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                    </TableHead>
+                  ))}
                 </TableRow>
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows?.length ? (
+              {table.getRowModel().rows.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id}>
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
                         {flexRender(
                           cell.column.columnDef.cell,
-                          cell.getContext()
+                          cell.getContext(),
                         )}
                       </TableCell>
                     ))}
@@ -96,8 +113,8 @@ const ProductTable: React.FC = () => {
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={totalStockColumns.length}
-                    className="text-center"
+                    colSpan={columns.length}
+                    className="h-24 text-center"
                   >
                     No results.
                   </TableCell>
@@ -107,8 +124,56 @@ const ProductTable: React.FC = () => {
           </Table>
         </div>
       </div>
+
+      {/* Pagination */}
+      <div className="flex-shrink-0 flex items-center justify-between px-2">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          Rows per page:
+          <select
+            value={table.getState().pagination.pageSize}
+            onChange={(e) => table.setPageSize(Number(e.target.value))}
+            className="h-8 w-[70px] border border-input bg-background px-3 py-1 text-xs rounded-md"
+          >
+            {[5, 10, 20, 30, 40, 50].map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => table.setPageIndex(0)}
+            disabled={!table.getCanPreviousPage()}
+            className="h-8 w-8 border rounded-md disabled:opacity-50"
+          >
+            {"<<"}
+          </button>
+          <button
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+            className="h-8 w-8 border rounded-md disabled:opacity-50"
+          >
+            {"<"}
+          </button>
+          <button
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+            className="h-8 w-8 border rounded-md disabled:opacity-50"
+          >
+            {">"}
+          </button>
+          <button
+            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+            disabled={!table.getCanNextPage()}
+            className="h-8 w-8 border rounded-md disabled:opacity-50"
+          >
+            {">>"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default ProductTable;
+export default ReusableTable;

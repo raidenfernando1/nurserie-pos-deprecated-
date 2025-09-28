@@ -15,25 +15,52 @@ export async function GET() {
 
     const userID = session.user.id;
 
-    const response = await db`
+    const response = await db`WITH warehouse_stats AS (
       SELECT
-        w.id,
+        w.id AS warehouse_id,
+        w.warehouse_name,
         w.company_id,
-        w.warehouse_name
+        COALESCE(SUM(wp.stock), 0) AS total_stock,
+        COUNT(DISTINCT wp.product_id) AS total_products
       FROM warehouse w
       JOIN company c ON w.company_id = c.id
+      LEFT JOIN warehouse_products wp ON w.id = wp.warehouse_id
       WHERE c.admin_id = ${userID}
-      ORDER BY w.id;
+      GROUP BY w.id, w.warehouse_name, w.company_id
+    )
+    SELECT *,
+           (SELECT SUM(total_stock) FROM warehouse_stats) AS company_total_stock,
+           (SELECT COUNT(DISTINCT wp.product_id)
+            FROM warehouse_products wp
+            JOIN warehouse w ON wp.warehouse_id = w.id
+            JOIN company c ON w.company_id = c.id
+            WHERE c.admin_id = ${userID}) AS company_total_products
+    FROM warehouse_stats
+    ORDER BY warehouse_id;
 `;
 
-    if (response.length === 0) {
-      return NextResponse.json(
-        { message: "No warehouses found for this admin" },
-        { status: 404 }
-      );
-    }
+    console.log(response);
 
-    return NextResponse.json(response, { status: 200 });
+    const warehouses = response.map((row) => ({
+      warehouse_id: parseInt(row.warehouse_id),
+      warehouse_name: row.warehouse_name,
+      company_id: parseInt(row.company_id),
+      total_stock: parseInt(row.total_stock),
+      total_products: parseInt(row.total_products),
+    }));
+
+    const stock = {
+      company_total_stock: parseInt(response[0]?.company_total_stock || 0),
+      company_total_products: parseInt(
+        response[0]?.company_total_products || 0,
+      ),
+    };
+
+    return NextResponse.json({
+      success: true,
+      stock,
+      warehouses,
+    });
   } catch (error: any) {
     console.error("Error fetching warehouses:", error.message, error.stack);
     return NextResponse.json({ error: error.message }, { status: 500 });

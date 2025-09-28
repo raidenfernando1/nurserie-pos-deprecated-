@@ -21,8 +21,8 @@ export default function DashboardLayout({
           </div>
         </div>
 
-        <main className="flex flex-1 flex-col gap-4 p-8">{children}</main>
-      </SidebarProvider>        
+        <main className="flex flex-1 flex-col gap-4">{children}</main>
+      </SidebarProvider>
     </ProtectedRoute>
   );
 }

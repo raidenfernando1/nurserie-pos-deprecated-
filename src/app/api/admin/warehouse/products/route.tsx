@@ -1,4 +1,3 @@
-// File: /app/api/admin/warehouse/products/route.ts
 import { NextResponse } from "next/server";
 import auth from "@/lib/auth-server";
 import { headers } from "next/headers";
@@ -20,15 +19,17 @@ SELECT
   p.name,
   p.brand,
   p.category,
-  p.stock,
-  p.stock_threshold,
+  p.image_url,
+  wp.stock,
+  wp.stock_threshold,
   p.price,
   p.sku,
   p.barcode,
   w.warehouse_name,
   c.company_name
 FROM products p
-JOIN warehouse w ON p.warehouse_id = w.id
+JOIN warehouse_products wp ON wp.product_id = p.id
+JOIN warehouse w ON wp.warehouse_id = w.id
 JOIN company c ON w.company_id = c.id
 JOIN "user" u ON c.admin_id = u.id
 WHERE u.id = ${adminId};

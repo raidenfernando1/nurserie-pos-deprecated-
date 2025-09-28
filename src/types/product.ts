@@ -7,8 +7,9 @@ export interface Product {
   stock: number;
   company_id?: number;
   description?: string;
-  img_url?: string;
+  image_url?: string;
   barcode: number;
   brand: string;
   category: string;
+  warehouse_name: string;
 }
