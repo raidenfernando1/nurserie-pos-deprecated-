@@ -1,12 +1,12 @@
 "use client";
-import { useAdminAuth } from "@/lib/admin/login";
+
 import React from "react";
-import { Roles } from "@/app/types/roles";
-import { useCashierAuth } from "@/lib/cashier/login";
+import { Roles } from "@/types/user";
 import { Input } from "@/components/ui/input";
 import { Button } from "./ui/button";
 import { X, Loader2Icon } from "lucide-react";
-import Link from "next/link";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 interface LoginFormProps {
   title?: string;
@@ -15,25 +15,30 @@ interface LoginFormProps {
 }
 
 export default function LoginForm({ title, subTitle, role }: LoginFormProps) {
+  const router = useRouter();
+
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [loginError, setLoginError] = React.useState("");
-  const { Login } = useAdminAuth();
-  const { Login: CashierLogin } = useCashierAuth();
 
   async function handleLogin(event?: React.FormEvent) {
     event?.preventDefault();
     setLoading(true);
     setLoginError("");
+
     try {
-      if (role === "admin") {
-        const response = await Login();
-        console.log("Admin login response:", response);
-      } else if (role === "cashier") {
-        const response = await CashierLogin({ email: username, password });
-        console.log("Cashier login response:", response);
+      const result = await authClient.signIn.email({
+        email: `${username}@placeholder.com`,
+        password,
+      });
+
+      if (result?.error) {
+        setLoginError(result.error.message || "Invalid credentials.");
+        return;
       }
+
+      router.push("/cashier");
     } catch (err) {
       console.error(err);
       setLoginError("Login failed. Please try again.");
@@ -54,10 +59,11 @@ export default function LoginForm({ title, subTitle, role }: LoginFormProps) {
             <h1 className="text-7xl tracking-tight">{title}</h1>
             <h2 className="opacity-30 text-center">{subTitle}</h2>
           </div>
+
           {role === "admin" ? (
             <button
               className="text-lg font-bold cursor-pointer border-2 rounded-2xl px-12 py-8"
-              onClick={() => handleLogin()}
+              onClick={handleLogin}
               disabled={loading}
             >
               {loading ? "Loading..." : "Sign in as Admin"}
@@ -91,7 +97,9 @@ export default function LoginForm({ title, subTitle, role }: LoginFormProps) {
                   {loading && "Please wait"}
                 </Button>
 
-                {loginError && <p className="text-red-500">{loginError}</p>}
+                {loginError && (
+                  <p className="text-red-500 text-center mt-2">{loginError}</p>
+                )}
               </div>
             </form>
           )}

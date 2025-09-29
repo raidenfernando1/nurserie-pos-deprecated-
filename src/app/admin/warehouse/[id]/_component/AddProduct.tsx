@@ -66,7 +66,6 @@ const AddProduct = ({
         throw new Error("Please fill in all required fields");
       }
 
-      // Parse and validate numbers
       const parsedPrice = parseFloat(price);
       const parsedInitialStock = parseInt(initialStock);
       const parsedThreshold = parseInt(threshold);
@@ -94,14 +93,11 @@ const AddProduct = ({
         stock_threshold: parsedThreshold,
       };
 
-      console.log("Sending product data:", productData); // Debug log
-
       const result = await createWarehouseProduct({
         warehouseID: warehouseId,
         productData,
       });
 
-      console.log("Product created successfully:", result);
       setStep(2);
     } catch (error) {
       console.error("Error creating product:", error);

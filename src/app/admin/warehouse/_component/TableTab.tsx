@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 const Tab = ({ table, categories }: { table: any; categories: string[] }) => {
-  const pageIndex = table.getState().pagination.pageIndex + 1; // 0-based index
+  const pageIndex = table.getState().pagination.pageIndex + 1;
   const pageCount = table.getPageCount();
 
   return (

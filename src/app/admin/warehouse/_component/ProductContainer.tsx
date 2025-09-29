@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useEffect, useMemo } from "react";
 import {
   useReactTable,
@@ -21,8 +22,8 @@ interface ReusableTableProps<T> {
   columns: any;
   defaultPageSize?: number;
   minRows?: number;
-  tabComponent?: (table: any) => React.ReactNode; // now a function
-  showActions?: boolean; // new prop
+  tabComponent?: (table: any, showActions?: boolean) => React.ReactNode;
+  showActions?: boolean;
 }
 
 const ReusableTable = <T,>({
@@ -31,7 +32,7 @@ const ReusableTable = <T,>({
   defaultPageSize = 10,
   minRows = 5,
   tabComponent,
-  showActions = true, // default to true
+  showActions = true,
 }: ReusableTableProps<T>) => {
   const [pagination, setPagination] = useState({
     pageIndex: 0,
@@ -72,11 +73,9 @@ const ReusableTable = <T,>({
 
   return (
     <div className="h-full flex flex-col gap-6">
-      {/* Optional tab section */}
       {tabComponent && (
         <div className="flex-shrink-0">{tabComponent(table, showActions)}</div>
       )}
-      {/* Table */}
       <div className="flex-1 min-h-0 overflow-hidden">
         <div className="h-full border rounded-lg overflow-auto">
           <Table className="border-none">

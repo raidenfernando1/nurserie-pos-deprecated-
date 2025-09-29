@@ -38,7 +38,7 @@ export const totalStockColumns: ColumnDef<Product>[] = [
   {
     id: "sku_barcode",
     header: "SKU / Barcode",
-    accessorFn: (row) => `${row.sku} ${row.barcode}`, // used for filtering/sorting
+    accessorFn: (row) => `${row.sku} ${row.barcode}`,
     cell: ({ row }) => (
       <div className="flex flex-col">
         <span className="font-medium">{row.original.sku}</span>
