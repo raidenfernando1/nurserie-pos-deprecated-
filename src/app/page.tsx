@@ -1,22 +1,17 @@
 "use client";
 
+import { GalleryVerticalEnd } from "lucide-react";
 import React from "react";
 import Head from "next/head";
-import Link from "next/link";
 import { useAdminAuth } from "@/hooks/useAdmin";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
-import LoginForm from "@/components/LoginPage";
+import LoginForm from "@/components/LoginForm";
+import { Navbar } from "@/components/Navbar";
 
 export default function Entry() {
   const [showCashierLogin, setShowCashierLogin] = React.useState(false);
   const { login } = useAdminAuth();
-
-  const PathItems = [
-    { name: "Support", path: "/support" },
-    { name: "About", path: "/about" },
-    { name: "Developers", path: "/developers" },
-  ];
 
   const {
     data: health,
@@ -49,28 +44,18 @@ export default function Entry() {
         <meta property="og:type" content="website" />
       </Head>
 
-      <main className="h-screen w-full flex flex-col">
+      <main className="h-screen max-h-screen w-full flex flex-col overflow-hidden">
         {!showCashierLogin && (
-          <div className="hidden md:flex flex-row gap-2 sm:gap-4 justify-between px-4 sm:px-10 py-4">
+          <div className="flex-shrink-0 md:flex flex-row gap-2 sm:gap-4 justify-between px-4 sm:px-10 py-4">
             <div className="flex items-center gap-6">
-              {PathItems.map((item) => (
-                <React.Fragment key={item.path}>
-                  <Button
-                    variant="link"
-                    className="text-lg cursor-pointer"
-                    asChild
-                  >
-                    <Link href={item.path}>{item.name}</Link>
-                  </Button>
-                </React.Fragment>
-              ))}
+              <Navbar />
             </div>
-            <div className="flex gap-6">
+            <div className="gap-6 hidden md:flex">
               <Button
                 className="cursor-pointer"
                 onClick={() => setShowCashierLogin(true)}
               >
-                User
+                Cashier
               </Button>
               <Button className="cursor-pointer" onClick={() => login()}>
                 Admin
@@ -79,52 +64,59 @@ export default function Entry() {
           </div>
         )}
 
-        {/* Page Body */}
-        <div className="h-full flex flex-col justify-between p-12">
-          {showCashierLogin ? (
-            <div className="w-full h-full flex items-center justify-center">
-              <LoginForm
-                title="Cashier Login"
-                subTitle="Please sign in to continue"
-              />
+        {showCashierLogin ? (
+          <div className="flex-1 min-h-0 flex flex-col items-center justify-center p-6 md:p-10">
+            <div className="flex w-full max-w-sm flex-col gap-6">
+              <a
+                href="#"
+                className="flex items-center gap-2 self-center font-medium"
+              >
+                <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
+                  <GalleryVerticalEnd className="size-4" />
+                </div>
+                Oracle Petroleum Corporation
+              </a>
+              <LoginForm />
             </div>
-          ) : (
-            <>
-              <div className="h-3/4 flex flex-col justify-center gap-12">
-                <div>
-                  <h1 className="text-9xl font-extrabold">Oracle POS</h1>
-                  <p className="text-gray-500">
-                    Property of Oracle Petroleum Corporation
-                  </p>
-                </div>
-                <div className="w-3/4 text-lg">
-                  <p>
-                    We are a young, family-owned, parent-operated company at the
-                    heart of Metro Manila...
-                  </p>
-                </div>
-              </div>
-              <div>
-                {isLoading ? (
-                  <p className="text-lg">Checking database status...</p>
-                ) : error ? (
-                  <p className="text-lg text-red-600">
-                    Error checking database
-                  </p>
-                ) : (
-                  <p className="text-lg">
-                    Database Status:
-                    {health ? (
-                      <span className="text-green-700"> Operational</span>
-                    ) : (
-                      <span className="text-red-700"> Non-Operational</span>
-                    )}
-                  </p>
-                )}
-              </div>
-            </>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div className="flex-1 min-h-0 flex flex-col justify-between p-6 sm:p-12 overflow-y-auto">
+            <div className="flex-1 flex flex-col justify-center">
+              <h1 className="scroll-m-20 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold">
+                Oracle POS
+              </h1>
+              <p className="text-sm sm:text-xs md:text-sm text-muted-foreground">
+                Property of Oracle Petroleum Corporation
+              </p>
+              <p className="md:w-3/4 text-sm sm:text-base md:text-lg leading-relaxed mt-5">
+                Our multi-tenant POS system allows multiple companies to operate
+                on a single platform with secure, independent data, customizable
+                settings, and real-time reporting—making it a flexible solution
+                for businesses across industries.
+              </p>
+            </div>
+            <div className="flex-shrink-0 mt-4">
+              {isLoading ? (
+                <p className="leading-7 [&:not(:first-child)]:mt-6">
+                  Checking database status...
+                </p>
+              ) : error ? (
+                <p className="leading-7 [&:not(:first-child)]:mt-6 text-red-700">
+                  Error checking database
+                </p>
+              ) : (
+                <p className="text-lg">
+                  Database Status:
+                  {health ? (
+                    <span className="text-green-700"> Operational</span>
+                  ) : (
+                    <span className="text-red-700"> Non-Operational</span>
+                  )}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
       </main>
     </>
   );
