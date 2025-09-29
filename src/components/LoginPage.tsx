@@ -11,10 +11,9 @@ import { useRouter } from "next/navigation";
 interface LoginFormProps {
   title?: string;
   subTitle?: string;
-  role: Roles;
 }
 
-export default function LoginForm({ title, subTitle, role }: LoginFormProps) {
+export default function LoginForm({ title, subTitle }: LoginFormProps) {
   const router = useRouter();
 
   const [username, setUsername] = React.useState("");
@@ -60,49 +59,39 @@ export default function LoginForm({ title, subTitle, role }: LoginFormProps) {
             <h2 className="opacity-30 text-center">{subTitle}</h2>
           </div>
 
-          {role === "admin" ? (
-            <button
-              className="text-lg font-bold cursor-pointer border-2 rounded-2xl px-12 py-8"
-              onClick={handleLogin}
-              disabled={loading}
-            >
-              {loading ? "Loading..." : "Sign in as Admin"}
-            </button>
-          ) : (
-            <form
-              className="flex flex-col items-center justify-center"
-              onSubmit={handleLogin}
-            >
-              <div className="flex flex-col gap-4 justify-center">
-                <Input
-                  className="p-3 text-xl border-2 rounded"
-                  placeholder="Username"
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-                <Input
-                  className="p-3 text-xl border-2 rounded"
-                  placeholder="Password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <Button
-                  className="rounded cursor-pointer"
-                  type="submit"
-                  disabled={loading}
-                >
-                  {loading ? <Loader2Icon className="animate-spin" /> : "Login"}
-                  {loading && "Please wait"}
-                </Button>
+          <form
+            className="flex flex-col items-center justify-center"
+            onSubmit={handleLogin}
+          >
+            <div className="flex flex-col gap-4 justify-center">
+              <Input
+                className="p-3 text-xl border-2 rounded"
+                placeholder="Username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+              <Input
+                className="p-3 text-xl border-2 rounded"
+                placeholder="Password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <Button
+                className="rounded cursor-pointer"
+                type="submit"
+                disabled={loading}
+              >
+                {loading ? <Loader2Icon className="animate-spin" /> : "Login"}
+                {loading && "Please wait"}
+              </Button>
 
-                {loginError && (
-                  <p className="text-red-500 text-center mt-2">{loginError}</p>
-                )}
-              </div>
-            </form>
-          )}
+              {loginError && (
+                <p className="text-red-500 text-center mt-2">{loginError}</p>
+              )}
+            </div>
+          </form>
         </div>
       </main>
     </>

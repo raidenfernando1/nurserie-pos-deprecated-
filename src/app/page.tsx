@@ -50,36 +50,44 @@ export default function Entry() {
       </Head>
 
       <main className="h-screen w-full flex flex-col">
-        <div className="hidden md:flex flex-row gap-2 sm:gap-4 justify-between px-4 sm:px-10 py-4">
-          <div className="flex items-center gap-6">
-            {PathItems.map((item) => (
-              <React.Fragment key={item.path}>
-                <Button
-                  variant="link"
-                  className="text-lg cursor-pointer"
-                  asChild
-                >
-                  <Link href={item.path}>{item.name}</Link>
-                </Button>
-              </React.Fragment>
-            ))}
+        {!showCashierLogin && (
+          <div className="hidden md:flex flex-row gap-2 sm:gap-4 justify-between px-4 sm:px-10 py-4">
+            <div className="flex items-center gap-6">
+              {PathItems.map((item) => (
+                <React.Fragment key={item.path}>
+                  <Button
+                    variant="link"
+                    className="text-lg cursor-pointer"
+                    asChild
+                  >
+                    <Link href={item.path}>{item.name}</Link>
+                  </Button>
+                </React.Fragment>
+              ))}
+            </div>
+            <div className="flex gap-6">
+              <Button
+                className="cursor-pointer"
+                onClick={() => setShowCashierLogin(true)}
+              >
+                User
+              </Button>
+              <Button className="cursor-pointer" onClick={() => login()}>
+                Admin
+              </Button>
+            </div>
           </div>
-          <div className="flex gap-6">
-            <Button
-              className="cursor-pointer"
-              onClick={() => setShowCashierLogin(true)}
-            >
-              User
-            </Button>
-            <Button className="cursor-pointer" onClick={() => login()}>
-              Admin
-            </Button>
-          </div>
-        </div>
+        )}
 
+        {/* Page Body */}
         <div className="h-full flex flex-col justify-between p-12">
           {showCashierLogin ? (
-            <div className="w-full h-full flex items-center justify-center"></div>
+            <div className="w-full h-full flex items-center justify-center">
+              <LoginForm
+                title="Cashier Login"
+                subTitle="Please sign in to continue"
+              />
+            </div>
           ) : (
             <>
               <div className="h-3/4 flex flex-col justify-center gap-12">
