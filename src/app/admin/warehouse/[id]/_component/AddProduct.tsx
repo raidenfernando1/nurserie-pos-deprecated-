@@ -93,11 +93,6 @@ const AddProduct = ({
         stock_threshold: parsedThreshold,
       };
 
-      const result = await createWarehouseProduct({
-        warehouseID: warehouseId,
-        productData,
-      });
-
       setStep(2);
     } catch (error) {
       console.error("Error creating product:", error);

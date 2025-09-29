@@ -5,6 +5,7 @@ import DataCard from "./_component/DataCard";
 import WarehouseCarousel from "./_component/WarehouseCarousel";
 import useWarehouseStore from "@/store/useWarehouse";
 import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 
 export default function Warehouse() {
@@ -32,6 +33,11 @@ export default function Warehouse() {
             <Link href="/admin/warehouse/total">Total Stock</Link>
           </Button>
         </div>
+        <Button variant="ghost" asChild>
+          <Card className="w-full border-2 rounded-2xl h-[150px] text-2xl text-center">
+            Warehouses
+          </Card>
+        </Button>
       </div>
     </main>
   );
