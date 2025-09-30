@@ -13,7 +13,6 @@ import DeleteProduct from "./_component/DeleteProduct";
 export default function WarehousePage({ params }: { params: { id: string } }) {
   const [addProductPopup, setAddProductPopup] = useState<boolean>(false);
   const [deleteProductPopup, setDeleteProductPopup] = useState<boolean>(false);
-  const [editProductPopup, setEditProductPopup] = useState("");
 
   const { warehouses } = useWarehouseStore();
   const { data, isLoading, isError } = useWarehouseProducts({
@@ -40,6 +39,7 @@ export default function WarehousePage({ params }: { params: { id: string } }) {
           onClose={() => setDeleteProductPopup(false)}
         />
       )}
+
       <WarehouseLayout
         title={currentWarehouse?.warehouse_name ?? "Warehouse"}
         companyTotalStock={currentWarehouse?.total_stock || 0}

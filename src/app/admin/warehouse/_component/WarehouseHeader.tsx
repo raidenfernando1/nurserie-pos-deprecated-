@@ -8,6 +8,7 @@ import useWarehouseStore from "@/store/useWarehouse";
 export interface WarehouseHeaderProps {
   title?: string;
   showActions?: boolean;
+  showAdmin?: boolean;
   onEditProduct?: () => void;
   onDeleteProduct?: () => void;
   onAddProduct?: () => void;
@@ -18,6 +19,7 @@ export interface WarehouseHeaderProps {
 const WarehouseHeader: React.FC<WarehouseHeaderProps> = ({
   title = "Total Warehouse",
   showActions = true,
+  showAdmin = false,
   onEditProduct,
   onDeleteProduct,
   onAddProduct,
@@ -55,14 +57,6 @@ const WarehouseHeader: React.FC<WarehouseHeaderProps> = ({
               <Button
                 variant="outline"
                 size="sm"
-                className="border-blue-200 text-blue-700 hover:bg-blue-50"
-                onClick={onEditProduct}
-              >
-                Edit Product
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
                 className="border-red-200 text-red-700 hover:bg-red-50"
                 onClick={onDeleteProduct}
               >
@@ -74,6 +68,19 @@ const WarehouseHeader: React.FC<WarehouseHeaderProps> = ({
                 onClick={onAddProduct}
               >
                 Add Product
+              </Button>
+            </div>
+          )}
+
+          {showAdmin && (
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                onClick={onEditProduct}
+              >
+                Edit Product
               </Button>
             </div>
           )}

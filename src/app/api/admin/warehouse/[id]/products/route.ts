@@ -55,121 +55,25 @@ export async function POST(
   { params }: { params: { id: string } },
 ) {
   const session = await auth.api.getSession({ headers: await headers() });
-
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-
   const adminID = session.user.id;
   const warehouseID = await params.id;
 
   try {
     const body = await request.json();
+    const { action } = body;
 
-    const {
-      name,
-      description,
-      brand,
-      category,
-      sku,
-      barcode,
-      price,
-      image_url,
-      initial_stock,
-      stock_threshold,
-    } = body;
-
-    if (
-      !name ||
-      !brand ||
-      !category ||
-      !sku ||
-      price === undefined ||
-      initial_stock === undefined ||
-      stock_threshold === undefined
-    ) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 },
-      );
+    // Route to link existing product
+    if (action === "link") {
+      return await linkExistingProduct(body, warehouseID, adminID);
     }
 
-    if (initial_stock < 0 || stock_threshold < 0 || price < 0) {
-      return NextResponse.json(
-        { error: "Stock values and price cannot be negative" },
-        { status: 400 },
-      );
-    }
-
-    const result = await db`
-      WITH admin_check AS (
-        SELECT c.id as company_id, c.admin_id
-        FROM company c
-        JOIN warehouse w ON c.id = w.company_id
-        WHERE w.id = ${warehouseID} AND c.admin_id = ${adminID}
-      ),
-      new_product AS (
-        INSERT INTO products (
-          company_id, name, description, brand, category, sku, barcode, price, image_url
-        )
-        SELECT
-          ac.company_id,
-          ${name},
-          ${description || null},
-          ${brand},
-          ${category},
-          ${sku},
-          ${barcode || null},
-          ${price},
-          ${image_url || null}
-        FROM admin_check ac
-        RETURNING id, name, sku
-      ),
-      wp AS (
-        INSERT INTO warehouse_products (
-          warehouse_id, product_id, stock, stock_threshold
-        )
-        SELECT ${warehouseID}, np.id, ${initial_stock}, ${stock_threshold}
-        FROM new_product np, admin_check ac
-        RETURNING id, product_id, stock
-      )
-      INSERT INTO stock_movements (
-        warehouse_product_id, change, reason, date_added
-      )
-      SELECT wp.id, ${initial_stock}, 'Initial stock delivery', NOW()
-      FROM wp
-      RETURNING
-        (SELECT json_build_object(
-          'product_id', np.id,
-          'name', np.name,
-          'sku', np.sku,
-          'initial_stock', wp.stock,
-          'warehouse_product_id', wp.id
-        ) FROM new_product np, wp WHERE wp.product_id = np.id) as product_info;
-    `;
-
-    console.log(result);
-
-    if (!result || result.length === 0) {
-      return NextResponse.json(
-        {
-          error: "Failed to create product or unauthorized access to warehouse",
-        },
-        { status: 403 },
-      );
-    }
-
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Product created successfully",
-        data: result[0].product_info,
-      },
-      { status: 201 },
-    );
+    // Default: Create new product
+    return await createNewProduct(body, warehouseID, adminID);
   } catch (error) {
-    console.error("Error creating product:", error);
-
+    console.error("Error in product operation:", error);
     if (error instanceof Error) {
       if (error.message.includes("duplicate key")) {
         return NextResponse.json(
@@ -184,10 +88,209 @@ export async function POST(
         );
       }
     }
-
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },
     );
   }
+}
+
+// Link existing product to warehouse
+async function linkExistingProduct(
+  body: any,
+  warehouseID: string,
+  adminID: string,
+) {
+  const { product_id, stock, stock_threshold } = body;
+
+  // Validate required fields
+  if (!product_id || stock === undefined || stock_threshold === undefined) {
+    return NextResponse.json(
+      {
+        error: "Missing required fields: product_id, stock, stock_threshold",
+      },
+      { status: 400 },
+    );
+  }
+
+  if (stock < 0 || stock_threshold < 0) {
+    return NextResponse.json(
+      { error: "Stock values cannot be negative" },
+      { status: 400 },
+    );
+  }
+
+  // Verify user owns the warehouse AND the product belongs to their company
+  const result = await db`
+    WITH admin_check AS (
+      SELECT
+        w.id as warehouse_id,
+        c.id as company_id
+      FROM warehouse w
+      JOIN company c ON w.company_id = c.id
+      WHERE w.id = ${warehouseID}
+        AND c.admin_id = ${adminID}
+    ),
+    product_check AS (
+      SELECT p.id
+      FROM products p, admin_check ac
+      WHERE p.id = ${product_id}
+        AND p.company_id = ac.company_id
+    ),
+    wp AS (
+      INSERT INTO warehouse_products (warehouse_id, product_id, stock, stock_threshold)
+      SELECT
+        ${warehouseID},
+        pc.id,
+        ${stock},
+        ${stock_threshold}
+      FROM product_check pc, admin_check ac
+      RETURNING id, warehouse_id, product_id, stock, stock_threshold
+    )
+    INSERT INTO stock_movements (warehouse_product_id, change, reason, date_added)
+    SELECT
+      wp.id,
+      ${stock},
+      'Initial stock for warehouse',
+      NOW()
+    FROM wp
+    RETURNING
+      warehouse_product_id,
+      change,
+      reason,
+      date_added,
+      (SELECT json_build_object(
+        'id', wp.id,
+        'warehouse_id', wp.warehouse_id,
+        'product_id', wp.product_id,
+        'stock', wp.stock,
+        'stock_threshold', wp.stock_threshold
+      ) FROM wp WHERE wp.id = warehouse_product_id) as warehouse_product
+  `;
+
+  if (!result || result.length === 0) {
+    return NextResponse.json(
+      {
+        error:
+          "Failed to link product. Product may not exist, already be linked, or you don't have permission.",
+      },
+      { status: 403 },
+    );
+  }
+
+  return NextResponse.json(
+    {
+      success: true,
+      message: "Product successfully linked to warehouse",
+      data: result[0],
+    },
+    { status: 201 },
+  );
+}
+
+// Create new product
+async function createNewProduct(
+  body: any,
+  warehouseID: string,
+  adminID: string,
+) {
+  const {
+    name,
+    description,
+    brand,
+    category,
+    sku,
+    barcode,
+    price,
+    image_url,
+    initial_stock,
+    stock_threshold,
+  } = body;
+
+  if (
+    !name ||
+    !brand ||
+    !category ||
+    !sku ||
+    price === undefined ||
+    initial_stock === undefined ||
+    stock_threshold === undefined
+  ) {
+    return NextResponse.json(
+      { error: "Missing required fields" },
+      { status: 400 },
+    );
+  }
+
+  if (initial_stock < 0 || stock_threshold < 0 || price < 0) {
+    return NextResponse.json(
+      { error: "Stock values and price cannot be negative" },
+      { status: 400 },
+    );
+  }
+
+  const result = await db`
+    WITH admin_check AS (
+      SELECT c.id as company_id, c.admin_id
+      FROM company c
+      JOIN warehouse w ON c.id = w.company_id
+      WHERE w.id = ${warehouseID} AND c.admin_id = ${adminID}
+    ),
+    new_product AS (
+      INSERT INTO products (
+        company_id, name, description, brand, category, sku, barcode, price, image_url
+      )
+      SELECT
+        ac.company_id,
+        ${name},
+        ${description || null},
+        ${brand},
+        ${category},
+        ${sku},
+        ${barcode || null},
+        ${price},
+        ${image_url || null}
+      FROM admin_check ac
+      RETURNING id, name, sku
+    ),
+    wp AS (
+      INSERT INTO warehouse_products (
+        warehouse_id, product_id, stock, stock_threshold
+      )
+      SELECT ${warehouseID}, np.id, ${initial_stock}, ${stock_threshold}
+      FROM new_product np, admin_check ac
+      RETURNING id, product_id, stock
+    )
+    INSERT INTO stock_movements (
+      warehouse_product_id, change, reason, date_added
+    )
+    SELECT wp.id, ${initial_stock}, 'Initial stock delivery', NOW()
+    FROM wp
+    RETURNING
+      (SELECT json_build_object(
+        'product_id', np.id,
+        'name', np.name,
+        'sku', np.sku,
+        'initial_stock', wp.stock,
+        'warehouse_product_id', wp.id
+      ) FROM new_product np, wp WHERE wp.product_id = np.id) as product_info;
+  `;
+
+  if (!result || result.length === 0) {
+    return NextResponse.json(
+      {
+        error: "Failed to create product or unauthorized access to warehouse",
+      },
+      { status: 403 },
+    );
+  }
+
+  return NextResponse.json(
+    {
+      success: true,
+      message: "Product created successfully",
+      data: result[0].product_info,
+    },
+    { status: 201 },
+  );
 }
