@@ -13,12 +13,15 @@ export default function DashboardLayout({
   return (
     <ProtectedRoute intendedRole="admin">
       <SidebarProvider>
-        <div className="flex border-none">
+        <div className="flex h-screen w-full overflow-hidden">
           <AppSidebar />
-          <SidebarTrigger className="m-2" />
+          <main className="flex flex-1 flex-col overflow-auto">
+            <div className="sticky top-0 z-10 bg-background">
+              <SidebarTrigger className="m-2" />
+            </div>
+            <div className="flex flex-1 flex-col gap-4 p-4">{children}</div>
+          </main>
         </div>
-
-        <main className="flex flex-1 flex-col gap-4">{children}</main>
       </SidebarProvider>
     </ProtectedRoute>
   );

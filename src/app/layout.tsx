@@ -2,6 +2,7 @@ import { Geist_Mono } from "next/font/google";
 import "./globals.css";
 import React from "react";
 import Listener from "./Listener";
+import { Toaster } from "sonner";
 
 const MainFont = Geist_Mono({
   variable: "--font-geist-sans",
@@ -16,7 +17,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${MainFont.variable} ${MainFont.variable} `}>
-        <Listener>{children}</Listener>
+        <Listener>
+          {children}
+          <Toaster />
+        </Listener>
       </body>
     </html>
   );

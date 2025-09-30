@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Alert } from "@/components/ui/alert";
+import { toast } from "sonner";
 
 interface ChangePasswordProps {
   cashier: {
@@ -55,7 +57,7 @@ export function ChangePassword({
       const data = await response.json();
 
       if (response.ok) {
-        alert("Password changed successfully!");
+        toast.success("Password changed successfully!");
         setNewPassword("");
         setOpen(false);
         onPasswordChanged?.();
