@@ -25,7 +25,7 @@ const WarehouseLayout: React.FC<WarehouseLayoutProps> = ({
   onAddProduct,
 }) => {
   return (
-    <main className="h-screen flex flex-col p-6 bg-gray-50/50">
+    <main className="h-screen flex flex-col p-2">
       <WarehouseHeader
         title={title}
         showActions={showActions}

@@ -105,7 +105,7 @@ export default function Entry() {
                   Error checking database
                 </p>
               ) : (
-                <p className="text-lg">
+                <p className="leading-7 [&:not(:first-child)]:mt-6">
                   Database Status:
                   {health ? (
                     <span className="text-green-700"> Operational</span>
