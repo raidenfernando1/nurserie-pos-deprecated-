@@ -7,6 +7,7 @@ interface WarehouseLayoutProps {
   children: React.ReactNode;
   title?: string;
   showActions?: boolean;
+  showAdmin?: boolean;
   companyTotalStock?: number;
   companyTotalProducts?: number;
   onEditProduct?: () => void;
@@ -18,6 +19,7 @@ const WarehouseLayout: React.FC<WarehouseLayoutProps> = ({
   children,
   title = "Warehouse",
   showActions = true,
+  showAdmin = false,
   companyTotalStock,
   companyTotalProducts,
   onEditProduct,
@@ -29,6 +31,7 @@ const WarehouseLayout: React.FC<WarehouseLayoutProps> = ({
       <WarehouseHeader
         title={title}
         showActions={showActions}
+        showAdmin={showAdmin}
         companyTotalStock={companyTotalStock || 0}
         companyTotalProducts={companyTotalProducts || 0}
         onEditProduct={onEditProduct}
