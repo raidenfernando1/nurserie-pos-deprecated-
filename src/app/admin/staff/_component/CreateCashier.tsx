@@ -45,16 +45,12 @@ export function CreateCashier() {
         }),
       });
 
-      console.log(">>> Raw response:", response);
-
       let data: any = null;
       try {
         data = await response.json();
       } catch (jsonErr) {
         console.error(">>> Failed to parse JSON response:", jsonErr);
       }
-
-      console.log(">>> Parsed response JSON:", data);
 
       if (!response.ok) {
         throw new Error(data?.message || "Unknown error from server");
@@ -73,7 +69,6 @@ export function CreateCashier() {
       setError(err.message || "Failed to create cashier");
     } finally {
       setLoading(false);
-      console.log(">>> Finished cashier creation attempt");
     }
   };
 

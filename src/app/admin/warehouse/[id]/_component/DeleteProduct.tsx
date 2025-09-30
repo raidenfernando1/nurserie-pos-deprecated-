@@ -1,10 +1,12 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { X, Search, Trash2, AlertCircle, Package } from "lucide-react";
 import { useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useWarehouseProducts } from "@/hooks/useProducts";
 
 const DeleteProduct = ({
   onClose,
@@ -29,7 +31,7 @@ const DeleteProduct = ({
       const response = await fetch("/api/product/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sku: sku.trim() }),
+        body: JSON.stringify({ sku: sku, warehouse_id: warehouseId }),
       });
 
       if (!response.ok) {
@@ -63,7 +65,7 @@ const DeleteProduct = ({
       const response = await fetch("/api/product/search", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sku: product.sku }),
+        body: JSON.stringify({ sku: product.sku, warehouse_id: warehouseId }),
       });
 
       if (!response.ok) {
@@ -73,7 +75,6 @@ const DeleteProduct = ({
       }
 
       const result = await response.json();
-      console.log("Delete result:", result);
 
       setProduct(null);
       setSku("");

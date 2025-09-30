@@ -148,6 +148,8 @@ export async function POST(
         ) FROM new_product np, wp WHERE wp.product_id = np.id) as product_info;
     `;
 
+    console.log(result);
+
     if (!result || result.length === 0) {
       return NextResponse.json(
         {

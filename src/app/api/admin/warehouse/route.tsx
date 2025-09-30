@@ -39,8 +39,6 @@ export async function GET() {
     ORDER BY warehouse_id;
 `;
 
-    console.log(response);
-
     const warehouses = response.map((row) => ({
       warehouse_id: parseInt(row.warehouse_id),
       warehouse_name: row.warehouse_name,

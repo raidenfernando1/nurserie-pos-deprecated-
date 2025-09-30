@@ -20,8 +20,6 @@ export const POST = async (req: Request) => {
     );
   }
 
-  console.log(sku);
-
   try {
     const response = await db`
       SELECT p.*, c.company_name
@@ -29,8 +27,6 @@ export const POST = async (req: Request) => {
       JOIN company c ON p.company_id = c.id
       WHERE p.sku = ${sku} AND c.admin_id = ${userID}
     `;
-
-    console.log(response);
 
     if (!response) {
       return NextResponse.json(

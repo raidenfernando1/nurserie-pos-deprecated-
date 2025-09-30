@@ -14,7 +14,7 @@ export async function GET() {
     const adminId = session.user.id;
 
     const response = await db`
-SELECT 
+SELECT
   p.id,
   p.name,
   p.brand,
@@ -38,7 +38,7 @@ WHERE u.id = ${adminId};
     if (response.length === 0) {
       return NextResponse.json(
         { message: "No products found in any warehouses" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
