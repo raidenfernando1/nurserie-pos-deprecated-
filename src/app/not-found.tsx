@@ -1,13 +1,15 @@
+import Image from "next/image";
 import { MoveLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function NotFound() {
   return (
     <div className="min-h-screen flex flex-col justify-center items-center px-6 py-12">
-      <img
+      <Image
         src="/NotFoundImage.svg"
         alt="Page not found illustration"
-        className="h-64 mb-8"
+        height={250}
+        width={250}
       />
       <h1 className="text-4xl font-bold tracking-tight text-center mb-2">
         Ooops! Something went wrong.
