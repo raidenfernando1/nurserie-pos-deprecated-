@@ -13,7 +13,7 @@ const TotalWarehouseLayout = () => {
 
   return (
     <WarehouseLayout
-      title="Total Warehouse"
+      title="Total Stock"
       companyTotalStock={warehouseStats.company_total_stock}
       companyTotalProducts={warehouseStats.company_total_products}
       showActions={false}

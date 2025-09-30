@@ -70,15 +70,12 @@ const AddProduct = ({
       const parsedInitialStock = parseInt(initialStock);
       const parsedThreshold = parseInt(threshold);
 
-      if (isNaN(parsedPrice) || parsedPrice < 0) {
+      if (isNaN(parsedPrice) || parsedPrice < 0)
         throw new Error("Please enter a valid price");
-      }
-      if (isNaN(parsedInitialStock) || parsedInitialStock < 0) {
+      if (isNaN(parsedInitialStock) || parsedInitialStock < 0)
         throw new Error("Please enter a valid initial stock amount");
-      }
-      if (isNaN(parsedThreshold) || parsedThreshold < 0) {
+      if (isNaN(parsedThreshold) || parsedThreshold < 0)
         throw new Error("Please enter a valid threshold amount");
-      }
 
       const productData = {
         name: name.trim(),
@@ -98,14 +95,16 @@ const AddProduct = ({
         productData,
       });
 
+      if (!result || result.error) {
+        throw new Error(result?.error || "Failed to create product");
+      }
+
+      await refetch();
       setStep(2);
     } catch (error) {
-      console.error("Error creating product:", error);
-      setError(
-        error instanceof Error ? error.message : "Failed to create product",
-      );
+      console.error("❌ Error creating product:", error);
+      setError(error instanceof Error ? error.message : "Unknown error");
     } finally {
-      await refetch();
       setIsLoading(false);
     }
   };
