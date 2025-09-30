@@ -20,25 +20,25 @@ SELECT
   p.brand,
   p.category,
   p.image_url,
-  wp.stock,
-  wp.stock_threshold,
+  COALESCE(wp.stock, 0) as stock,
+  COALESCE(wp.stock_threshold, 0) as stock_threshold,
   p.price,
   p.sku,
   p.barcode,
-  w.warehouse_name,
+  COALESCE(w.warehouse_name, 'No Warehouse') as warehouse_name,
   c.company_name
 FROM products p
-JOIN warehouse_products wp ON wp.product_id = p.id
-JOIN warehouse w ON wp.warehouse_id = w.id
-JOIN company c ON w.company_id = c.id
+JOIN company c ON p.company_id = c.id
 JOIN "user" u ON c.admin_id = u.id
+LEFT JOIN warehouse_products wp ON wp.product_id = p.id
+LEFT JOIN warehouse w ON wp.warehouse_id = w.id
 WHERE u.id = ${adminId};
     `;
 
     if (response.length === 0) {
       return NextResponse.json(
         { message: "No products found in any warehouses" },
-        { status: 404 },
+        { status: 404 }
       );
     }
 

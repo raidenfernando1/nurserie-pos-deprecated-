@@ -1,19 +1,19 @@
 "use client";
 
-import WarehouseLayout from "../_component/WarehouseLayout";
+import WarehouseLayout from "../_component/warehouse-layout";
 import useWarehouseStore from "@/store/useWarehouse";
 import ReusableTable from "../_component/product-container";
-import { totalStockColumns } from "../_component/table-column";
 import Tab from "../_component/table-tab";
 import { useWarehouseProducts } from "@/hooks/useProducts";
-import AddProduct from "./_component/AddProduct";
+import AddProduct from "../_component/popups/add-product";
 import { useState } from "react";
-import DeleteProduct from "./_component/DeleteProduct";
 import { columns } from "./table-column";
+import DeleteWarehouseProduct from "../_component/popups/delete-product-warehouse";
 
 export default function WarehousePage({ params }: { params: { id: string } }) {
   const [addProductPopup, setAddProductPopup] = useState<boolean>(false);
-  const [deleteProductPopup, setDeleteProductPopup] = useState<boolean>(false);
+  const [deleteWarehouseProduct, setDeleteWarehouseProduct] =
+    useState<boolean>(false);
 
   const { warehouses } = useWarehouseStore();
   const { data, isLoading, isError } = useWarehouseProducts({
@@ -34,19 +34,18 @@ export default function WarehousePage({ params }: { params: { id: string } }) {
           onClose={() => setAddProductPopup(false)}
         />
       )}
-      {deleteProductPopup && (
-        <DeleteProduct
+      {deleteWarehouseProduct && (
+        <DeleteWarehouseProduct
           warehouseId={Number(params.id)}
-          onClose={() => setDeleteProductPopup(false)}
+          onClose={() => setDeleteWarehouseProduct(false)}
         />
       )}
-
       <WarehouseLayout
         title={currentWarehouse?.warehouse_name ?? "Warehouse"}
         companyTotalStock={currentWarehouse?.total_stock || 0}
         companyTotalProducts={currentWarehouse?.total_products || 0}
         onAddProduct={() => setAddProductPopup(true)}
-        onDeleteProduct={() => setDeleteProductPopup(true)}
+        onDeleteWarehouseProduct={() => setDeleteWarehouseProduct(true)}
       >
         <ReusableTable
           data={data ?? []}

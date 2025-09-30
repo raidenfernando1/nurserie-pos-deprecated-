@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { Separator } from "@/components/ui/separator";
-import WarehouseHeader from "./WarehouseHeader";
+import WarehouseHeader from "./warehouse-header";
 
 interface WarehouseLayoutProps {
   children: React.ReactNode;
@@ -12,6 +12,7 @@ interface WarehouseLayoutProps {
   companyTotalProducts?: number;
   onEditProduct?: () => void;
   onDeleteProduct?: () => void;
+  onDeleteWarehouseProduct?: () => void;
   onAddProduct?: () => void;
 }
 
@@ -24,6 +25,7 @@ const WarehouseLayout: React.FC<WarehouseLayoutProps> = ({
   companyTotalProducts,
   onEditProduct,
   onDeleteProduct,
+  onDeleteWarehouseProduct,
   onAddProduct,
 }) => {
   return (
@@ -36,6 +38,7 @@ const WarehouseLayout: React.FC<WarehouseLayoutProps> = ({
         companyTotalProducts={companyTotalProducts || 0}
         onEditProduct={onEditProduct}
         onDeleteProduct={onDeleteProduct}
+        onDeleteWarehouseProduct={onDeleteWarehouseProduct}
         onAddProduct={onAddProduct}
       />
       <Separator decorative={false} className="my-3" />

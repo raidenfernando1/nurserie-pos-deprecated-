@@ -6,15 +6,11 @@ import { Input } from "@/components/ui/input";
 import { X, Search, Trash2, AlertCircle, Package } from "lucide-react";
 import { useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useWarehouseProducts } from "@/hooks/useProducts";
+import { useProducts } from "@/hooks/useProducts";
 
-const DeleteProduct = ({
-  onClose,
-  warehouseId,
-}: {
-  onClose: () => void;
-  warehouseId: number;
-}) => {
+const DeleteProduct = ({ onClose }: { onClose: () => void }) => {
+  const { refetch } = useProducts();
+
   const [sku, setSku] = useState("");
   const [product, setProduct] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
@@ -31,7 +27,7 @@ const DeleteProduct = ({
       const response = await fetch("/api/product/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sku: sku, warehouse_id: warehouseId }),
+        body: JSON.stringify({ sku: sku }),
       });
 
       if (!response.ok) {
@@ -62,10 +58,10 @@ const DeleteProduct = ({
     setError(null);
 
     try {
-      const response = await fetch("/api/product/search", {
+      const response = await fetch("/api/product", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sku: product.sku, warehouse_id: warehouseId }),
+        body: JSON.stringify({ sku: product.sku, isGlobal: true }),
       });
 
       if (!response.ok) {
@@ -82,6 +78,7 @@ const DeleteProduct = ({
       setError("An error occurred while deleting. Please try again.");
     } finally {
       setLoading(false);
+      await refetch();
     }
   };
 

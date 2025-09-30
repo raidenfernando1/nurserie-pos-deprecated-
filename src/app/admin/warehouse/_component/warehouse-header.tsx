@@ -1,9 +1,7 @@
 "use client";
 import React from "react";
-import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import useWarehouseStore from "@/store/useWarehouse";
 
 export interface WarehouseHeaderProps {
   title?: string;
@@ -11,6 +9,7 @@ export interface WarehouseHeaderProps {
   showAdmin?: boolean;
   onEditProduct?: () => void;
   onDeleteProduct?: () => void;
+  onDeleteWarehouseProduct?: () => void;
   onAddProduct?: () => void;
   companyTotalStock: number;
   companyTotalProducts: number;
@@ -22,6 +21,7 @@ const WarehouseHeader: React.FC<WarehouseHeaderProps> = ({
   showAdmin = false,
   onEditProduct,
   onDeleteProduct,
+  onDeleteWarehouseProduct,
   onAddProduct,
   companyTotalStock,
   companyTotalProducts,
@@ -55,19 +55,19 @@ const WarehouseHeader: React.FC<WarehouseHeaderProps> = ({
           {showActions && (
             <div className="flex items-center gap-3">
               <Button
-                variant="outline"
-                size="sm"
-                className="border-red-200 text-red-700 hover:bg-red-50"
-                onClick={onDeleteProduct}
-              >
-                Delete Product
-              </Button>
-              <Button
                 size="sm"
                 className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
                 onClick={onAddProduct}
               >
                 Add Product
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-red-200 text-red-700 hover:bg-red-50"
+                onClick={onDeleteWarehouseProduct}
+              >
+                Delete Product
               </Button>
             </div>
           )}
@@ -81,6 +81,14 @@ const WarehouseHeader: React.FC<WarehouseHeaderProps> = ({
                 onClick={onEditProduct}
               >
                 Edit Product
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-red-200 text-red-700 hover:bg-red-50"
+                onClick={onDeleteProduct}
+              >
+                Delete Product
               </Button>
             </div>
           )}
