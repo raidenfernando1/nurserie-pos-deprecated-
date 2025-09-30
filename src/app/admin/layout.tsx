@@ -2,7 +2,7 @@
 
 import React from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/app-sidebar";
+import { AppSidebar } from "@/components/AppSidebar";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
 export default function DashboardLayout({
@@ -15,10 +15,7 @@ export default function DashboardLayout({
       <SidebarProvider>
         <div className="flex border-none">
           <AppSidebar />
-
-          <div className="flex border-2 bg-[var(--sidebar)]">
-            <SidebarTrigger />
-          </div>
+          <SidebarTrigger className="m-2" />
         </div>
 
         <main className="flex flex-1 flex-col gap-4">{children}</main>
