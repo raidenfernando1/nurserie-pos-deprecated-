@@ -3,7 +3,6 @@
 import React from "react";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
-import { Button } from "@/components/ui/button";
 
 import {
   Sidebar,
@@ -17,16 +16,9 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-import {
-  Home,
-  Users,
-  Warehouse,
-  Settings,
-  ChartSpline,
-  Loader2Icon,
-} from "lucide-react";
+import { Home, Users, Warehouse, Settings, ChartSpline } from "lucide-react";
+import { NavUser } from "./NavUser";
 
-// Define role-based menus
 export const adminItems = [
   { name: "Dashboard", path: "/admin/dashboard", icon: Home },
   { name: "Analytics", path: "/admin/analytics", icon: ChartSpline },
@@ -39,11 +31,11 @@ export const cashierItems = [
   { name: "Settings", path: "/cashier/settings", icon: Settings },
 ];
 
-export function AppSidebar() {
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [role, setRole] = React.useState<string | null>(null);
   const [activePath, setActivePath] = React.useState<string>("");
   const [loading, setLoading] = React.useState(true);
-  const [signingOut, setSigningOut] = React.useState(false);
+  const [sessionData, setSessionData] = React.useState<any>(null);
 
   React.useEffect(() => {
     const fetchRole = async () => {
@@ -51,6 +43,8 @@ export function AppSidebar() {
         const session = await authClient.getSession();
         const userRole = session?.data?.user?.role ?? null;
         setRole(userRole);
+        setSessionData(session?.data);
+        console.log("session role:", session);
 
         if (userRole === "admin") setActivePath("/admin/dashboard");
         else if (userRole === "cashier") setActivePath("/cashier");
@@ -82,8 +76,14 @@ export function AppSidebar() {
   const itemsToRender =
     role === "admin" ? adminItems : role === "cashier" ? cashierItems : [];
 
+  const userData = {
+    name: sessionData?.user?.name || "Unknown User",
+    email: sessionData?.user?.email || "Unknown Email",
+    avatar: sessionData?.user?.image || "",
+  };
+
   return (
-    <Sidebar>
+    <Sidebar collapsible="icon" {...props}>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Oracle POS</SidebarGroupLabel>
@@ -112,31 +112,7 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <Button
-          disabled={signingOut}
-          variant="destructive"
-          className="cursor-pointer"
-          onClick={async () => {
-            try {
-              setSigningOut(true);
-              await authClient.signOut();
-              window.location.href = "/";
-            } catch (err) {
-              console.error("Sign out failed:", err);
-            } finally {
-              setSigningOut(false);
-            }
-          }}
-        >
-          {signingOut ? (
-            <>
-              <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-              Signing Out...
-            </>
-          ) : (
-            "Sign Out"
-          )}
-        </Button>
+        <NavUser user={userData} />
       </SidebarFooter>
     </Sidebar>
   );
