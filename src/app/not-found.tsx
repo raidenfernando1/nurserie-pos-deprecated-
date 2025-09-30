@@ -1,28 +1,26 @@
-import "./globals.css";
+import { MoveLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function NotFound() {
   return (
-    <div className="h-full flex flex-col justify-center items-center px-10">
-      <h1 className="text-5xl tracking-wide p-5">Something went wrong...</h1>
-      <h2>404 - Not Found</h2>
-      <p>The page you are looking for does not exist</p>
-      <a href="/" className="flex gap-2 items-center py-10">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          className="size-6"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M6.75 15.75 3 12m0 0 3.75-3.75M3 12h18"
-          />
-        </svg>
-        Go back home
-      </a>
+    <div className="min-h-screen flex flex-col justify-center items-center px-6 py-12">
+      <img
+        src="/NotFoundImage.svg"
+        alt="Page not found illustration"
+        className="h-64 mb-8"
+      />
+      <h1 className="text-4xl font-bold tracking-tight text-center mb-2">
+        Ooops! Something went wrong.
+      </h1>
+      <p className="text-xl text-gray-600 text-center mb-6">
+        The page you are looking for does not exist.
+      </p>
+      <Button asChild>
+        <a href="/" className="inline-flex items-center gap-2">
+          <MoveLeft className="w-5 h-5" />
+          <span>Go back home</span>
+        </a>
+      </Button>
     </div>
   );
 }
