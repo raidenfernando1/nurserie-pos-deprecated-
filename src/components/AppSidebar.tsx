@@ -44,7 +44,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         const userRole = session?.data?.user?.role ?? null;
         setRole(userRole);
         setSessionData(session?.data);
-        console.log("session role:", session);
 
         if (userRole === "admin") setActivePath("/admin/dashboard");
         else if (userRole === "cashier") setActivePath("/cashier");
