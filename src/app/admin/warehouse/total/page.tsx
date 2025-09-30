@@ -1,10 +1,10 @@
 "use client";
 import React from "react";
 import WarehouseLayout from "../_component/WarehouseLayout";
-import Tab from "../_component/TableTab";
+import Tab from "../_component/table-tab";
 import { useProducts } from "@/hooks/useProducts";
-import { totalStockColumns } from "../_component/TableColumns";
-import ReusableTable from "../_component/ProductContainer";
+import { totalStockColumns } from "../_component/table-column";
+import ReusableTable from "../_component/product-container";
 import useWarehouseStore from "@/store/useWarehouse";
 import { useState } from "react";
 import EditProduct from "../[id]/_component/EditProduct";
@@ -34,7 +34,7 @@ const TotalWarehouseLayout = () => {
             <Tab
               table={table}
               categories={Array.from(
-                new Set((data ?? []).map((d) => d.category)),
+                new Set((data ?? []).map((d) => d.category))
               )}
             />
           )}

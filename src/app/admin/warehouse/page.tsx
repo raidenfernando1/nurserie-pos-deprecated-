@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import DataCard from "./_component/DataCard";
+import DataCard from "./_component/data-card";
 import WarehouseCarousel from "./_component/WarehouseCarousel";
 import useWarehouseStore from "@/store/useWarehouse";
 import { Button } from "@/components/ui/button";

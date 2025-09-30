@@ -19,7 +19,6 @@ export const totalStockColumns: ColumnDef<Product>[] = [
         </div>
       </div>
     ),
-    accessorFn: (row) => `${row.name} ${row.price}`, // ❌ try removing this
   },
 
   {
@@ -68,6 +67,7 @@ export const totalStockColumns: ColumnDef<Product>[] = [
     accessorFn: (row) => `${row.stock} ${row.stock_threshold}`,
     filterFn: "includesString",
   },
+
   {
     accessorKey: "warehouse_name",
     header: "Warehouse",
@@ -75,5 +75,5 @@ export const totalStockColumns: ColumnDef<Product>[] = [
       <span className="font-medium">{row.original.warehouse_name}</span>
     ),
     filterFn: "includesString",
-  },
+  } as ColumnDef<Product>,
 ];

@@ -2,13 +2,14 @@
 
 import WarehouseLayout from "../_component/WarehouseLayout";
 import useWarehouseStore from "@/store/useWarehouse";
-import ReusableTable from "../_component/ProductContainer";
-import { totalStockColumns } from "../_component/TableColumns";
-import Tab from "../_component/TableTab";
+import ReusableTable from "../_component/product-container";
+import { totalStockColumns } from "../_component/table-column";
+import Tab from "../_component/table-tab";
 import { useWarehouseProducts } from "@/hooks/useProducts";
 import AddProduct from "./_component/AddProduct";
 import { useState } from "react";
 import DeleteProduct from "./_component/DeleteProduct";
+import { columns } from "./table-column";
 
 export default function WarehousePage({ params }: { params: { id: string } }) {
   const [addProductPopup, setAddProductPopup] = useState<boolean>(false);
@@ -22,7 +23,7 @@ export default function WarehousePage({ params }: { params: { id: string } }) {
   const warehouseId = Number(params.id);
 
   const currentWarehouse = warehouses.find(
-    (w) => Number(w.warehouse_id) === warehouseId,
+    (w) => Number(w.warehouse_id) === warehouseId
   );
 
   return (
@@ -49,12 +50,12 @@ export default function WarehousePage({ params }: { params: { id: string } }) {
       >
         <ReusableTable
           data={data ?? []}
-          columns={totalStockColumns}
+          columns={columns}
           tabComponent={(table) => (
             <Tab
               table={table}
               categories={Array.from(
-                new Set((data ?? []).map((d) => d.category)),
+                new Set((data ?? []).map((d) => d.category))
               )}
             />
           )}

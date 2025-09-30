@@ -74,8 +74,6 @@ const DeleteProduct = ({
         return;
       }
 
-      const result = await response.json();
-
       setProduct(null);
       setSku("");
       onClose();

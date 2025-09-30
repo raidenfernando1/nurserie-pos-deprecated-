@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { Separator } from "@/components/ui/separator";
-import WarehouseHeader from "../_component/WarehouseHeader";
+import WarehouseHeader from "./WarehouseHeader";
 
 interface WarehouseLayoutProps {
   children: React.ReactNode;
