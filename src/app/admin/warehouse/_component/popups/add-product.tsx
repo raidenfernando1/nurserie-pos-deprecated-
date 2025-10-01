@@ -9,6 +9,7 @@ import { X, Package, Search, ArrowLeft, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { createWarehouseProduct } from "@/hooks/useProducts";
 import useWarehouseStore from "@/store/useWarehouse";
+import { useWarehouseProducts } from "@/hooks/useProducts";
 
 const AddProduct = ({
   onClose,
@@ -17,6 +18,7 @@ const AddProduct = ({
   onClose: () => void;
   warehouseId: number;
 }) => {
+  const { refetch } = useWarehouseProducts({ warehouseID: warehouseId });
   const { products } = useWarehouseStore();
 
   const [step, setStep] = useState(0);
@@ -28,7 +30,7 @@ const AddProduct = ({
     (product) =>
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.warehouse_name.toLowerCase().includes(searchQuery.toLowerCase()),
+      product.warehouse_name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const [sku, setSku] = useState("");
@@ -113,6 +115,7 @@ const AddProduct = ({
       setError(error instanceof Error ? error.message : "Unknown error");
     } finally {
       setIsLoading(false);
+      await refetch();
     }
   };
 

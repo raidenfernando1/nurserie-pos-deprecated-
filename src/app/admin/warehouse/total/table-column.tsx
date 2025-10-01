@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Product } from "@/types/product";
-import StatusBadge from "../_component/StatusBadge";
+import StatusBadge from "../_component/status-badge";
 
 export const columns: ColumnDef<Product>[] = [
   {

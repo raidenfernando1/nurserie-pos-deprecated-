@@ -3,9 +3,13 @@ import { headers } from "next/headers";
 import auth from "@/lib/auth-server";
 import { db } from "@/lib/db-client";
 
+/*
+THIS API IS FOR FETCHING ALL PRODUCTS TIED TO AN ADMIN USERID AND WAREHOUSEID 
+ITS TIED TO
+*/
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });

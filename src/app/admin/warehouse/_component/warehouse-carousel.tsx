@@ -6,7 +6,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Warehouse } from "@/types/warehouse";
-import WarehouseCard from "./WarehouseCard";
+import WarehouseCard from "./warehouse-card";
 
 const WarehouseCarousel = ({ warehouses }: { warehouses: Warehouse[] }) => {
   return (

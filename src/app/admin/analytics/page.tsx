@@ -13,11 +13,11 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import LoadingBar from "@/components/LoadingPage";
+import LoadingBar from "@/components/loading-page";
 
 function Analytics() {
   return (
-    <LoadingBar duration={1000}>
+    <LoadingBar duration={1500}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline">Open</Button>
