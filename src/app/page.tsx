@@ -6,8 +6,8 @@ import Head from "next/head";
 import { useAdminAuth } from "@/hooks/useAdmin";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
-import LoginForm from "@/components/LoginForm";
-import { Navbar } from "@/components/Navbar";
+import LoginForm from "@/components/login-form";
+import { Navbar } from "@/components/navbar";
 
 export default function Entry() {
   const [showCashierLogin, setShowCashierLogin] = React.useState(false);

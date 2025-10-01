@@ -2,10 +2,10 @@
 
 import React from "react";
 import DataCard from "./_component/data-card";
-import WarehouseCarousel from "./_component/WarehouseCarousel";
+import WarehouseCarousel from "./_component/warehouse-carousel";
 import useWarehouseStore from "@/store/useWarehouse";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import Link from "next/link";
 
 export default function Warehouse() {

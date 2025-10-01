@@ -23,7 +23,7 @@ interface ApiWarehouseResponse {
   }>;
 }
 
-async function fetchWarehouses(): Promise<WarehouseResponse> {
+export async function fetchWarehouses(): Promise<WarehouseResponse> {
   const res = await fetch("/api/admin/warehouse");
   if (!res.ok) {
     const { error, message } = await res.json().catch(() => ({}));
