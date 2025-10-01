@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
-import auth from "@/lib/auth-server";
 import { headers } from "next/headers";
+import auth from "@/lib/auth-server";
 import { db } from "@/lib/db-client";
 
+/*
+FOR FETCHING ALL COMPANY WIDE PRODUCTS ALL WAREHOUSES AND ETC
+*/
 export async function GET() {
   try {
     const session = await auth.api.getSession({ headers: await headers() });

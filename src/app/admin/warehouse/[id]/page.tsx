@@ -9,6 +9,7 @@ import AddProduct from "../_component/popups/add-product";
 import { useState } from "react";
 import { columns } from "./table-column";
 import DeleteWarehouseProduct from "../_component/popups/delete-product-warehouse";
+import LoadingBar from "@/components/loading-page";
 
 export default function WarehousePage({ params }: { params: { id: string } }) {
   const [addProductPopup, setAddProductPopup] = useState<boolean>(false);
@@ -27,7 +28,7 @@ export default function WarehousePage({ params }: { params: { id: string } }) {
   );
 
   return (
-    <>
+    <LoadingBar duration={500}>
       {addProductPopup && (
         <AddProduct
           warehouseId={Number(params.id)}
@@ -60,6 +61,6 @@ export default function WarehousePage({ params }: { params: { id: string } }) {
           )}
         />
       </WarehouseLayout>
-    </>
+    </LoadingBar>
   );
 }
