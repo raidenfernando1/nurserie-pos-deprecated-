@@ -4,15 +4,14 @@ import React from "react";
 
 import LoadingBar from "@/components/LoadingPage";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import { CalendarApp } from "@/components/CalendarApp";
+import DashboardHome from "@/components/DashboardHome";
 
 export default function AdminView() {
   return (
     <ProtectedRoute intendedRole="admin">
       <LoadingBar duration={1000}>
         <main>
-          <h1>Date Today</h1>
-          <CalendarApp />
+          <DashboardHome />
         </main>
       </LoadingBar>
     </ProtectedRoute>
