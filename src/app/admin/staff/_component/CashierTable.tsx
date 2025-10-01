@@ -11,6 +11,8 @@ import {
 
 import { useQuery } from "@tanstack/react-query";
 import { ChangePassword } from "./ChangePassword";
+import { Delete } from "lucide-react";
+import { DeleteCashier } from "./DeleteCashier";
 
 const fetchCashiers = async () => {
   const res = await fetch("/api/admin/cashier");
@@ -43,12 +45,13 @@ const CashierTable = () => {
             <TableHead>Username</TableHead>
             <TableHead>Date Added</TableHead>
             <TableHead></TableHead>
+            <TableHead></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {cashiers.map((cashier: any) => (
             <TableRow key={cashier.id}>
-              <TableCell className="max-w-10 truncate">{cashier.id}</TableCell>
+              <TableCell className="max-w-15 truncate">{cashier.id}</TableCell>
               <TableCell>{cashier.name}</TableCell>
               <TableCell>{cashier.name}</TableCell>
               <TableCell>
@@ -62,6 +65,9 @@ const CashierTable = () => {
               </TableCell>
               <TableCell>
                 <ChangePassword cashier={cashier} />
+              </TableCell>
+              <TableCell>
+                <DeleteCashier cashier={cashier} />
               </TableCell>
             </TableRow>
           ))}

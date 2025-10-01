@@ -190,7 +190,6 @@ export default function AdminView() {
     <ProtectedRoute intendedRole="admin">
       <div className="h-full w-full flex flex-col items-center justify-center bg-gradient-to-br p-8">
         <div className="max-w-6xl w-full space-y-8">
-          {/* Header Section */}
           <div className="text-center space-y-4">
             <div className="flex justify-center mb-6">
               <svg
@@ -208,7 +207,6 @@ export default function AdminView() {
             </div>
           </div>
 
-          {/* Quick Actions Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-8">
             {quickActions.map((action) => (
               <Link key={action.href} href={action.href}>
