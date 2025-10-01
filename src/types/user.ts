@@ -3,4 +3,4 @@ export interface RoleStore {
   setRole: (role: Roles | undefined) => void;
 }
 
-export type Roles = "admin" | "user";
+export type Roles = "admin" | "cashier" | "user";

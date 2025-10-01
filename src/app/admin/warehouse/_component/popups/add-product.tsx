@@ -30,7 +30,7 @@ const AddProduct = ({
     (product) =>
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.warehouse_name.toLowerCase().includes(searchQuery.toLowerCase())
+      product.warehouse_name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const [sku, setSku] = useState("");

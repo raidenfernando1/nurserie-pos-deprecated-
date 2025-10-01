@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Alert } from "@/components/ui/alert";
 import { toast } from "sonner";
 
 interface ChangePasswordProps {
@@ -66,7 +65,7 @@ export function ChangePassword({
       }
     } catch (error) {
       console.error("Error calling changePassword:", error);
-      alert("An error occurred while changing password");
+      toast.error("An error occurred while changing password");
     } finally {
       setIsLoading(false);
     }

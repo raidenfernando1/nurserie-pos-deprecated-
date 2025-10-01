@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function ErrorPage() {
-  const searchParams = useSearchParams();
+function ErrorContent() {
+  const searchParams = useSearchParams(); // ✅ now inside Suspense
   const msg = searchParams.get("msg");
   const router = useRouter();
 
@@ -17,4 +17,12 @@ export default function ErrorPage() {
   }, [router]);
 
   return <h1>Error: {msg ?? "Unknown error"}</h1>;
+}
+
+export default function ErrorPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ErrorContent />
+    </Suspense>
+  );
 }

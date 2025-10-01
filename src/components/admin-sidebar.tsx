@@ -1,5 +1,6 @@
 "use client";
-import React from "react";
+
+import React, { useEffect } from "react";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import {
@@ -50,7 +51,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [sessionData, setSessionData] = React.useState<any>(null);
   const { warehouses } = useWarehouseStore();
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchRole = async () => {
       try {
         const session = await authClient.getSession();
@@ -116,8 +117,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
-
-              {/* Warehouses Dropdown - Only for Admin */}
               {role === "admin" && (
                 <Collapsible defaultOpen className="group/collapsible">
                   <SidebarMenuItem>
@@ -130,7 +129,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                       <SidebarMenuSub>
-                        {/* View All Stocks Option */}
                         <SidebarMenuSubItem>
                           <SidebarMenuSubButton
                             asChild
@@ -162,7 +160,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                   href={`/admin/warehouse/${warehouse.warehouse_id}`}
                                   onClick={() =>
                                     setActivePath(
-                                      `/admin/warehouse/${warehouse.warehouse_id}`
+                                      `/admin/warehouse/${warehouse.warehouse_id}`,
                                     )
                                   }
                                 >

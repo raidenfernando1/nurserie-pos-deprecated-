@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { headers } from "next/headers";
 import auth from "@/lib/auth-server";
 import { db } from "@/lib/db-client";
@@ -12,19 +12,18 @@ import { db } from "@/lib/db-client";
  *  - Warehouse ID as a dynamic route param
  */
 export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> },
 ) {
+  const { id: warehouseID } = await context.params; // 👈 await is required now
+
   const session = await auth.api.getSession({ headers: await headers() });
 
-  // Ensure user is authenticated
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const userID = session.user.id;
-  const warehouseID = await params.id;
-
   try {
     // ✅ Query all products that belong to this warehouse owned by the logged-in admin
     const response = await db`
@@ -54,7 +53,7 @@ export async function GET(
     console.error("GET /api/admin/warehouse/[id]/products error:", e);
     return NextResponse.json(
       { error: "Server error while fetching warehouse products" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -69,8 +68,9 @@ export async function GET(
  */
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> },
 ) {
+  const { id: warehouseID } = await context.params;
   const session = await auth.api.getSession({ headers: await headers() });
 
   // Must be authenticated
@@ -79,7 +79,6 @@ export async function POST(
   }
 
   const adminID = session.user.id;
-  const warehouseID = await params.id;
 
   try {
     const body = await request.json();
@@ -100,20 +99,20 @@ export async function POST(
       if (error.message.includes("duplicate key")) {
         return NextResponse.json(
           { error: "SKU or barcode already exists" },
-          { status: 409 }
+          { status: 409 },
         );
       }
       if (error.message.includes("foreign key")) {
         return NextResponse.json(
           { error: "Invalid warehouse or company reference" },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
 
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -130,7 +129,7 @@ export async function POST(
 async function linkExistingProduct(
   body: any,
   warehouseID: string,
-  adminID: string
+  adminID: string,
 ) {
   const { product_id, stock, stock_threshold } = body;
 
@@ -140,7 +139,7 @@ async function linkExistingProduct(
       {
         error: "Missing required fields: product_id, stock, stock_threshold",
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -148,7 +147,7 @@ async function linkExistingProduct(
   if (stock < 0 || stock_threshold < 0) {
     return NextResponse.json(
       { error: "Stock values cannot be negative" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -206,7 +205,7 @@ async function linkExistingProduct(
         error:
           "Failed to link product. Product may not exist, already be linked, or you don't have permission.",
       },
-      { status: 403 }
+      { status: 403 },
     );
   }
 
@@ -216,7 +215,7 @@ async function linkExistingProduct(
       message: "Product successfully linked to warehouse",
       data: result[0],
     },
-    { status: 201 }
+    { status: 201 },
   );
 }
 
@@ -234,7 +233,7 @@ async function linkExistingProduct(
 async function createNewProduct(
   body: any,
   warehouseID: string,
-  adminID: string
+  adminID: string,
 ) {
   const {
     name,
@@ -261,14 +260,14 @@ async function createNewProduct(
   ) {
     return NextResponse.json(
       { error: "Missing required fields" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   if (initial_stock < 0 || stock_threshold < 0 || price < 0) {
     return NextResponse.json(
       { error: "Stock values and price cannot be negative" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -325,7 +324,7 @@ async function createNewProduct(
       {
         error: "Failed to create product or unauthorized access to warehouse",
       },
-      { status: 403 }
+      { status: 403 },
     );
   }
 
@@ -335,6 +334,6 @@ async function createNewProduct(
       message: "Product created successfully",
       data: result[0].product_info,
     },
-    { status: 201 }
+    { status: 201 },
   );
 }

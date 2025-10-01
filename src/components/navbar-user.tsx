@@ -1,5 +1,6 @@
 "use client";
-import React from "react";
+
+import React, { useState } from "react";
 import { Loader2Icon, Settings } from "lucide-react";
 import { ChevronsUpDown, LogOut } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
@@ -30,7 +31,7 @@ export function NavUser({
   };
 }) {
   const { isMobile } = useSidebar();
-  const [signingOut, setSigningOut] = React.useState(false);
+  const [signingOut, setSigningOut] = useState(false);
 
   return (
     <SidebarMenu>
