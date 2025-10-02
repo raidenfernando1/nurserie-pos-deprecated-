@@ -53,7 +53,7 @@ const CashierTable = () => {
             <TableRow key={cashier.id}>
               <TableCell className="max-w-15 truncate">{cashier.id}</TableCell>
               <TableCell>{cashier.name}</TableCell>
-              <TableCell>{cashier.name}</TableCell>
+              <TableCell>{cashier.username}</TableCell>
               <TableCell>
                 {new Date(cashier.createdAt).toLocaleDateString("en-US", {
                   year: "numeric",
