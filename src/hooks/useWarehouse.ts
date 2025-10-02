@@ -1,27 +1,12 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { useEffect } from "react";
 import useWarehouseStore from "@/store/useWarehouse";
-import type { Warehouse, WarehouseStats } from "@/types/warehouse";
-
-interface WarehouseResponse {
-  warehouses: Warehouse[];
-  totals: WarehouseStats;
-}
-
-interface ApiWarehouseResponse {
-  success: boolean;
-  stock: {
-    company_total_stock: number;
-    company_total_products: number;
-  };
-  warehouses: Array<{
-    warehouse_id: number;
-    warehouse_name: string;
-    company_id: number;
-    total_stock: string;
-    total_products: string;
-  }>;
-}
+import type {
+  Warehouse,
+  WarehouseStats,
+  WarehouseResponse,
+  ApiWarehouseResponse,
+} from "@/types/warehouse";
 
 export async function fetchWarehouses(): Promise<WarehouseResponse> {
   const res = await fetch("/api/admin/warehouse");

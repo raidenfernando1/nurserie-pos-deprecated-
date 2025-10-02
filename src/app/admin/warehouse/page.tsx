@@ -1,44 +1,53 @@
 "use client";
-
 import React from "react";
-import DataCard from "./_component/data-card";
-import WarehouseCarousel from "./_component/warehouse-carousel";
+import WarehouseLayout from "./_component/warehouse-layout";
+import Tab from "./_component/table-tab";
+import { useProducts } from "@/hooks/useProducts";
+import { totalStockColumns } from "./_component/table-column";
+import ReusableTable from "./_component/product-container";
 import useWarehouseStore from "@/store/useWarehouse";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import Link from "next/link";
+import { useState } from "react";
+import EditProduct from "./_component/popups/edit-product";
+import DeleteProduct from "./_component/popups/delete-product";
 
-export default function Warehouse() {
-  const { warehouses, warehouseStats } = useWarehouseStore();
+const TotalWarehouseLayout = () => {
+  const { data } = useProducts();
+  const [editProductPopup, setEditProductPopup] = useState<boolean>(false);
+  const [deleteProductPopup, setDeleteProductPopup] = useState<boolean>(false);
+  const { warehouseStats } = useWarehouseStore();
+
   return (
-    <main className="h-full w-full">
-      <div className="grid grid-cols-3 gap-3 p-6">
-        <DataCard label="Total warehouse" value={warehouses.length} />
-        <DataCard
-          label="Total Products"
-          value={warehouseStats.company_total_products}
+    <>
+      {editProductPopup && (
+        <EditProduct onClose={() => setEditProductPopup(false)} />
+      )}
+      {deleteProductPopup && (
+        <DeleteProduct onClose={() => setDeleteProductPopup(false)} />
+      )}
+      <WarehouseLayout
+        title="Total Stock"
+        companyTotalStock={warehouseStats.company_total_stock}
+        companyTotalProducts={warehouseStats.company_total_products}
+        showActions={false}
+        showAdmin={true}
+        onDeleteProduct={() => setDeleteProductPopup(true)}
+        onEditProduct={() => setEditProductPopup(true)}
+      >
+        <ReusableTable
+          data={data ?? []}
+          columns={totalStockColumns}
+          tabComponent={(table) => (
+            <Tab
+              table={table}
+              categories={Array.from(
+                new Set((data ?? []).map((d) => d.category)),
+              )}
+            />
+          )}
         />
-        <DataCard
-          label="Total Stock"
-          value={warehouseStats.company_total_stock}
-        />
-        <DataCard
-          label="Total Stock"
-          value={warehouseStats.company_total_stock}
-        />
-        <DataCard label="Most active Warehouse" value="Central Hub" />
-        <div className="flex flex-col gap-3">
-          <WarehouseCarousel warehouses={warehouses} />
-          <Button variant="outline" asChild>
-            <Link href="/admin/warehouse/total">Total Stock</Link>
-          </Button>
-        </div>
-        <Button variant="ghost" asChild>
-          <Card className="w-full border-2 rounded-2xl h-[150px] text-2xl text-center">
-            Warehouses
-          </Card>
-        </Button>
-      </div>
-    </main>
+      </WarehouseLayout>
+    </>
   );
-}
+};
+
+export default TotalWarehouseLayout;

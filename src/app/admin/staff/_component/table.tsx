@@ -1,4 +1,5 @@
 "use client";
+
 import {
   Table,
   TableBody,
@@ -10,9 +11,8 @@ import {
 } from "@/components/ui/table";
 
 import { useQuery } from "@tanstack/react-query";
-import { ChangePassword } from "./ChangePassword";
-import { Delete } from "lucide-react";
-import { DeleteCashier } from "./DeleteCashier";
+import { ChangePassword } from "./change-password";
+import { DeleteCashier } from "./delete-cashier";
 
 const fetchCashiers = async () => {
   const res = await fetch("/api/admin/cashier");

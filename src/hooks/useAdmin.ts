@@ -39,11 +39,11 @@ export function useAdminAuth() {
     const { getID, checkSession } = useSession();
     const sessionCheck = await checkSession({ intendedRole: "admin" });
 
-    if (!sessionCheck.proceed) {
-      throw new Error(sessionCheck.error || "Unauthorized");
+    if (!sessionCheck?.proceed) {
+      throw new Error(sessionCheck?.error || "Unauthorized");
     }
 
-    const adminID = (await getID()).userID;
+    const { userID: adminID } = await getID();
 
     try {
       const { data: user, error } = await authClient.admin.createUser({

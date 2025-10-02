@@ -1,1 +1,0 @@
-alter table "user" add column "admin_id" text not null;

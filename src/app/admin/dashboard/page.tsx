@@ -28,7 +28,7 @@ export default function AdminView() {
       title: "Warehouses",
       description: "Manage inventory locations",
       icon: Package,
-      href: "/admin/warehouse/total",
+      href: "/admin/warehouse",
       color: "text-purple-600",
     },
     {

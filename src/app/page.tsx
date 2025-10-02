@@ -82,17 +82,19 @@ export default function Entry() {
         ) : (
           <div className="flex-1 min-h-0 flex flex-col justify-between p-6 sm:p-12 overflow-y-auto">
             <div className="flex-1 flex flex-col justify-center">
-              <h1 className="scroll-m-20 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold">
+              <h1 className="scroll-m-20 text-3xl sm:text-4xl md:text-5xl lg:text-9xl font-bold">
                 Oracle POS
               </h1>
               <p className="text-sm sm:text-xs md:text-sm text-muted-foreground">
                 Property of Oracle Petroleum Corporation
               </p>
               <p className="md:w-3/4 text-sm sm:text-base md:text-lg leading-relaxed mt-5">
-                Our multi-tenant POS system allows multiple companies to operate
-                on a single platform with secure, independent data, customizable
-                settings, and real-time reporting—making it a flexible solution
-                for businesses across industries.
+                Our multi-tenant POS system — developed by a dedicated team of
+                interns at Oracle Petroleum Corporation — enables multiple
+                companies to operate on a single platform with secure,
+                independent data, customizable settings, and real-time
+                reporting, delivering a flexible solution for businesses across
+                various industries.
               </p>
             </div>
             <div className="flex-shrink-0 mt-4">

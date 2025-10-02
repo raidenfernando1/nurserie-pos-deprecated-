@@ -1,7 +1,7 @@
 "use client";
 
 import useWarehouseStore from "@/store/useWarehouse";
-import Table from "./_component/Table";
+import Table from "./_component/table";
 
 const Page = () => {
   const { warehouses } = useWarehouseStore();

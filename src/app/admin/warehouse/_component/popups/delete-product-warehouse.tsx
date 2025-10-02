@@ -14,6 +14,7 @@ import {
 import { useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useProducts } from "@/hooks/useProducts";
+import { useWarehouseProducts } from "@/hooks/useProducts";
 
 interface DeleteWarehouseProductProps {
   warehouseId: number;
@@ -25,6 +26,9 @@ const DeleteWarehouseProduct = ({
   onClose,
 }: DeleteWarehouseProductProps) => {
   const { refetch } = useProducts();
+  const { refetch: refetchWarehouse } = useWarehouseProducts({
+    warehouseID: warehouseId,
+  });
 
   const [sku, setSku] = useState("");
   const [product, setProduct] = useState<any | null>(null);
@@ -97,7 +101,7 @@ const DeleteWarehouseProduct = ({
       setError("An error occurred while deleting. Please try again.");
     } finally {
       setLoading(false);
-      await refetch();
+      await refetchWarehouse();
     }
   };
 

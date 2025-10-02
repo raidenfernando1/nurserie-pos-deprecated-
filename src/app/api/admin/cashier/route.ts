@@ -121,7 +121,7 @@ export async function POST(req: Request) {
       { status: 201 },
     );
   } catch (err) {
-    console.error(">>> Error creating cashier:", err);
+    console.error("Error creating cashier:", err);
     return NextResponse.json(
       { message: "Cashier creation failed" },
       { status: 500 },

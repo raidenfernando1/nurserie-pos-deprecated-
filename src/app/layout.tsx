@@ -1,7 +1,7 @@
 import { Geist_Mono } from "next/font/google";
 import "./globals.css";
 import React from "react";
-import Listener from "./Listener";
+import Listener from "./listener";
 import { Toaster } from "sonner";
 
 const MainFont = Geist_Mono({

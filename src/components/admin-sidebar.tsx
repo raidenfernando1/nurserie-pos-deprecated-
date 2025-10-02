@@ -132,13 +132,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         <SidebarMenuSubItem>
                           <SidebarMenuSubButton
                             asChild
-                            isActive={activePath === "/admin/warehouse/total"}
+                            isActive={activePath === "/admin/warehouse"}
                           >
                             <Link
-                              href="/admin/warehouse/total"
-                              onClick={() =>
-                                setActivePath("/admin/warehouse/total")
-                              }
+                              href="/admin/warehouse"
+                              onClick={() => setActivePath("/admin/warehouse")}
                             >
                               <span>All Stocks</span>
                             </Link>

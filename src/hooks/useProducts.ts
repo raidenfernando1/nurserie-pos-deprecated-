@@ -4,7 +4,7 @@ import { Product } from "@/types/product";
 import useWarehouseStore from "@/store/useWarehouse";
 
 async function fetchProducts(): Promise<Product[]> {
-  const res = await fetch("/api/admin/warehouse/products");
+  const res = await fetch("/api/admin/products");
   if (!res.ok) throw new Error("Failed to fetch products");
   const products: Product[] = await res.json();
   return products.map((product) => ({

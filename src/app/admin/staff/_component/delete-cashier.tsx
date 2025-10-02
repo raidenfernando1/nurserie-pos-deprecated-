@@ -1,6 +1,4 @@
 "use client";
-import { useRouter } from "next/navigation";
-
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -15,6 +13,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface DeleteCashierProps {
   cashier: {
@@ -28,7 +27,7 @@ export const DeleteCashier = ({
   onDeleteCashier,
 }: DeleteCashierProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
-  const router = useRouter();
+  const queryClient = useQueryClient(); // ✅ React Query client
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -42,10 +41,12 @@ export const DeleteCashier = ({
 
       if (data.success) {
         toast.success("Cashier deleted successfully!");
+
+        await queryClient.invalidateQueries({ queryKey: ["cashiers"] });
+
         if (onDeleteCashier) {
           onDeleteCashier();
         }
-        router.refresh();
       } else {
         toast.error(data.error || "Failed to delete cashier");
       }

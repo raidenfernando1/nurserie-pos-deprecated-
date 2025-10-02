@@ -1,9 +1,9 @@
 "use client";
 
 import LoadingBar from "@/components/loading-page";
-import CashierTable from "./_component/CashierTable";
+import CashierTable from "./_component/table";
+import { CreateCashier } from "./_component/create-cashier";
 import ProtectedRoute from "@/components/protected-route";
-import { CreateCashier } from "./_component/CreateCashier";
 
 function Staff() {
   return (

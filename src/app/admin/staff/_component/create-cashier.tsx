@@ -28,12 +28,6 @@ export function CreateCashier() {
     setError(null);
     setSuccess(false);
 
-    console.log(">>> Submitting cashier creation:", {
-      name,
-      username,
-      password: "****",
-    });
-
     try {
       const response = await fetch("/api/admin/cashier", {
         method: "POST",

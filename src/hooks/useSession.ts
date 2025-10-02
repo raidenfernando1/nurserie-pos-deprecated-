@@ -1,6 +1,9 @@
 import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 const useSession = () => {
+  const router = useRouter();
+
   const getSession = async () => {
     const session = await authClient.getSession();
     return session;
@@ -29,7 +32,8 @@ const useSession = () => {
     const role = session.data?.user.role;
 
     if (role !== intendedRole) {
-      return { proceed: false, error: "unauthorized" };
+      router.replace("/error?msg=unauthorized");
+      return;
     }
 
     return { proceed: true, error: null };
