@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 
 export function CreateCashier() {
+  const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -28,6 +29,7 @@ export function CreateCashier() {
     setSuccess(false);
 
     console.log(">>> Submitting cashier creation:", {
+      name,
       username,
       password: "****",
     });
@@ -40,6 +42,7 @@ export function CreateCashier() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          name,
           username,
           password,
         }),
@@ -57,6 +60,7 @@ export function CreateCashier() {
       }
 
       setSuccess(true);
+      setName("");
       setUsername("");
       setPassword("");
 
@@ -75,6 +79,7 @@ export function CreateCashier() {
   const handleOpenChange = (newOpen: boolean) => {
     setOpen(newOpen);
     if (!newOpen) {
+      setName;
       setUsername("");
       setPassword("");
       setError(null);
@@ -95,6 +100,16 @@ export function CreateCashier() {
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
+          <div className="grid gap-3">
+            <Label htmlFor="name">Full Name</Label>
+            <Input
+              id="name"
+              name="name"
+              placeholder="Enter Full Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
           <div className="grid gap-3">
             <Label htmlFor="username">Username</Label>
             <Input

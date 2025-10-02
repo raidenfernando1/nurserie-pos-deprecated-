@@ -19,6 +19,7 @@ export async function GET() {
       SELECT
           u.id,
           u.name,
+          u.username,
           u."createdAt",
           u.banned
       FROM "user" u
@@ -92,10 +93,10 @@ export async function POST(req: Request) {
   }
 
   // Fallback: create a new cashier
-  const { username, password } = body;
-  if (!username || !password) {
+  const { username, password, name } = body;
+  if (!username || !password || !name) {
     return NextResponse.json(
-      { message: "Error: empty username or password" },
+      { message: "Error: empty username, password or name" },
       { status: 400 },
     );
   }
@@ -106,7 +107,8 @@ export async function POST(req: Request) {
       body: {
         email: `${username}@placeholder.com`,
         password,
-        name: username,
+        name: name,
+        username: username,
         admin_id: adminID,
       },
     });
