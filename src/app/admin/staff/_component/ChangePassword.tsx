@@ -92,8 +92,12 @@ export function ChangePassword({
               <p className="text-sm text-gray-600">{cashier.id}</p>
             </div>
             <div className="grid gap-3">
-              <Label>Username</Label>
+              <Label>Full Name</Label>
               <p className="text-sm text-gray-600">{cashier.name}</p>
+            </div>
+            <div className="grid gap-3">
+              <Label>Username</Label>
+              <p className="text-sm text-gray-600">{cashier.username}</p>
             </div>
             <div className="grid gap-3">
               <Label htmlFor="password-input">New Password</Label>
