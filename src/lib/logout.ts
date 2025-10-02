@@ -1,10 +1,11 @@
-import { Roles } from "@/app/types/roles";
+import { useRouter } from "next/navigation";
 import { authClient } from "./auth-client";
+import type { Roles } from "@/types/user";
 
 export default async function Logout(role: Roles): Promise<boolean> {
-  try {
-    console.log("123");
+  const router = useRouter();
 
+  try {
     const res = await authClient.signOut();
 
     if (!res) {
@@ -17,9 +18,7 @@ export default async function Logout(role: Roles): Promise<boolean> {
       case "cashier":
       default:
         console.error(`Unknown role during logout: ${role}`);
-        console.log(res);
-
-        window.location.href = "/";
+        router.push("/");
         break;
     }
 

@@ -1,138 +1,123 @@
 "use client";
 
+import { GalleryVerticalEnd } from "lucide-react";
 import React from "react";
-import useError from "@/store/useError";
-import LoginForm from "@/components/LoginPage";
-import { useAdminAuth } from "@/lib/admin/login";
+import Head from "next/head";
+import { useAdminAuth } from "@/hooks/useAdmin";
 import { Button } from "@/components/ui/button";
-
-const cardList = [
-  { name: "cashier", role: "cashier" },
-  { name: "admin", role: "admin" },
-];
-
-function SquareCard({
-  name,
-  role,
-  onSelect,
-}: {
-  name: string;
-  role: string;
-  onSelect: (role: string) => void;
-}) {
-  function handleClick() {
-    onSelect(role);
-  }
-
-  return (
-    <button
-      onClick={handleClick}
-      className="cursor-pointer size-80 border-2 rounded-2xl flex items-center justify-center text-2xl"
-    >
-      {name}
-    </button>
-  );
-}
+import { useQuery } from "@tanstack/react-query";
+import LoginForm from "@/components/login-form";
+import { Navbar } from "@/components/navbar";
 
 export default function Entry() {
-  const [selectedRole, setSelectedRole] = React.useState<string | null>(null);
-  const { healthDB, setHealthDB } = useError();
+  const [showCashierLogin, setShowCashierLogin] = React.useState(false);
+  const { login } = useAdminAuth();
 
-  React.useEffect(() => {
-    async function fetchHealth() {
-      try {
-        const res = await fetch("/api/health");
-        const data = await res.json();
-        setHealthDB(data.healthDB);
-      } catch (e) {
-        console.error(e);
-        setHealthDB(false);
-      }
-    }
-    fetchHealth();
-  }, [setHealthDB]);
-
-  function renderContent(selectedRole: string) {
-    switch (selectedRole) {
-      case "admin":
-        return (
-          <LoginForm title="nurserie" subTitle="administrator" role="admin" />
-        );
-      case "cashier":
-        return <LoginForm title="nurserie" subTitle="cashier" role="cashier" />;
-      default:
-        return null;
-    }
-  }
-
-  if (selectedRole) {
-    return (
-      <main className="w-full h-full flex items-center justify-center">
-        {renderContent(selectedRole)}
-      </main>
-    );
-  }
+  const {
+    data: health,
+    error,
+    isLoading,
+  } = useQuery({
+    queryKey: ["DatabaseHealth"],
+    queryFn: async () => {
+      const response = await fetch("/api/health");
+      if (!response.ok) throw new Error("Health check failed");
+      return (await response.json()).health;
+    },
+    refetchInterval: 60_000,
+  });
 
   return (
-    <main className="min-h-screen w-full flex flex-col bg-black">
-      <div className="hidden md:flex flex-row gap-2 sm:gap-4 justify-end px-4 sm:px-10 py-4">
-        <div className="flex flex-wrap items-center gap-2 md:flex-row rounded">
-          <Button
-            className="rounded hover:bg-blue-500 hover:text-white transition duration-200"
-            onClick={() => setSelectedRole("cashier")}
-          >
-            Cashier
-          </Button>
-        </div>
-        <div className="flex flex-wrap items-center gap-2 md:flex-row">
-          <Button
-            className="rounded hover:bg-red-500 hover:text-white transition duration-200"
-            onClick={() => useAdminAuth().Login()}
-          >
-            Admin
-          </Button>
-        </div>
-      </div>
+    <>
+      <Head>
+        <title>Oracle POS</title>
+        <meta
+          name="description"
+          content="All-in-one POS system for Oracle Petroleum Corporation"
+        />
+        <meta name="robots" content="index, follow" />
+        <meta property="og:title" content="Oracle POS" />
+        <meta
+          property="og:description"
+          content="All-in-one POS system for Oracle Petroleum Corporation"
+        />
+        <meta property="og:type" content="website" />
+      </Head>
 
-      <div className="flex-grow flex flex-col items-center justify-center text-center md:items-start md:justify-start md:text-left px-4 sm:px-10 lg:px-20 py-10">
-        <h1 className="text-4xl sm:text-6xl lg:text-8xl font-bold">
-          Oracle POS
-        </h1>
+      <main className="h-screen max-h-screen w-full flex flex-col overflow-hidden">
+        {!showCashierLogin && (
+          <div className="flex-shrink-0 md:flex flex-row gap-2 sm:gap-4 justify-between px-4 sm:px-10 py-4">
+            <div className="flex items-center gap-6">
+              <Navbar />
+            </div>
+            <div className="gap-6 hidden md:flex">
+              <Button
+                className="cursor-pointer"
+                onClick={() => setShowCashierLogin(true)}
+              >
+                Cashier
+              </Button>
+              <Button className="cursor-pointer" onClick={() => login()}>
+                Admin
+              </Button>
+            </div>
+          </div>
+        )}
 
-        <div className=" space-y-2 text-sm sm:text-base lg:text-lg py-10">
-          <p>
-            We are a young, family-owned, parent-operated company at the heart
-            of Metro Manila.
-          </p>
-          <p>
-            This all-in-one POS handles everything from tracking transactions to
-            managing inventory, so you can focus on what matters. The best part?
-            You can customize the look to match your brand. It's powerful, and
-            it's personal
-          </p>
-        </div>
-      </div>
-
-      <div className="px-4 sm:px-10 py-4 text-sm sm:text-base">
-        <p className="text-lg">
-          Database Status:{" "}
-          <span
-            className={
-              healthDB
-                ? "text-green-500"
-                : healthDB === false
-                ? "text-red-500"
-                : ""
-            }
-          >
-            {healthDB === undefined
-              ? "Checking..."
-              : healthDB
-              ? "Online"
-              : "Offline"}
-          </span>
-        </p>
-      </div>
-    </main>
+        {showCashierLogin ? (
+          <div className="flex-1 min-h-0 flex flex-col items-center justify-center p-6 md:p-10">
+            <div className="flex w-full max-w-sm flex-col gap-6">
+              <a
+                href="#"
+                className="flex items-center gap-2 self-center font-medium"
+              >
+                <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
+                  <GalleryVerticalEnd className="size-4" />
+                </div>
+                Oracle Petroleum Corporation
+              </a>
+              <LoginForm />
+            </div>
+          </div>
+        ) : (
+          <div className="flex-1 min-h-0 flex flex-col justify-between p-6 sm:p-12 overflow-y-auto">
+            <div className="flex-1 flex flex-col justify-center">
+              <h1 className="scroll-m-20 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold">
+                Oracle POS
+              </h1>
+              <p className="text-sm sm:text-xs md:text-sm text-muted-foreground">
+                Property of Oracle Petroleum Corporation
+              </p>
+              <p className="md:w-3/4 text-sm sm:text-base md:text-lg leading-relaxed mt-5">
+                Our multi-tenant POS system allows multiple companies to operate
+                on a single platform with secure, independent data, customizable
+                settings, and real-time reporting—making it a flexible solution
+                for businesses across industries.
+              </p>
+            </div>
+            <div className="flex-shrink-0 mt-4">
+              {isLoading ? (
+                <p className="leading-7 [&:not(:first-child)]:mt-6">
+                  Checking database status...
+                </p>
+              ) : error ? (
+                <p className="leading-7 [&:not(:first-child)]:mt-6 text-red-700">
+                  Error checking database
+                </p>
+              ) : (
+                <p className="leading-7 [&:not(:first-child)]:mt-6">
+                  Database Status:
+                  {health ? (
+                    <span className="text-green-700"> Operational</span>
+                  ) : (
+                    <span className="text-red-700"> Non-Operational</span>
+                  )}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+      </main>
+    </>
   );
 }

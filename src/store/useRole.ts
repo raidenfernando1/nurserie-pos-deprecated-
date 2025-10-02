@@ -1,12 +1,8 @@
 import { create } from "zustand";
-import type { Roles } from "@/app/types/roles";
+import { RoleStore } from "@/types/user";
+import type { Roles } from "@/types/user";
 
-interface RoleStoreTypes {
-  role: Roles | undefined;
-  setRole: (role: Roles | undefined) => void;
-}
-
-const useRole = create<RoleStoreTypes>((set) => ({
+const useRole = create<RoleStore>((set) => ({
   role: undefined,
   setRole: (role) => set({ role }),
 }));
