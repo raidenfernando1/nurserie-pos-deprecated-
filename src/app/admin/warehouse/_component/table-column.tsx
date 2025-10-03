@@ -11,7 +11,7 @@ export const totalStockColumns: ColumnDef<Product>[] = [
         {row.original.image_url ? (
           <img
             src={row.original.image_url}
-            alt={row.original.name}
+            alt=""
             className="w-10 h-10 object-cover rounded"
           />
         ) : (
