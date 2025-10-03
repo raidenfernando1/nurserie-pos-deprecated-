@@ -69,6 +69,33 @@ const ReusableTable = <T,>({
     state: { pagination, globalFilter },
     onGlobalFilterChange: setGlobalFilter,
     onPaginationChange: setPagination,
+    globalFilterFn: (row, columnId, filterValue) => {
+      const search = String(filterValue).toLowerCase().trim();
+
+      // Split search into individual words
+      const searchWords = search.split(/\s+/).filter((word) => word.length > 0);
+
+      // If no search words, show all
+      if (searchWords.length === 0) return true;
+
+      // Collect all searchable text from the row
+      const rowText = columns
+        .map((col: any) => {
+          let value;
+
+          if (col.accessorFn) {
+            value = col.accessorFn(row.original);
+          } else if (col.accessorKey) {
+            value = row.original[col.accessorKey as keyof typeof row.original];
+          }
+
+          return String(value || "").toLowerCase();
+        })
+        .join(" ");
+
+      // Check if ALL search words are present in the row text (order doesn't matter)
+      return searchWords.every((word) => rowText.includes(word));
+    },
   });
 
   return (
