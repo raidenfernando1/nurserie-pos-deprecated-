@@ -3,9 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import { Product } from "@/types/product";
 import useWarehouseStore from "@/store/useWarehouse";
 
-async function fetchProducts(): Promise<Product[]> {
-  const res = await fetch("/api/admin/products");
+async function fetchProducts({
+  isFull = true,
+}: {
+  isFull: boolean;
+}): Promise<Product[]> {
+  const res = await fetch(`/api/admin/products?full=${isFull}`);
   if (!res.ok) throw new Error("Failed to fetch products");
+
   const products: Product[] = await res.json();
   return products.map((product) => ({
     ...product,
@@ -73,12 +78,13 @@ export function useWarehouseProducts({ warehouseID }: { warehouseID: number }) {
   });
 }
 
-export function useProducts() {
+export function useProducts(isFull: boolean = true) {
   const { setStockCount } = useWarehouseStore();
   const setProducts = useWarehouseStore((state) => state.setProducts);
+
   const query = useQuery<Product[], Error>({
-    queryKey: ["products"],
-    queryFn: fetchProducts,
+    queryKey: ["products", isFull],
+    queryFn: () => fetchProducts({ isFull }),
   });
 
   useEffect(() => {

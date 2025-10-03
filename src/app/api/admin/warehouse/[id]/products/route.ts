@@ -5,27 +5,20 @@ import { db } from "@/lib/db-client";
 
 /**
  * GET /api/admin/warehouse/[id]/products
- * ---------------------------------------
- * Fetches all products stored in a specific warehouse owned by the authenticated admin.
- * Requires:
- *  - Authenticated session
- *  - Warehouse ID as a dynamic route param
+ * Fetch all products stored in a specific warehouse.
  */
 export async function GET(
   request: NextRequest,
   context: { params: Promise<{ id: string }> },
 ) {
-  const { id: warehouseID } = await context.params; // 👈 await is required now
+  const { id: warehouseID } = await context.params;
 
   const session = await auth.api.getSession({ headers: await headers() });
-
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const userID = session.user.id;
   try {
-    // ✅ Query all products that belong to this warehouse owned by the logged-in admin
     const response = await db`
       SELECT
           wp.id AS warehouse_product_id,
@@ -43,9 +36,7 @@ export async function GET(
       FROM warehouse_products wp
       JOIN products p ON wp.product_id = p.id
       JOIN warehouse w ON wp.warehouse_id = w.id
-      JOIN company c ON w.company_id = c.id
-      WHERE c.admin_id = ${userID}
-        AND w.id = ${warehouseID};
+      WHERE w.id = ${warehouseID};
     `;
 
     return NextResponse.json(response);
@@ -60,11 +51,7 @@ export async function GET(
 
 /**
  * POST /api/admin/warehouse/[id]/products
- * ---------------------------------------
- * Adds a product into a warehouse.
- * Two modes:
- *  1. Link an existing product to the warehouse (`action: "link"`)
- *  2. Create a new product and immediately store it in the warehouse (default)
+ * Adds a product to a warehouse — either by linking an existing product or creating a new one.
  */
 export async function POST(
   request: Request,
@@ -73,28 +60,21 @@ export async function POST(
   const { id: warehouseID } = await context.params;
   const session = await auth.api.getSession({ headers: await headers() });
 
-  // Must be authenticated
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-
-  const adminID = session.user.id;
 
   try {
     const body = await request.json();
     const { action } = body;
 
-    // If client specifies `link`, try linking an existing product
     if (action === "link") {
-      return await linkExistingProduct(body, warehouseID, adminID);
+      return await linkExistingProduct(body, warehouseID);
     }
-
-    // Otherwise, create a completely new product
-    return await createNewProduct(body, warehouseID, adminID);
+    return await createNewProduct(body, warehouseID);
   } catch (error) {
     console.error("Error in product operation:", error);
 
-    // Specific database error handling
     if (error instanceof Error) {
       if (error.message.includes("duplicate key")) {
         return NextResponse.json(
@@ -104,7 +84,7 @@ export async function POST(
       }
       if (error.message.includes("foreign key")) {
         return NextResponse.json(
-          { error: "Invalid warehouse or company reference" },
+          { error: "Invalid warehouse or product reference" },
           { status: 400 },
         );
       }
@@ -119,21 +99,11 @@ export async function POST(
 
 /**
  * linkExistingProduct()
- * ----------------------
  * Links an existing product to a specific warehouse and records the initial stock movement.
- * Steps:
- *  1. Verify that the admin owns the warehouse and the product belongs to their company.
- *  2. Insert a record into `warehouse_products`.
- *  3. Log the initial stock insertion into `stock_movements`.
  */
-async function linkExistingProduct(
-  body: any,
-  warehouseID: string,
-  adminID: string,
-) {
+async function linkExistingProduct(body: any, warehouseID: string) {
   const { product_id, stock, stock_threshold } = body;
 
-  // Validate required fields
   if (!product_id || stock === undefined || stock_threshold === undefined) {
     return NextResponse.json(
       {
@@ -143,7 +113,6 @@ async function linkExistingProduct(
     );
   }
 
-  // Prevent negative stock values
   if (stock < 0 || stock_threshold < 0) {
     return NextResponse.json(
       { error: "Stock values cannot be negative" },
@@ -151,31 +120,10 @@ async function linkExistingProduct(
     );
   }
 
-  // ✅ Verify ownership and link product to warehouse
   const result = await db`
-    WITH admin_check AS (
-      SELECT
-        w.id as warehouse_id,
-        c.id as company_id
-      FROM warehouse w
-      JOIN company c ON w.company_id = c.id
-      WHERE w.id = ${warehouseID}
-        AND c.admin_id = ${adminID}
-    ),
-    product_check AS (
-      SELECT p.id
-      FROM products p, admin_check ac
-      WHERE p.id = ${product_id}
-        AND p.company_id = ac.company_id
-    ),
-    wp AS (
+    WITH wp AS (
       INSERT INTO warehouse_products (warehouse_id, product_id, stock, stock_threshold)
-      SELECT
-        ${warehouseID},
-        pc.id,
-        ${stock},
-        ${stock_threshold}
-      FROM product_check pc, admin_check ac
+      VALUES (${warehouseID}, ${product_id}, ${stock}, ${stock_threshold})
       RETURNING id, warehouse_id, product_id, stock, stock_threshold
     )
     INSERT INTO stock_movements (warehouse_product_id, change, reason, date_added)
@@ -203,7 +151,7 @@ async function linkExistingProduct(
     return NextResponse.json(
       {
         error:
-          "Failed to link product. Product may not exist, already be linked, or you don't have permission.",
+          "Failed to link product. Product may not exist or is already linked.",
       },
       { status: 403 },
     );
@@ -221,20 +169,9 @@ async function linkExistingProduct(
 
 /**
  * createNewProduct()
- * -------------------
- * Creates a new product under the admin's company and stores it directly in the specified warehouse.
- * Steps:
- *  1. Validate all input fields.
- *  2. Confirm the admin owns the warehouse.
- *  3. Insert product into `products` table.
- *  4. Insert stock entry into `warehouse_products`.
- *  5. Log initial stock movement in `stock_movements`.
+ * Creates a new product and stores it directly in the specified warehouse.
  */
-async function createNewProduct(
-  body: any,
-  warehouseID: string,
-  adminID: string,
-) {
+async function createNewProduct(body: any, warehouseID: string) {
   const {
     name,
     description,
@@ -248,7 +185,6 @@ async function createNewProduct(
     stock_threshold,
   } = body;
 
-  // ✅ Validate input
   if (
     !name ||
     !brand ||
@@ -271,20 +207,12 @@ async function createNewProduct(
     );
   }
 
-  // ✅ Create product, link it to warehouse, and log stock movement in one query
   const result = await db`
-    WITH admin_check AS (
-      SELECT c.id as company_id, c.admin_id
-      FROM company c
-      JOIN warehouse w ON c.id = w.company_id
-      WHERE w.id = ${warehouseID} AND c.admin_id = ${adminID}
-    ),
-    new_product AS (
+    WITH new_product AS (
       INSERT INTO products (
-        company_id, name, description, brand, category, sku, barcode, price, image_url
+        name, description, brand, category, sku, barcode, price, image_url
       )
-      SELECT
-        ac.company_id,
+      VALUES (
         ${name},
         ${description || null},
         ${brand},
@@ -293,7 +221,7 @@ async function createNewProduct(
         ${barcode || null},
         ${price},
         ${image_url || null}
-      FROM admin_check ac
+      )
       RETURNING id, name, sku
     ),
     wp AS (
@@ -301,7 +229,7 @@ async function createNewProduct(
         warehouse_id, product_id, stock, stock_threshold
       )
       SELECT ${warehouseID}, np.id, ${initial_stock}, ${stock_threshold}
-      FROM new_product np, admin_check ac
+      FROM new_product np
       RETURNING id, product_id, stock
     )
     INSERT INTO stock_movements (
@@ -321,9 +249,7 @@ async function createNewProduct(
 
   if (!result || result.length === 0) {
     return NextResponse.json(
-      {
-        error: "Failed to create product or unauthorized access to warehouse",
-      },
+      { error: "Failed to create product or link it to warehouse" },
       { status: 403 },
     );
   }

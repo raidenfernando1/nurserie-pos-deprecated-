@@ -7,9 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { X, Package, Search, ArrowLeft, Loader2 } from "lucide-react";
 import { useState } from "react";
-import { createWarehouseProduct } from "@/hooks/useProducts";
+import {
+  createWarehouseProduct,
+  useProducts,
+  useWarehouseProducts,
+} from "@/hooks/useProducts";
 import useWarehouseStore from "@/store/useWarehouse";
-import { useWarehouseProducts } from "@/hooks/useProducts";
+import ProductList from "./_component/add-product-list";
 
 const AddProduct = ({
   onClose,
@@ -24,14 +28,6 @@ const AddProduct = ({
   const [step, setStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const filteredProducts = products.filter(
-    (product) =>
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.warehouse_name.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
 
   const [sku, setSku] = useState("");
   const [barcode, setBarcode] = useState("");
@@ -371,6 +367,7 @@ const AddProduct = ({
           </CardContent>
         </Card>
       )}
+
       {/* Step 2: Success Confirmation */}
       {step === 2 && (
         <Card className="w-full max-w-md">
@@ -430,29 +427,7 @@ const AddProduct = ({
               <X className="h-4 w-4" />
             </Button>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Search Bar */}
-            <Input
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full"
-            />
-            {/* Scrollable Product List */}
-            <div className="max-h-[400px] overflow-y-auto space-y-2 pr-2">
-              {filteredProducts.map((data) => (
-                <div
-                  key={data.id}
-                  className="p-3 rounded-lg border bg-card hover:bg-accent cursor-pointer transition-colors"
-                >
-                  <p className="font-medium text-sm">{data.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {data.brand} • {data.warehouse_name}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </CardContent>
+          <ProductList />
         </Card>
       )}
     </div>

@@ -4,12 +4,12 @@ import auth from "@/lib/auth-server";
 import { db } from "@/lib/db-client";
 
 /*
-THIS API IS FOR FETCHING ALL PRODUCTS TIED TO AN ADMIN USERID AND WAREHOUSEID 
+THIS API IS FOR FETCHING ALL PRODUCTS TIED TO AN ADMIN USERID AND WAREHOUSEID
 ITS TIED TO
 */
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
@@ -36,8 +36,6 @@ export async function GET(
       FROM warehouse_products wp
       JOIN products p ON wp.product_id = p.id
       JOIN warehouse w ON wp.warehouse_id = w.id
-      JOIN company c ON w.company_id = c.id
-      WHERE c.admin_id = ${userID}
       AND w.id = ${warehouseID}
     `;
 
