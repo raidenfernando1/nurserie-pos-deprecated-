@@ -11,7 +11,7 @@ export default function NotFound() {
         height={250}
         width={250}
       />
-      <h1 className="text-4xl font-bold tracking-tight text-center mb-2">
+      <h1 className="text-4xl font-bold tracking-tight text-ce  nter mb-2">
         Ooops! Something went wrong.
       </h1>
       <p className="text-xl text-gray-600 text-center mb-6">

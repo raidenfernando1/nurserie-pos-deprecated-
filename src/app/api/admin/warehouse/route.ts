@@ -13,36 +13,28 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userID = session.user.id;
-
-    const response = await db`WITH warehouse_stats AS (
-      SELECT
-        w.id AS warehouse_id,
-        w.warehouse_name,
-        w.company_id,
-        COALESCE(SUM(wp.stock), 0) AS total_stock,
-        COUNT(DISTINCT wp.product_id) AS total_products
-      FROM warehouse w
-      JOIN company c ON w.company_id = c.id
-      LEFT JOIN warehouse_products wp ON w.id = wp.warehouse_id
-      WHERE c.admin_id = ${userID}
-      GROUP BY w.id, w.warehouse_name, w.company_id
-    )
-    SELECT *,
-           (SELECT SUM(total_stock) FROM warehouse_stats) AS company_total_stock,
-           (SELECT COUNT(DISTINCT wp.product_id)
-            FROM warehouse_products wp
-            JOIN warehouse w ON wp.warehouse_id = w.id
-            JOIN company c ON w.company_id = c.id
-            WHERE c.admin_id = ${userID}) AS company_total_products
-    FROM warehouse_stats
-    ORDER BY warehouse_id;
-`;
+    // No need for userID anymore if there's no filtering
+    const response = await db`
+      WITH warehouse_stats AS (
+        SELECT
+          w.id AS warehouse_id,
+          w.warehouse_name,
+          COALESCE(SUM(wp.stock), 0) AS total_stock,
+          COUNT(DISTINCT wp.product_id) AS total_products
+        FROM warehouse w
+        LEFT JOIN warehouse_products wp ON w.id = wp.warehouse_id
+        GROUP BY w.id, w.warehouse_name
+      )
+      SELECT *,
+            (SELECT SUM(total_stock) FROM warehouse_stats) AS company_total_stock,
+            (SELECT SUM(total_products) FROM warehouse_stats) AS company_total_products
+      FROM warehouse_stats
+      ORDER BY warehouse_id;
+    `;
 
     const warehouses = response.map((row) => ({
       warehouse_id: parseInt(row.warehouse_id),
       warehouse_name: row.warehouse_name,
-      company_id: parseInt(row.company_id),
       total_stock: parseInt(row.total_stock),
       total_products: parseInt(row.total_products),
     }));

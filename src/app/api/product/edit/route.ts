@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import auth from "@/lib/auth-server";
 
 interface UpdateProductBody {
-  id: string; // Product ID to update
+  id: string;
   name?: string;
   description?: string;
   brand?: string;
@@ -52,8 +52,6 @@ export async function PATCH(request: Request) {
         category = COALESCE(${category}, p.category),
         price = COALESCE(${price}, p.price),
         image_url = COALESCE(${image_url}, p.image_url)
-      FROM company c
-      WHERE p.company_id = c.id
         AND c.admin_id = ${userID}
         AND p.id = ${id}
       RETURNING p.*;
