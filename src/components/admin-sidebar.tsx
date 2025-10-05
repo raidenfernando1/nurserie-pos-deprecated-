@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import {
@@ -24,6 +24,7 @@ import {
   Settings,
   ChartSpline,
   ChevronDown,
+  Handshake,
 } from "lucide-react";
 import { NavUser } from "./navbar-user";
 import useWarehouseStore from "@/store/useWarehouse";
@@ -32,11 +33,14 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import useClient from "@/app/admin/consignments/_store/useClient";
+import useWarehouse from "@/app/admin/warehouse/_lib/useWarehouse";
 
 export const adminItems = [
   { name: "Dashboard", path: "/admin/dashboard", icon: Home },
   { name: "Analytics", path: "/admin/analytics", icon: ChartSpline },
   { name: "Staff", path: "/admin/staff", icon: Users },
+  { name: "Consignments", path: "/admin/consignments", icon: Handshake },
 ];
 
 export const cashierItems = [
@@ -45,11 +49,13 @@ export const cashierItems = [
 ];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const [role, setRole] = React.useState<string | null>(null);
-  const [activePath, setActivePath] = React.useState<string>("");
-  const [loading, setLoading] = React.useState(true);
-  const [sessionData, setSessionData] = React.useState<any>(null);
-  const { warehouses } = useWarehouseStore();
+  const [role, setRole] = useState<string | null>(null);
+  const [activeMenu, setActiveMenu] = useState(""); // e.g., "warehouse" or "consignments"
+  const [activeSubPath, setActiveSubPath] = useState(""); // exact path of sub-item
+  const [loading, setLoading] = useState(true);
+  const [sessionData, setSessionData] = useState<any>(null);
+  const { warehouses } = useWarehouse();
+  const { clients } = useClient();
 
   useEffect(() => {
     const fetchRole = async () => {
@@ -58,8 +64,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         const userRole = session?.data?.user?.role ?? null;
         setRole(userRole);
         setSessionData(session?.data);
-        if (userRole === "admin") setActivePath("/admin/dashboard");
-        else if (userRole === "cashier") setActivePath("/cashier");
+        if (userRole === "admin") setActiveSubPath("/admin/dashboard");
+        else if (userRole === "cashier") setActiveSubPath("/cashier");
       } catch (err) {
         console.error("Failed to fetch role:", err);
       } finally {
@@ -104,11 +110,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarMenuItem key={item.path}>
                   <SidebarMenuButton
                     asChild
-                    isActive={activePath === item.path}
+                    isActive={activeSubPath === item.path}
                   >
                     <Link
                       href={item.path}
-                      onClick={() => setActivePath(item.path)}
+                      onClick={() => {
+                        setActiveMenu("");
+                        setActiveSubPath(item.path);
+                      }}
                       className="flex items-center"
                     >
                       <item.icon className="mr-2 h-4 w-4" />
@@ -117,69 +126,151 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
-              {role === "admin" && (
-                <Collapsible defaultOpen className="group/collapsible">
-                  <SidebarMenuItem>
-                    <CollapsibleTrigger asChild>
-                      <SidebarMenuButton>
-                        <Warehouse className="mr-2 h-4 w-4" />
-                        <span>Warehouses</span>
-                        <ChevronDown className="ml-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
-                      </SidebarMenuButton>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent>
-                      <SidebarMenuSub>
-                        <SidebarMenuSubItem>
-                          <SidebarMenuSubButton
-                            asChild
-                            isActive={activePath === "/admin/warehouse"}
-                          >
-                            <Link
-                              href="/admin/warehouse"
-                              onClick={() => setActivePath("/admin/warehouse")}
-                            >
-                              <span>All Stocks</span>
-                            </Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
 
-                        {/* Individual Warehouses */}
-                        {warehouses && warehouses.length > 0 ? (
-                          warehouses.map((warehouse: any) => (
-                            <SidebarMenuSubItem key={warehouse.warehouse_id}>
-                              <SidebarMenuSubButton
-                                asChild
-                                isActive={
-                                  activePath ===
-                                  `/admin/warehouse/${warehouse.warehouse_id}`
-                                }
-                              >
-                                <Link
-                                  href={`/admin/warehouse/${warehouse.warehouse_id}`}
-                                  onClick={() =>
-                                    setActivePath(
-                                      `/admin/warehouse/${warehouse.warehouse_id}`,
-                                    )
-                                  }
-                                >
-                                  <span>{warehouse.warehouse_name}</span>
-                                </Link>
-                              </SidebarMenuSubButton>
-                            </SidebarMenuSubItem>
-                          ))
-                        ) : (
+              {role === "admin" && (
+                <>
+                  {/* Warehouses */}
+                  <Collapsible defaultOpen className="group/collapsible">
+                    <SidebarMenuItem>
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuButton
+                          isActive={activeMenu === "warehouse"}
+                        >
+                          <Warehouse className="mr-2 h-4 w-4" />
+                          <span>Warehouses</span>
+                          <ChevronDown className="ml-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <SidebarMenuSub>
                           <SidebarMenuSubItem>
-                            <SidebarMenuSubButton>
-                              <span className="text-gray-500">
-                                No warehouses
-                              </span>
+                            <SidebarMenuSubButton
+                              asChild
+                              isActive={activeSubPath === "/admin/warehouse"}
+                            >
+                              <Link
+                                href="/admin/warehouse"
+                                onClick={() => {
+                                  setActiveMenu("warehouse");
+                                  setActiveSubPath("/admin/warehouse");
+                                }}
+                              >
+                                <span>All Stocks</span>
+                              </Link>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
-                        )}
-                      </SidebarMenuSub>
-                    </CollapsibleContent>
-                  </SidebarMenuItem>
-                </Collapsible>
+
+                          {warehouses && warehouses.length > 0 ? (
+                            warehouses.map((warehouse: any) => (
+                              <SidebarMenuSubItem key={warehouse.warehouse_id}>
+                                <SidebarMenuSubButton
+                                  asChild
+                                  isActive={
+                                    activeSubPath ===
+                                    `/admin/warehouse/${warehouse.warehouse_id}`
+                                  }
+                                >
+                                  <Link
+                                    href={`/admin/warehouse/${warehouse.warehouse_id}`}
+                                    onClick={() => {
+                                      setActiveMenu("warehouse");
+                                      setActiveSubPath(
+                                        `/admin/warehouse/${warehouse.warehouse_id}`
+                                      );
+                                    }}
+                                  >
+                                    <span>{warehouse.warehouse_name}</span>
+                                  </Link>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+                            ))
+                          ) : (
+                            <SidebarMenuSubItem>
+                              <SidebarMenuSubButton>
+                                <span className="text-gray-500">
+                                  No warehouses
+                                </span>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          )}
+                        </SidebarMenuSub>
+                      </CollapsibleContent>
+                    </SidebarMenuItem>
+                  </Collapsible>
+
+                  {/* Consignments */}
+                  <Collapsible defaultOpen className="group/collapsible">
+                    <SidebarMenuItem>
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuButton
+                          isActive={activeMenu === "consignments"}
+                        >
+                          <Handshake className="mr-2 h-4 w-4" />
+                          <span>Consignments</span>
+                          <ChevronDown className="ml-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <SidebarMenuSub>
+                          {/* All Clients */}
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              asChild
+                              isActive={activeSubPath === "/admin/consignments"}
+                            >
+                              <Link
+                                href="/admin/consignments"
+                                onClick={() => {
+                                  setActiveMenu("consignments");
+                                  setActiveSubPath("/admin/consignments");
+                                }}
+                              >
+                                <span>All Clients</span>
+                              </Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+
+                          {/* Individual Clients */}
+                          {clients && clients.length > 0 ? (
+                            clients.map((client: any) => (
+                              <SidebarMenuSubItem key={client.client_id}>
+                                <SidebarMenuSubButton
+                                  asChild
+                                  isActive={
+                                    activeSubPath ===
+                                    `/admin/consignments/${client.client_id}`
+                                  }
+                                >
+                                  <Link
+                                    href={`/admin/consignments/${client.client_id}`}
+                                    onClick={() => {
+                                      setActiveMenu("consignments");
+                                      setActiveSubPath(
+                                        `/admin/consignments/${client.client_id}`
+                                      );
+                                    }}
+                                  >
+                                    <span>
+                                      {client.client_name || "Unnamed Client"}
+                                    </span>
+                                  </Link>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+                            ))
+                          ) : (
+                            <SidebarMenuSubItem>
+                              <SidebarMenuSubButton>
+                                <span className="text-gray-500">
+                                  No clients
+                                </span>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          )}
+                        </SidebarMenuSub>
+                      </CollapsibleContent>
+                    </SidebarMenuItem>
+                  </Collapsible>
+                </>
               )}
             </SidebarMenu>
           </SidebarGroupContent>

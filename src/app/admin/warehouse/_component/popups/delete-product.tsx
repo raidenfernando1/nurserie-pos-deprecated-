@@ -177,7 +177,7 @@ const DeleteProduct = ({ onClose }: { onClose: () => void }) => {
                     <div>
                       <p className="text-xs text-muted-foreground">Price</p>
                       <p className="text-sm font-medium">
-                        ${parseFloat(product.price).toFixed(2)}
+                        ₱ {parseFloat(product.price).toFixed(2)}
                       </p>
                     </div>
                     <div>

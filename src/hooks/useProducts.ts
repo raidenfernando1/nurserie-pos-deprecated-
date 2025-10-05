@@ -22,7 +22,7 @@ async function fetchProducts({
 async function fetchWarehouseProducts({
   warehouseID,
 }: {
-  warehouseID: number;
+  warehouseID: string;
 }): Promise<Product[]> {
   const res = await fetch(`/api/admin/warehouse/${warehouseID}/products`);
   if (!res.ok) throw new Error("Failed to fetch warehouse products");
@@ -33,7 +33,7 @@ async function createWarehouseProduct({
   warehouseID,
   productData,
 }: {
-  warehouseID: number;
+  warehouseID: string;
   productData: {
     name: string;
     description?: string;
@@ -70,7 +70,7 @@ async function createWarehouseProduct({
   return res.json();
 }
 
-export function useWarehouseProducts({ warehouseID }: { warehouseID: number }) {
+export function useWarehouseProducts({ warehouseID }: { warehouseID: string }) {
   return useQuery<Product[], Error>({
     queryKey: ["warehouseProducts", warehouseID],
     queryFn: () => fetchWarehouseProducts({ warehouseID }),

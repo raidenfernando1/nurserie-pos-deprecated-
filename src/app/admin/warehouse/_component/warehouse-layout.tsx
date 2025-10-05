@@ -12,8 +12,10 @@ interface WarehouseLayoutProps {
   companyTotalProducts?: number;
   onEditProduct?: () => void;
   onDeleteProduct?: () => void;
-  onDeleteWarehouseProduct?: () => void;
+  onMoveProduct?: () => void;
   onAddProduct?: () => void;
+  onDeleteWarehouseProduct?: () => void;
+  onAddExistingProduct: () => void;
 }
 
 const WarehouseLayout: React.FC<WarehouseLayoutProps> = ({
@@ -26,7 +28,9 @@ const WarehouseLayout: React.FC<WarehouseLayoutProps> = ({
   onEditProduct,
   onDeleteProduct,
   onDeleteWarehouseProduct,
+  onMoveProduct,
   onAddProduct,
+  onAddExistingProduct,
 }) => {
   return (
     <main className="h-screen flex flex-col p-2">
@@ -39,7 +43,9 @@ const WarehouseLayout: React.FC<WarehouseLayoutProps> = ({
         onEditProduct={onEditProduct}
         onDeleteProduct={onDeleteProduct}
         onDeleteWarehouseProduct={onDeleteWarehouseProduct}
+        onMoveProduct={onMoveProduct}
         onAddProduct={onAddProduct}
+        onAddExistingProduct={onAddExistingProduct}
       />
       <Separator decorative={false} className="my-3" />
       <div className="flex-1 min-h-0">{children}</div>

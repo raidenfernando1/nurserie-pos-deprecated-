@@ -1,29 +1,32 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import {
-  X,
-  Search,
-  Trash2,
-  AlertCircle,
-  Package,
-  Warehouse,
-} from "lucide-react";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Search, Trash2, AlertCircle, Package, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useProducts } from "@/hooks/useProducts";
-import { useWarehouseProducts } from "@/hooks/useProducts";
+import { useProducts, useWarehouseProducts } from "@/hooks/useProducts";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 
 interface DeleteWarehouseProductProps {
-  warehouseId: number;
-  onClose: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  warehouseId: string;
 }
 
 const DeleteWarehouseProduct = ({
+  open,
+  onOpenChange,
   warehouseId,
-  onClose,
 }: DeleteWarehouseProductProps) => {
   const { refetch } = useProducts();
   const { refetch: refetchWarehouse } = useWarehouseProducts({
@@ -34,6 +37,14 @@ const DeleteWarehouseProduct = ({
   const [product, setProduct] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleClose = () => {
+    setSku("");
+    setProduct(null);
+    setError(null);
+    onOpenChange(false);
+  };
 
   const searchProduct = async () => {
     if (!sku.trim()) return;
@@ -73,7 +84,7 @@ const DeleteWarehouseProduct = ({
   const handleDelete = async () => {
     if (!product?.sku) return;
 
-    setLoading(true);
+    setIsDeleting(true);
     setError(null);
 
     try {
@@ -93,71 +104,72 @@ const DeleteWarehouseProduct = ({
         return;
       }
 
-      setProduct(null);
-      setSku("");
-      onClose();
+      await refetchWarehouse();
+      handleClose();
     } catch (err) {
       console.error("Delete error:", err);
       setError("An error occurred while deleting. Please try again.");
     } finally {
-      setLoading(false);
-      await refetchWarehouse();
+      setIsDeleting(false);
     }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && sku.trim()) {
+    if (e.key === "Enter" && sku.trim() && !loading) {
       searchProduct();
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b">
-          <div className="flex items-center gap-2">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
             <div className="p-2 bg-destructive/10 rounded-lg">
-              <Warehouse className="h-5 w-5 text-destructive" />
+              <Trash2 className="h-4 w-4 text-destructive" />
             </div>
-            <CardTitle className="text-xl font-semibold">
-              Remove Product from Warehouse
-            </CardTitle>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="h-8 w-8"
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </CardHeader>
-
-        <CardContent className="space-y-4 pt-6 overflow-y-auto">
-          <p className="text-sm text-muted-foreground">
+            Remove Product from Warehouse
+          </DialogTitle>
+          <DialogDescription>
             Search for a product by SKU to remove it from this warehouse.
-          </p>
+          </DialogDescription>
+        </DialogHeader>
 
+        <div className="space-y-4 py-4">
           {/* Search Input */}
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Input
-                placeholder="Enter product SKU..."
-                value={sku}
-                onChange={(e) => setSku(e.target.value)}
-                onKeyPress={handleKeyPress}
-                className="pr-10"
-              />
-              <Package className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <div className="space-y-2">
+            <Label htmlFor="sku-search">Product SKU</Label>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Package className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="sku-search"
+                  placeholder="Enter product SKU..."
+                  value={sku}
+                  onChange={(e) => setSku(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  className="pl-10"
+                  disabled={loading || isDeleting}
+                />
+              </div>
+              <Button
+                onClick={searchProduct}
+                disabled={loading || !sku.trim() || isDeleting}
+                className="gap-2"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Searching...
+                  </>
+                ) : (
+                  <>
+                    <Search className="h-4 w-4" />
+                    Search
+                  </>
+                )}
+              </Button>
             </div>
-            <Button
-              onClick={searchProduct}
-              disabled={loading || !sku.trim()}
-              className="gap-2"
-            >
-              <Search className="h-4 w-4" />
-              {loading ? "Searching..." : "Search"}
-            </Button>
           </div>
 
           {/* Error Alert */}
@@ -171,6 +183,8 @@ const DeleteWarehouseProduct = ({
           {/* Product Display */}
           {product && (
             <div className="space-y-4 animate-in fade-in-50 duration-300">
+              <Separator />
+
               <div className="border rounded-lg overflow-hidden">
                 {/* Product Image */}
                 {product.image_url && (
@@ -179,30 +193,42 @@ const DeleteWarehouseProduct = ({
                       src={product.image_url}
                       alt={product.name}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
                     />
                   </div>
                 )}
 
                 {/* Product Details */}
-                <div className="p-4 space-y-3">
+                <div className="p-4 space-y-4">
                   <div>
-                    <h3 className="text-lg font-semibold">{product.name}</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {product.description}
-                    </p>
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="text-lg font-semibold">{product.name}</h3>
+                      <Badge variant="secondary" className="shrink-0">
+                        ${parseFloat(product.price).toFixed(2)}
+                      </Badge>
+                    </div>
+                    {product.description && (
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {product.description}
+                      </p>
+                    )}
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3 pt-2">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <div>
                       <p className="text-xs text-muted-foreground">SKU</p>
                       <p className="text-sm font-medium">{product.sku}</p>
                     </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Price</p>
-                      <p className="text-sm font-medium">
-                        ${parseFloat(product.price).toFixed(2)}
-                      </p>
-                    </div>
+                    {product.barcode && (
+                      <div>
+                        <p className="text-xs text-muted-foreground">Barcode</p>
+                        <p className="text-sm font-medium font-mono">
+                          {product.barcode}
+                        </p>
+                      </div>
+                    )}
                     <div>
                       <p className="text-xs text-muted-foreground">Brand</p>
                       <p className="text-sm font-medium">{product.brand}</p>
@@ -226,16 +252,31 @@ const DeleteWarehouseProduct = ({
 
               {/* Action Buttons */}
               <div className="flex gap-2 pt-2">
-                <Button variant="outline" onClick={onClose} className="flex-1">
+                <Button
+                  variant="outline"
+                  onClick={handleClose}
+                  className="flex-1"
+                  disabled={isDeleting}
+                >
                   Cancel
                 </Button>
                 <Button
                   variant="destructive"
                   onClick={handleDelete}
                   className="flex-1 gap-2"
+                  disabled={isDeleting}
                 >
-                  <Trash2 className="h-4 w-4" />
-                  Remove from Warehouse
+                  {isDeleting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Removing...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="h-4 w-4" />
+                      Remove from Warehouse
+                    </>
+                  )}
                 </Button>
               </div>
             </div>
@@ -243,14 +284,22 @@ const DeleteWarehouseProduct = ({
 
           {/* Empty State */}
           {!loading && !product && !error && sku && (
-            <div className="text-center py-8 text-muted-foreground">
+            <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
               <Package className="h-12 w-12 mx-auto mb-3 opacity-50" />
               <p className="text-sm">Enter a SKU and click search</p>
             </div>
           )}
-        </CardContent>
-      </Card>
-    </div>
+
+          {/* Initial Empty State */}
+          {!loading && !product && !error && !sku && (
+            <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
+              <Search className="h-12 w-12 mx-auto mb-3 opacity-50" />
+              <p className="text-sm">Search for a product to remove</p>
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

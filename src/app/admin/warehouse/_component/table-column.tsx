@@ -2,6 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Product } from "@/types/product";
 import StatusBadge from "./status-badge";
 import { ImageOff } from "lucide-react";
+
 export const totalStockColumns: ColumnDef<Product>[] = [
   {
     id: "name_price",

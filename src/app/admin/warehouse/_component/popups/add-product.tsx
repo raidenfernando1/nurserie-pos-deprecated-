@@ -1,87 +1,194 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { X, Package, Search, ArrowLeft, Loader2 } from "lucide-react";
-import { useState } from "react";
+import {
+  Package,
+  Search,
+  ArrowLeft,
+  Loader2,
+  Scan,
+  Plus,
+  Minus,
+} from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 import {
   createWarehouseProduct,
-  useProducts,
   useWarehouseProducts,
 } from "@/hooks/useProducts";
-import useWarehouseStore from "@/store/useWarehouse";
 import ProductList from "./_component/add-product-list";
 
-const AddProduct = ({
-  onClose,
-  warehouseId,
-}: {
-  onClose: () => void;
-  warehouseId: number;
-}) => {
-  const { refetch } = useWarehouseProducts({ warehouseID: warehouseId });
-  const { products } = useWarehouseStore();
+interface AddProductProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  warehouseId: string;
+}
 
-  const [step, setStep] = useState(0);
+const AddProduct = ({ open, onOpenChange, warehouseId }: AddProductProps) => {
+  const { refetch } = useWarehouseProducts({ warehouseID: warehouseId });
+  const barcodeInputRef = useRef<HTMLInputElement>(null);
+
+  const [step, setStep] = useState<0 | 1 | 2 | 3 | 5>(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [sku, setSku] = useState("");
-  const [barcode, setBarcode] = useState("");
+  const [productBarcode, setProductBarcode] = useState(""); // The actual product barcode
+  const [scanCount, setScanCount] = useState(0); // Number of times scanned
+  const [tempBarcodeInput, setTempBarcodeInput] = useState(""); // Temporary input field value
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("");
   const [brand, setBrand] = useState("");
   const [imageUrl, setImageUrl] = useState("");
-  const [initialStock, setInitialStock] = useState("");
   const [threshold, setThreshold] = useState("");
   const [description, setDescription] = useState("");
 
+  // Auto-focus barcode input when entering step 3
+  useEffect(() => {
+    if (step === 3 && barcodeInputRef.current) {
+      barcodeInputRef.current.focus();
+    }
+  }, [step]);
+
   const resetForm = () => {
     setSku("");
-    setBarcode("");
+    setProductBarcode("");
+    setScanCount(0);
+    setTempBarcodeInput("");
     setName("");
     setPrice("");
     setCategory("");
     setBrand("");
     setImageUrl("");
-    setInitialStock("");
     setThreshold("");
     setDescription("");
     setError(null);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleClose = () => {
+    resetForm();
+    setStep(0);
+    onOpenChange(false);
+  };
+
+  const handleBarcodeInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // When Enter is pressed, process the barcode
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const barcodeValue = tempBarcodeInput.trim();
+
+      if (barcodeValue) {
+        if (!productBarcode) {
+          // First scan - set the product barcode
+          setProductBarcode(barcodeValue);
+          setScanCount(1);
+        } else if (barcodeValue === productBarcode) {
+          // Same barcode - increment count
+          setScanCount((prev) => prev + 1);
+        } else {
+          // Different barcode - show warning
+          setError(`Barcode mismatch! Expected: ${productBarcode}`);
+          setTimeout(() => setError(null), 3000);
+        }
+        setTempBarcodeInput(""); // Clear input for next scan
+      }
+    }
+  };
+
+  const handleManualAdd = () => {
+    const barcodeValue = tempBarcodeInput.trim();
+
+    if (barcodeValue) {
+      if (!productBarcode) {
+        setProductBarcode(barcodeValue);
+        setScanCount(1);
+      } else if (barcodeValue === productBarcode) {
+        setScanCount((prev) => prev + 1);
+      } else {
+        setError(`Barcode mismatch! Expected: ${productBarcode}`);
+        setTimeout(() => setError(null), 3000);
+      }
+      setTempBarcodeInput("");
+      barcodeInputRef.current?.focus();
+    }
+  };
+
+  const incrementCount = () => {
+    setScanCount((prev) => prev + 1);
+  };
+
+  const decrementCount = () => {
+    setScanCount((prev) => Math.max(0, prev - 1));
+  };
+
+  const resetScanning = () => {
+    setProductBarcode("");
+    setScanCount(0);
+    setTempBarcodeInput("");
+    setError(null);
+    barcodeInputRef.current?.focus();
+  };
+
+  const handleDetailsSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+
+    // Validate required fields
+    if (
+      !name.trim() ||
+      !brand.trim() ||
+      !category.trim() ||
+      !sku.trim() ||
+      !price.trim() ||
+      !threshold.trim()
+    ) {
+      setError("Please fill in all required fields");
+      return;
+    }
+
+    const parsedPrice = parseFloat(price);
+    const parsedThreshold = parseInt(threshold);
+
+    if (isNaN(parsedPrice) || parsedPrice < 0) {
+      setError("Please enter a valid price");
+      return;
+    }
+    if (isNaN(parsedThreshold) || parsedThreshold < 0) {
+      setError("Please enter a valid threshold amount");
+      return;
+    }
+
+    // Move to barcode scanning step
+    setStep(3);
+  };
+
+  const handleFinalSubmit = async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      if (
-        !name.trim() ||
-        !brand.trim() ||
-        !category.trim() ||
-        !sku.trim() ||
-        !price.trim() ||
-        !initialStock.trim() ||
-        !threshold.trim()
-      ) {
-        throw new Error("Please fill in all required fields");
+      if (!productBarcode) {
+        throw new Error("Please scan the product barcode");
+      }
+
+      if (scanCount === 0) {
+        throw new Error("Stock count cannot be 0");
       }
 
       const parsedPrice = parseFloat(price);
-      const parsedInitialStock = parseInt(initialStock);
       const parsedThreshold = parseInt(threshold);
-
-      if (isNaN(parsedPrice) || parsedPrice < 0)
-        throw new Error("Please enter a valid price");
-      if (isNaN(parsedInitialStock) || parsedInitialStock < 0)
-        throw new Error("Please enter a valid initial stock amount");
-      if (isNaN(parsedThreshold) || parsedThreshold < 0)
-        throw new Error("Please enter a valid threshold amount");
 
       const productData = {
         name: name.trim(),
@@ -89,10 +196,10 @@ const AddProduct = ({
         brand: brand.trim(),
         category: category.trim(),
         sku: sku.trim(),
-        barcode: barcode.trim() || undefined,
+        barcode: productBarcode,
         price: parsedPrice,
         image_url: imageUrl.trim() || undefined,
-        initial_stock: parsedInitialStock,
+        initial_stock: scanCount,
         stock_threshold: parsedThreshold,
       };
 
@@ -105,36 +212,29 @@ const AddProduct = ({
         throw new Error(result?.error || "Failed to create product");
       }
 
+      await refetch();
       setStep(2);
     } catch (error) {
       console.error("❌ Error creating product:", error);
       setError(error instanceof Error ? error.message : "Unknown error");
     } finally {
       setIsLoading(false);
-      await refetch();
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-      {step === 0 && (
-        <Card className="w-full max-w-md">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="text-xl font-semibold">Add Product</CardTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="h-8 w-8 p-0"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Choose how you'd like to add a product to your inventory.
-            </p>
-            <div className="grid gap-3">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        {/* Step 0: Choose Product Type */}
+        {step === 0 && (
+          <>
+            <DialogHeader>
+              <DialogTitle>Add Product</DialogTitle>
+              <DialogDescription>
+                Choose how you'd like to add a product to your inventory.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-3 py-4">
               <Button
                 onClick={() => setStep(1)}
                 className="justify-start h-12"
@@ -162,50 +262,46 @@ const AddProduct = ({
                 </div>
               </Button>
             </div>
-          </CardContent>
-        </Card>
-      )}
-      {/* Step 1: New Product Form */}
-      {step === 1 && (
-        <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setStep(0)}
-                className="h-8 w-8 p-0"
-                disabled={isLoading}
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-              <CardTitle className="text-xl font-semibold">
-                New Product
-              </CardTitle>
-              <Badge variant="secondary">Step 1 of 2</Badge>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="h-8 w-8 p-0"
-              disabled={isLoading}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </CardHeader>
-          <CardContent>
+          </>
+        )}
+
+        {/* Step 1: New Product Form (Without Barcode) */}
+        {step === 1 && (
+          <>
+            <DialogHeader>
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setStep(0)}
+                  className="h-8 w-8 p-0"
+                  disabled={isLoading}
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+                <div>
+                  <DialogTitle>New Product Details</DialogTitle>
+                  <DialogDescription>
+                    Fill in the product details. Barcode scanning comes next.
+                  </DialogDescription>
+                </div>
+                <Badge variant="secondary" className="ml-auto">
+                  Step 1 of 3
+                </Badge>
+              </div>
+            </DialogHeader>
+
             {error && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+              <div className="p-3 bg-red-50 border border-red-200 rounded-md">
                 <p className="text-sm text-red-600">{error}</p>
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleDetailsSubmit} className="space-y-6">
               {/* Basic Information */}
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Basic Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="sku">SKU *</Label>
                     <Input
@@ -214,17 +310,6 @@ const AddProduct = ({
                       onChange={(e) => setSku(e.target.value)}
                       placeholder="Enter SKU"
                       required
-                      disabled={isLoading}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="barcode">Barcode</Label>
-                    <Input
-                      id="barcode"
-                      value={barcode}
-                      onChange={(e) => setBarcode(e.target.value)}
-                      placeholder="Enter barcode"
-                      disabled={isLoading}
                     />
                   </div>
                   <div className="space-y-2">
@@ -235,7 +320,6 @@ const AddProduct = ({
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Enter product name"
                       required
-                      disabled={isLoading}
                     />
                   </div>
                 </div>
@@ -257,7 +341,6 @@ const AddProduct = ({
                       onChange={(e) => setPrice(e.target.value)}
                       placeholder="0.00"
                       required
-                      disabled={isLoading}
                     />
                   </div>
                   <div className="space-y-2">
@@ -268,7 +351,6 @@ const AddProduct = ({
                       onChange={(e) => setCategory(e.target.value)}
                       placeholder="Enter category"
                       required
-                      disabled={isLoading}
                     />
                   </div>
                   <div className="space-y-2">
@@ -279,7 +361,6 @@ const AddProduct = ({
                       onChange={(e) => setBrand(e.target.value)}
                       placeholder="Enter brand"
                       required
-                      disabled={isLoading}
                     />
                   </div>
                 </div>
@@ -290,7 +371,6 @@ const AddProduct = ({
                     value={imageUrl}
                     onChange={(e) => setImageUrl(e.target.value)}
                     placeholder="https://example.com/image.jpg"
-                    disabled={isLoading}
                   />
                 </div>
                 <div className="space-y-2">
@@ -301,7 +381,6 @@ const AddProduct = ({
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Enter product description..."
                     rows={3}
-                    disabled={isLoading}
                   />
                 </div>
               </div>
@@ -311,91 +390,257 @@ const AddProduct = ({
               {/* Inventory Settings */}
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Inventory Settings</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="initialStock">Initial Stock *</Label>
-                    <Input
-                      id="initialStock"
-                      type="number"
-                      min="0"
-                      value={initialStock}
-                      onChange={(e) => setInitialStock(e.target.value)}
-                      placeholder="0"
-                      required
-                      disabled={isLoading}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="threshold">Low Stock Threshold *</Label>
-                    <Input
-                      id="threshold"
-                      type="number"
-                      min="0"
-                      value={threshold}
-                      onChange={(e) => setThreshold(e.target.value)}
-                      placeholder="5"
-                      required
-                      disabled={isLoading}
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="threshold">Low Stock Threshold *</Label>
+                  <Input
+                    id="threshold"
+                    type="number"
+                    min="0"
+                    value={threshold}
+                    onChange={(e) => setThreshold(e.target.value)}
+                    placeholder="5"
+                    required
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Initial stock will be counted in the next step via barcode
+                    scanning
+                  </p>
                 </div>
               </div>
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                <Button type="submit" className="flex-1" disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Creating Product...
-                    </>
-                  ) : (
-                    "Create Product"
-                  )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleClose}
+                  className="flex-1"
+                >
+                  Cancel
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
                   onClick={resetForm}
                   className="flex-1"
-                  disabled={isLoading}
                 >
                   Reset Form
                 </Button>
+                <Button type="submit" className="flex-1">
+                  Next: Scan Barcode
+                </Button>
               </div>
             </form>
-          </CardContent>
-        </Card>
-      )}
+          </>
+        )}
 
-      {/* Step 2: Success Confirmation */}
-      {step === 2 && (
-        <Card className="w-full max-w-md">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="text-xl font-semibold">
-              Product Created!
-            </CardTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="h-8 w-8 p-0"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="text-center space-y-2">
+        {/* Step 3: Barcode Scanning */}
+        {step === 3 && (
+          <>
+            <DialogHeader>
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setStep(1)}
+                  className="h-8 w-8 p-0"
+                  disabled={isLoading}
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+                <div>
+                  <DialogTitle>Scan Product Barcode</DialogTitle>
+                  <DialogDescription>
+                    Scan the same barcode multiple times to count your
+                    inventory.
+                  </DialogDescription>
+                </div>
+                <Badge variant="secondary" className="ml-auto">
+                  Step 2 of 3
+                </Badge>
+              </div>
+            </DialogHeader>
+
+            {error && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                <p className="text-sm text-red-600">{error}</p>
+              </div>
+            )}
+
+            <div className="space-y-6 py-4">
+              {/* Barcode Scanner Input */}
+              <div className="space-y-2">
+                <Label htmlFor="barcode">Barcode Scanner</Label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Scan className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      ref={barcodeInputRef}
+                      id="barcode"
+                      value={tempBarcodeInput}
+                      onChange={(e) => setTempBarcodeInput(e.target.value)}
+                      onKeyDown={handleBarcodeInput}
+                      placeholder={
+                        productBarcode
+                          ? `Scan ${productBarcode} to add more`
+                          : "Scan or type barcode and press Enter"
+                      }
+                      className="pl-10"
+                      disabled={isLoading}
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    onClick={handleManualAdd}
+                    disabled={!tempBarcodeInput.trim() || isLoading}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Keep scanning the same barcode to increase the stock count
+                </p>
+              </div>
+
+              {/* Stock Counter Display */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label>Current Stock Count</Label>
+                  {productBarcode && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={resetScanning}
+                      disabled={isLoading}
+                    >
+                      Reset Scanning
+                    </Button>
+                  )}
+                </div>
+
+                {!productBarcode ? (
+                  <div className="border-2 border-dashed rounded-lg p-8 text-center">
+                    <Scan className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
+                    <p className="text-sm text-muted-foreground">
+                      Scan the product barcode to begin counting
+                    </p>
+                  </div>
+                ) : (
+                  <div className="border rounded-lg p-6 space-y-4">
+                    {/* Product Barcode */}
+                    <div className="text-center space-y-2">
+                      <Label className="text-xs text-muted-foreground">
+                        Product Barcode
+                      </Label>
+                      <div className="font-mono text-lg font-semibold">
+                        {productBarcode}
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* Stock Counter */}
+                    <div className="flex items-center justify-center gap-4">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        className="h-12 w-12"
+                        onClick={decrementCount}
+                        disabled={scanCount === 0 || isLoading}
+                      >
+                        <Minus className="h-5 w-5" />
+                      </Button>
+
+                      <div className="text-center min-w-[120px]">
+                        <div className="text-5xl font-bold text-primary">
+                          {scanCount}
+                        </div>
+                        <div className="text-sm text-muted-foreground mt-1">
+                          units in stock
+                        </div>
+                      </div>
+
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        className="h-12 w-12"
+                        onClick={incrementCount}
+                        disabled={isLoading}
+                      >
+                        <Plus className="h-5 w-5" />
+                      </Button>
+                    </div>
+
+                    <div className="text-center">
+                      <p className="text-xs text-muted-foreground">
+                        Scan to auto-increment or use +/- buttons
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setStep(1)}
+                  className="flex-1"
+                  disabled={isLoading}
+                >
+                  Back to Details
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleFinalSubmit}
+                  className="flex-1"
+                  disabled={!productBarcode || scanCount === 0 || isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Creating Product...
+                    </>
+                  ) : (
+                    <>
+                      Create Product ({scanCount}{" "}
+                      {scanCount === 1 ? "unit" : "units"})
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Step 2: Success Confirmation */}
+        {step === 2 && (
+          <>
+            <DialogHeader>
+              <DialogTitle>Product Created!</DialogTitle>
+              <DialogDescription>
+                Your product has been added to the inventory.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="text-center space-y-4 py-4">
               <Package className="h-12 w-12 mx-auto text-green-500" />
               <h3 className="text-lg font-medium">
                 Product Added Successfully!
               </h3>
-              <p className="text-sm text-muted-foreground">
-                Your product has been added to the inventory.
-              </p>
+              <div className="space-y-1">
+                <p className="text-2xl font-bold">{scanCount} units</p>
+                <p className="text-sm text-muted-foreground">
+                  Barcode: {productBarcode}
+                </p>
+              </div>
             </div>
             <div className="flex gap-3">
-              <Button onClick={onClose} className="flex-1">
+              <Button onClick={handleClose} className="flex-1">
                 Done
               </Button>
               <Button
@@ -409,28 +654,35 @@ const AddProduct = ({
                 Add Another
               </Button>
             </div>
-          </CardContent>
-        </Card>
-      )}
-      {step === 5 && (
-        <Card className="w-full max-w-md">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="text-xl font-semibold">
-              Select Product
-            </CardTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="h-8 w-8 p-0"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </CardHeader>
-          <ProductList />
-        </Card>
-      )}
-    </div>
+          </>
+        )}
+
+        {/* Step 5: Existing Product List */}
+        {step === 5 && (
+          <>
+            <DialogHeader>
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setStep(0)}
+                  className="h-8 w-8 p-0"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+                <div>
+                  <DialogTitle>Select Product</DialogTitle>
+                  <DialogDescription>
+                    Choose an existing product to add stock.
+                  </DialogDescription>
+                </div>
+              </div>
+            </DialogHeader>
+            <ProductList />
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 };
 

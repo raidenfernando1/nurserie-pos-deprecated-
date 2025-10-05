@@ -1,69 +1,84 @@
 "use client";
-
-import { useState } from "react";
-
-import useWarehouseStore from "@/store/useWarehouse";
-import { useWarehouseProducts } from "@/hooks/useProducts";
-
-import WarehouseLayout from "../_component/warehouse-layout";
+import React, { useEffect, useState } from "react";
 import ReusableTable from "../_component/product-container";
 import Tab from "../_component/table-tab";
 import AddProduct from "../_component/popups/add-product";
 import DeleteWarehouseProduct from "../_component/popups/delete-product-warehouse";
-import LoadingBar from "@/components/loading-page";
-
+import WarehouseHeader from "../_component/warehouse-header";
 import { columns } from "./table-column";
 
-export default function WarehousePage({ params }: { params: { id: string } }) {
-  const [addProductPopup, setAddProductPopup] = useState<boolean>(false);
-  const [deleteWarehouseProduct, setDeleteWarehouseProduct] =
-    useState<boolean>(false);
+export default function WarehousePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = React.use(params);
+  const [popup, setPopup] = useState<"add" | "delete" | undefined>(undefined);
+  const [warehouseData, setWarehouseData] = useState<{
+    warehouse: { id: number; warehouse_name: string };
+    products: any[];
+  } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const { warehouses } = useWarehouseStore();
-  const { data, isLoading, isError } = useWarehouseProducts({
-    warehouseID: Number(params.id),
-  });
+  useEffect(() => {
+    const run = async () => {
+      setLoading(true);
+      setError(null);
 
-  const warehouseId = Number(params.id);
+      try {
+        const response = await fetch(`/api/admin/warehouse/${id}`);
+        if (!response.ok) throw new Error("Failed to fetch warehouse data");
 
-  const currentWarehouse = warehouses.find(
-    (w) => Number(w.warehouse_id) === warehouseId,
-  );
+        const data = await response.json();
+        setWarehouseData(data);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    run();
+  }, [id]);
+
+  if (loading) return <p>Loading warehouse data...</p>;
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
+
+  const products = warehouseData?.products ?? [];
 
   return (
-    <LoadingBar duration={500}>
-      {addProductPopup && (
-        <AddProduct
-          warehouseId={Number(params.id)}
-          onClose={() => setAddProductPopup(false)}
-        />
-      )}
-      {deleteWarehouseProduct && (
-        <DeleteWarehouseProduct
-          warehouseId={Number(params.id)}
-          onClose={() => setDeleteWarehouseProduct(false)}
-        />
-      )}
-      <WarehouseLayout
-        title={currentWarehouse?.warehouse_name ?? "Warehouse"}
-        companyTotalStock={currentWarehouse?.total_stock || 0}
-        companyTotalProducts={currentWarehouse?.total_products || 0}
-        onAddProduct={() => setAddProductPopup(true)}
-        onDeleteWarehouseProduct={() => setDeleteWarehouseProduct(true)}
-      >
-        <ReusableTable
-          data={data ?? []}
-          columns={columns}
-          tabComponent={(table) => (
-            <Tab
-              table={table}
-              categories={Array.from(
-                new Set((data ?? []).map((d) => d.category)),
-              )}
-            />
-          )}
-        />
-      </WarehouseLayout>
-    </LoadingBar>
+    <>
+      <AddProduct
+        open={popup === "add"}
+        onOpenChange={(open) => !open && setPopup(undefined)}
+        warehouseId={id}
+      />
+
+      <DeleteWarehouseProduct
+        open={popup === "delete"}
+        onOpenChange={(open) => !open && setPopup(undefined)}
+        warehouseId={id}
+      />
+
+      <WarehouseHeader
+        title={warehouseData?.warehouse?.warehouse_name || ""}
+        onAddProduct={() => setPopup("add")}
+        onDeleteProduct={() => setPopup("delete")}
+        companyTotalStock={products.reduce((sum, p) => sum + (p.stock || 0), 0)}
+        companyTotalProducts={products.length}
+      />
+
+      <ReusableTable
+        data={products}
+        columns={columns}
+        tabComponent={(table) => (
+          <Tab
+            table={table}
+            categories={Array.from(new Set(products.map((d) => d.category)))}
+          />
+        )}
+      />
+    </>
   );
 }

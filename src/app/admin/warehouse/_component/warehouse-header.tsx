@@ -9,10 +9,12 @@ export interface WarehouseHeaderProps {
   showAdmin?: boolean;
   onEditProduct?: () => void;
   onDeleteProduct?: () => void;
-  onDeleteWarehouseProduct?: () => void;
   onAddProduct?: () => void;
-  companyTotalStock: number;
-  companyTotalProducts: number;
+  onMoveProduct?: () => void;
+  onDeleteWarehouseProduct?: () => void;
+  onAddExistingProduct: () => void;
+  companyTotalStock?: number;
+  companyTotalProducts?: number;
 }
 
 const WarehouseHeader: React.FC<WarehouseHeaderProps> = ({
@@ -21,10 +23,11 @@ const WarehouseHeader: React.FC<WarehouseHeaderProps> = ({
   showAdmin = false,
   onEditProduct,
   onDeleteProduct,
-  onDeleteWarehouseProduct,
   onAddProduct,
-  companyTotalStock,
-  companyTotalProducts,
+  onMoveProduct,
+  onAddExistingProduct,
+  companyTotalStock = 0,
+  companyTotalProducts = 0,
 }) => {
   return (
     <Card className="shadow-sm py-2">
@@ -64,10 +67,26 @@ const WarehouseHeader: React.FC<WarehouseHeaderProps> = ({
               <Button
                 variant="outline"
                 size="sm"
-                className="border-red-200 text-red-700 hover:bg-red-50"
-                onClick={onDeleteWarehouseProduct}
+                className="bg-green-200 text-green-700"
+                onClick={onMoveProduct}
               >
-                Delete Product
+                Move Product
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-green-200 text-green-700"
+                onClick={onAddExistingProduct}
+              >
+                Add Existing Product
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-red-200 text-red-700"
+                onClick={onDeleteProduct}
+              >
+                Remove Product
               </Button>
             </div>
           )}
@@ -77,7 +96,7 @@ const WarehouseHeader: React.FC<WarehouseHeaderProps> = ({
               <Button
                 variant="outline"
                 size="sm"
-                className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                className="bg-blue-200 text-blue-700"
                 onClick={onEditProduct}
               >
                 Edit Product

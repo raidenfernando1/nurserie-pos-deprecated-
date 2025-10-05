@@ -2,9 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 const Tab = ({ table, categories }: { table: any; categories: string[] }) => {
-  const pageIndex = table.getState().pagination.pageIndex + 1;
-  const pageCount = table.getPageCount();
-
   return (
     <div className="flex items-center gap-3 w-full">
       <div className="flex-1 border-2 rounded-md">

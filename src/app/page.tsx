@@ -8,9 +8,10 @@ import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import LoginForm from "@/components/login-form";
 import { Navbar } from "@/components/navbar";
+import { useState } from "react";
 
 export default function Entry() {
-  const [showCashierLogin, setShowCashierLogin] = React.useState(false);
+  const [showCashierLogin, setShowCashierLogin] = useState(false);
   const { login } = useAdminAuth();
 
   const {

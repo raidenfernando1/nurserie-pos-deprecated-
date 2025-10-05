@@ -72,13 +72,9 @@ const ReusableTable = <T,>({
     globalFilterFn: (row, columnId, filterValue) => {
       const search = String(filterValue).toLowerCase().trim();
 
-      // Split search into individual words
       const searchWords = search.split(/\s+/).filter((word) => word.length > 0);
-
-      // If no search words, show all
       if (searchWords.length === 0) return true;
 
-      // Collect all searchable text from the row
       const rowText = columns
         .map((col: any) => {
           let value;
