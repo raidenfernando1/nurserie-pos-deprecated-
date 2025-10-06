@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   useReactTable,
   getCoreRowModel,
   getPaginationRowModel,
   getFilteredRowModel,
   flexRender,
+  ColumnDef,
 } from "@tanstack/react-table";
 import {
   Table,
@@ -16,25 +17,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-} from "lucide-react";
 
 interface ReusableTableProps<T> {
   data: T[];
-  columns: any;
+  columns: ColumnDef<T>[];
   defaultPageSize?: number;
+  minRows?: number;
   tabComponent?: (table: any, showActions?: boolean) => React.ReactNode;
   showActions?: boolean;
 }
@@ -42,7 +30,8 @@ interface ReusableTableProps<T> {
 const ReusableTable = <T,>({
   data,
   columns,
-  defaultPageSize = 5,
+  defaultPageSize = 10,
+  minRows = 5,
   tabComponent,
   showActions = true,
 }: ReusableTableProps<T>) => {
@@ -51,6 +40,26 @@ const ReusableTable = <T,>({
     pageSize: defaultPageSize,
   });
   const [globalFilter, setGlobalFilter] = useState<any>([]);
+
+  const calculatePageSize = () => {
+    const viewportHeight = window.innerHeight;
+    const tabHeight = tabComponent ? 80 : 0;
+    const headerHeight = 60;
+    const layoutPadding = 120;
+    const rowHeight = 60;
+    const availableHeight =
+      viewportHeight - tabHeight - headerHeight - layoutPadding;
+    return Math.max(Math.floor(availableHeight / rowHeight), minRows);
+  };
+
+  useEffect(() => {
+    const updatePageSize = () => {
+      setPagination((prev) => ({ ...prev, pageSize: calculatePageSize() }));
+    };
+    updatePageSize();
+    window.addEventListener("resize", updatePageSize);
+    return () => window.removeEventListener("resize", updatePageSize);
+  }, []);
 
   const table = useReactTable({
     data,
@@ -86,15 +95,14 @@ const ReusableTable = <T,>({
   });
 
   return (
-    <div className="h-full flex flex-col gap-4">
+    <div className="h-full flex flex-col gap-6">
       {tabComponent && (
         <div className="flex-shrink-0">{tabComponent(table, showActions)}</div>
       )}
-
       <div className="flex-1 min-h-0 overflow-hidden">
-        <div className="h-full border rounded-lg overflow-auto bg-background">
-          <Table>
-            <TableHeader className="sticky top-0 bg-background z-10">
+        <div className="h-full border rounded-lg overflow-auto">
+          <Table className="border-none">
+            <TableHeader className="sticky top-0 bg-background z-10 border-b">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
@@ -139,72 +147,50 @@ const ReusableTable = <T,>({
         </div>
       </div>
 
-      {/* Pagination */}
-      <div className="flex-shrink-0 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <p className="text-sm font-medium">Rows per page</p>
-          <Select
-            value={`${table.getState().pagination.pageSize}`}
-            onValueChange={(value) => {
-              table.setPageSize(Number(value));
-            }}
+      <div className="flex-shrink-0 flex items-center justify-between px-2">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          Rows per page:
+          <select
+            value={table.getState().pagination.pageSize}
+            onChange={(e) => table.setPageSize(Number(e.target.value))}
+            className="h-8 w-[70px] border border-input bg-background px-3 py-1 text-xs rounded-md"
           >
-            <SelectTrigger className="h-8 w-[70px]">
-              <SelectValue placeholder={table.getState().pagination.pageSize} />
-            </SelectTrigger>
-            <SelectContent side="top">
-              {[5, 10, 20, 30, 40, 50].map((pageSize) => (
-                <SelectItem key={pageSize} value={`${pageSize}`}>
-                  {pageSize}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            {[5, 10, 20, 30, 40, 50].map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
         </div>
-
-        <div className="flex items-center gap-6 lg:gap-8">
-          <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-            Page {table.getState().pagination.pageIndex + 1} of{" "}
-            {table.getPageCount()}
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              className="hidden h-8 w-8 p-0 lg:flex"
-              onClick={() => table.setPageIndex(0)}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <span className="sr-only">Go to first page</span>
-              <ChevronsLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              className="h-8 w-8 p-0"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <span className="sr-only">Go to previous page</span>
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              className="h-8 w-8 p-0"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              <span className="sr-only">Go to next page</span>
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              className="hidden h-8 w-8 p-0 lg:flex"
-              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-              disabled={!table.getCanNextPage()}
-            >
-              <span className="sr-only">Go to last page</span>
-              <ChevronsRight className="h-4 w-4" />
-            </Button>
-          </div>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => table.setPageIndex(0)}
+            disabled={!table.getCanPreviousPage()}
+            className="h-8 w-8 border rounded-md disabled:opacity-50"
+          >
+            {"<<"}
+          </button>
+          <button
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+            className="h-8 w-8 border rounded-md disabled:opacity-50"
+          >
+            {"<"}
+          </button>
+          <button
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+            className="h-8 w-8 border rounded-md disabled:opacity-50"
+          >
+            {">"}
+          </button>
+          <button
+            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+            disabled={!table.getCanNextPage()}
+            className="h-8 w-8 border rounded-md disabled:opacity-50"
+          >
+            {">>"}
+          </button>
         </div>
       </div>
     </div>

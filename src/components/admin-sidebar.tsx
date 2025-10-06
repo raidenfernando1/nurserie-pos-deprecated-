@@ -16,6 +16,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubItem,
   SidebarMenuSubButton,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import {
   Home,
@@ -101,6 +102,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <Sidebar collapsible="icon" {...props}>
+      <SidebarTrigger className="m-2" />
+
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Oracle POS</SidebarGroupLabel>
@@ -175,7 +178,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                     onClick={() => {
                                       setActiveMenu("warehouse");
                                       setActiveSubPath(
-                                        `/admin/warehouse/${warehouse.warehouse_id}`
+                                        `/admin/warehouse/${warehouse.warehouse_id}`,
                                       );
                                     }}
                                   >
@@ -246,7 +249,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                     onClick={() => {
                                       setActiveMenu("consignments");
                                       setActiveSubPath(
-                                        `/admin/consignments/${client.client_id}`
+                                        `/admin/consignments/${client.client_id}`,
                                       );
                                     }}
                                   >

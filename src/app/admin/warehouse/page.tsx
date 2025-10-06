@@ -49,7 +49,7 @@ const TotalWarehouseLayout = () => {
             <Tab
               table={table}
               categories={Array.from(
-                new Set((data ?? []).map((d) => d.category))
+                new Set((data ?? []).map((d) => d.category)),
               )}
             />
           )}

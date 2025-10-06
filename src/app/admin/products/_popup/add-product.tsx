@@ -1,33 +1,26 @@
+"use client";
+
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { X, Package, Search, ArrowLeft, Loader2 } from "lucide-react";
+import { X, Package, Loader2 } from "lucide-react";
 import { useState } from "react";
-import {
-  createWarehouseProduct,
-  useProducts,
-  useWarehouseProducts,
-} from "@/hooks/useProducts";
-import useWarehouseStore from "@/store/useWarehouse";
-import ProductList from "./_component/add-product-list";
+import { useProductStore } from "@/store/product-store";
 
-const AddProduct = ({
-  onClose,
-  warehouseId,
-}: {
+interface AddProductProps {
   onClose: () => void;
-  warehouseId: number;
-}) => {
-  const { refetch } = useWarehouseProducts({ warehouseID: warehouseId });
-  const { products } = useWarehouseStore();
+}
 
-  const [step, setStep] = useState(0);
+const AddProduct = ({ onClose }: AddProductProps) => {
+  const { createProduct, products } = useProductStore();
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const [sku, setSku] = useState("");
   const [barcode, setBarcode] = useState("");
@@ -36,8 +29,6 @@ const AddProduct = ({
   const [category, setCategory] = useState("");
   const [brand, setBrand] = useState("");
   const [imageUrl, setImageUrl] = useState("");
-  const [initialStock, setInitialStock] = useState("");
-  const [threshold, setThreshold] = useState("");
   const [description, setDescription] = useState("");
 
   const resetForm = () => {
@@ -48,8 +39,6 @@ const AddProduct = ({
     setCategory("");
     setBrand("");
     setImageUrl("");
-    setInitialStock("");
-    setThreshold("");
     setDescription("");
     setError(null);
   };
@@ -65,136 +54,50 @@ const AddProduct = ({
         !brand.trim() ||
         !category.trim() ||
         !sku.trim() ||
-        !price.trim() ||
-        !initialStock.trim() ||
-        !threshold.trim()
+        !price.trim()
       ) {
         throw new Error("Please fill in all required fields");
       }
 
       const parsedPrice = parseFloat(price);
-      const parsedInitialStock = parseInt(initialStock);
-      const parsedThreshold = parseInt(threshold);
 
-      if (isNaN(parsedPrice) || parsedPrice < 0)
+      if (isNaN(parsedPrice) || parsedPrice < 0) {
         throw new Error("Please enter a valid price");
-      if (isNaN(parsedInitialStock) || parsedInitialStock < 0)
-        throw new Error("Please enter a valid initial stock amount");
-      if (isNaN(parsedThreshold) || parsedThreshold < 0)
-        throw new Error("Please enter a valid threshold amount");
+      }
 
       const productData = {
         name: name.trim(),
-        description: description.trim() || undefined,
+        description: description.trim(),
         brand: brand.trim(),
         category: category.trim(),
         sku: sku.trim(),
-        barcode: barcode.trim() || undefined,
+        barcode: barcode.trim(),
         price: parsedPrice,
-        image_url: imageUrl.trim() || undefined,
-        initial_stock: parsedInitialStock,
-        stock_threshold: parsedThreshold,
+        image_url: imageUrl.trim(),
       };
 
-      const result = await createWarehouseProduct({
-        warehouseID: warehouseId,
-        productData,
-      });
-
-      if (!result || result.error) {
-        throw new Error(result?.error || "Failed to create product");
-      }
-
-      setStep(2);
+      await createProduct(productData);
+      setShowSuccess(true);
     } catch (error) {
       console.error("❌ Error creating product:", error);
       setError(error instanceof Error ? error.message : "Unknown error");
     } finally {
       setIsLoading(false);
-      await refetch();
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-      {step === 0 && (
-        <Card className="w-full max-w-md">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="text-xl font-semibold">Add Product</CardTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="h-8 w-8 p-0"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Choose how you'd like to add a product to your inventory.
-            </p>
-            <div className="grid gap-3">
-              <Button
-                onClick={() => setStep(1)}
-                className="justify-start h-12"
-                variant="outline"
-              >
-                <Package className="mr-3 h-4 w-4" />
-                <div className="text-left">
-                  <div className="font-medium">New Product</div>
-                  <div className="text-xs text-muted-foreground">
-                    Create a brand new product
-                  </div>
-                </div>
-              </Button>
-              <Button
-                onClick={() => setStep(5)}
-                className="justify-start h-12"
-                variant="outline"
-              >
-                <Search className="mr-3 h-4 w-4" />
-                <div className="text-left">
-                  <div className="font-medium">Existing Product</div>
-                  <div className="text-xs text-muted-foreground">
-                    Add stock to existing item
-                  </div>
-                </div>
-              </Button>
+    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        {!showSuccess ? (
+          <>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <h2 className="text-xl font-semibold">New Product</h2>
+                <Badge variant="secondary">Create Product</Badge>
+              </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
-      {/* Step 1: New Product Form */}
-      {step === 1 && (
-        <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setStep(0)}
-                className="h-8 w-8 p-0"
-                disabled={isLoading}
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-              <CardTitle className="text-xl font-semibold">
-                New Product
-              </CardTitle>
-              <Badge variant="secondary">Step 1 of 2</Badge>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="h-8 w-8 p-0"
-              disabled={isLoading}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </CardHeader>
-          <CardContent>
+
             {error && (
               <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
                 <p className="text-sm text-red-600">{error}</p>
@@ -205,9 +108,9 @@ const AddProduct = ({
               {/* Basic Information */}
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Basic Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="flex flex-col gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="sku">SKU *</Label>
+                    <Label htmlFor="sku">SKU</Label>
                     <Input
                       id="sku"
                       value={sku}
@@ -224,11 +127,12 @@ const AddProduct = ({
                       value={barcode}
                       onChange={(e) => setBarcode(e.target.value)}
                       placeholder="Enter barcode"
+                      required
                       disabled={isLoading}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="name">Product Name *</Label>
+                    <Label htmlFor="name">Product Name</Label>
                     <Input
                       id="name"
                       value={name}
@@ -306,41 +210,6 @@ const AddProduct = ({
                 </div>
               </div>
 
-              <Separator />
-
-              {/* Inventory Settings */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Inventory Settings</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="initialStock">Initial Stock *</Label>
-                    <Input
-                      id="initialStock"
-                      type="number"
-                      min="0"
-                      value={initialStock}
-                      onChange={(e) => setInitialStock(e.target.value)}
-                      placeholder="0"
-                      required
-                      disabled={isLoading}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="threshold">Low Stock Threshold *</Label>
-                    <Input
-                      id="threshold"
-                      type="number"
-                      min="0"
-                      value={threshold}
-                      onChange={(e) => setThreshold(e.target.value)}
-                      placeholder="5"
-                      required
-                      disabled={isLoading}
-                    />
-                  </div>
-                </div>
-              </div>
-
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
                 <Button type="submit" className="flex-1" disabled={isLoading}>
@@ -364,28 +233,22 @@ const AddProduct = ({
                 </Button>
               </div>
             </form>
-          </CardContent>
-        </Card>
-      )}
+          </>
+        ) : (
+          <>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">Product Created!</h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onClose}
+                className="h-8 w-8 p-0"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
 
-      {/* Step 2: Success Confirmation */}
-      {step === 2 && (
-        <Card className="w-full max-w-md">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="text-xl font-semibold">
-              Product Created!
-            </CardTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="h-8 w-8 p-0"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="text-center space-y-2">
+            <div className="text-center space-y-4 py-6">
               <Package className="h-12 w-12 mx-auto text-green-500" />
               <h3 className="text-lg font-medium">
                 Product Added Successfully!
@@ -394,6 +257,7 @@ const AddProduct = ({
                 Your product has been added to the inventory.
               </p>
             </div>
+
             <div className="flex gap-3">
               <Button onClick={onClose} className="flex-1">
                 Done
@@ -402,35 +266,17 @@ const AddProduct = ({
                 variant="outline"
                 onClick={() => {
                   resetForm();
-                  setStep(1);
+                  setShowSuccess(false);
                 }}
                 className="flex-1"
               >
                 Add Another
               </Button>
             </div>
-          </CardContent>
-        </Card>
-      )}
-      {step === 5 && (
-        <Card className="w-full max-w-md">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="text-xl font-semibold">
-              Select Product
-            </CardTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="h-8 w-8 p-0"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </CardHeader>
-          <ProductList />
-        </Card>
-      )}
-    </div>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 };
 

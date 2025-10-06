@@ -30,10 +30,8 @@ async function fetchWarehouseProducts({
 }
 
 async function createWarehouseProduct({
-  warehouseID,
   productData,
 }: {
-  warehouseID: string;
   productData: {
     name: string;
     description?: string;

@@ -16,21 +16,18 @@ export async function GET(req: NextRequest) {
   try {
     const response = full
       ? await db`
-          SELECT
+        SELECT
             p.id,
             p.name,
             p.brand,
             p.category,
             p.image_url,
-            COALESCE(wp.stock, 0) AS stock,
-            COALESCE(wp.stock_threshold, 0) AS stock_threshold,
             p.price,
             p.sku,
-            p.barcode,
-            COALESCE(w.warehouse_name, 'No Warehouse') AS warehouse_name
-          FROM products p
-          LEFT JOIN warehouse_products wp ON wp.product_id = p.id
-          LEFT JOIN warehouse w ON wp.warehouse_id = w.id;
+            p.barcode
+        FROM products p
+        LEFT JOIN warehouse_products wp ON wp.product_id = p.id
+        LEFT JOIN warehouse w ON wp.warehouse_id = w.id;
         `
       : await db`
           SELECT
@@ -44,7 +41,7 @@ export async function GET(req: NextRequest) {
     if (response.length === 0) {
       return NextResponse.json(
         { message: "No products found" },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -52,5 +49,64 @@ export async function GET(req: NextRequest) {
   } catch (error: any) {
     console.error("Error fetching products:", error.message, error.stack);
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function POST(req: NextRequest) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session || session.user.role !== "admin") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const body = await req.json();
+    const {
+      name,
+      description,
+      brand = "none",
+      category,
+      sku,
+      barcode,
+      price = 0,
+      image_url = "https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-15.png",
+    } = body;
+
+    if (!name || !sku || !barcode) {
+      return NextResponse.json(
+        { error: "Missing required fields: name, sku, or barcode" },
+        { status: 400 }
+      );
+    }
+    const insertedProduct = await db`
+  INSERT INTO products (
+    name,
+    description,
+    brand,
+    category,
+    sku,
+    barcode,
+    price,
+    image_url
+  ) VALUES (
+    ${name},
+    ${description},
+    ${brand},
+    ${category},
+    ${sku},
+    ${barcode},
+    ${price},
+    ${
+      image_url?.trim() ||
+      "https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-15.png"
+    }  )
+`;
+
+    return NextResponse.json({ product: insertedProduct }, { status: 201 });
+  } catch (e: any) {
+    console.error("Error inserting product:", e);
+    return NextResponse.json(
+      { error: "Failed to create product" },
+      { status: 500 }
+    );
   }
 }

@@ -14,7 +14,7 @@ import ClientHeader from "./_components/client-header";
 const ClientsPage = () => {
   const { clients } = useClient();
   const [popup, setPopup] = useState<"add" | "delete" | "edit" | undefined>(
-    undefined
+    undefined,
   );
   return (
     <>
