@@ -12,6 +12,15 @@ export type CreateProductInput = {
   image_url: string;
 };
 
+type ProductUpdateData = Partial<{
+  name: string;
+  description: string;
+  brand: string;
+  category: string;
+  price: number;
+  image_url: string;
+}>;
+
 interface ProductStore {
   products: Product[];
   isLoading: boolean;
@@ -21,9 +30,10 @@ interface ProductStore {
   deleteProduct: (
     sku: string,
     isGlobal?: boolean,
-    warehouseId?: string
+    warehouseId?: string,
   ) => Promise<void>;
   fetchProduct: (sku: string) => Promise<void>;
+  editProduct: (sku: string, updateData: ProductUpdateData) => Promise<Product>;
 }
 
 export const useProductStore = create<ProductStore>((set) => ({
@@ -31,10 +41,47 @@ export const useProductStore = create<ProductStore>((set) => ({
   isLoading: false,
   error: null,
 
+  editProduct: async (
+    sku: string,
+    updateData: {
+      name?: string;
+      description?: string;
+      brand?: string;
+      category?: string;
+      price?: number;
+      image_url?: string;
+    },
+  ) => {
+    try {
+      const res = await fetch(`/api/admin/products/${sku}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updateData),
+      });
+      if (!res.ok) {
+        const errorBody = await res.json().catch(() => ({}));
+        throw new Error(errorBody.error || `Request failed: ${res.status}`);
+      }
+      const updatedProduct = await res.json();
+
+      // Update the product in the store
+      set((state) => ({
+        products: state.products.map((p) =>
+          p.sku === sku ? { ...p, ...updatedProduct } : p,
+        ),
+      }));
+
+      return updatedProduct;
+    } catch (e: any) {
+      console.error("Failed to edit product:", e.message);
+      throw e;
+    }
+  },
+
   deleteProduct: async (
     sku: string,
     isGlobal = false,
-    warehouseId?: string
+    warehouseId?: string,
   ) => {
     try {
       const query = new URLSearchParams();
@@ -45,7 +92,7 @@ export const useProductStore = create<ProductStore>((set) => ({
         `/api/admin/products/${sku}?${query.toString()}`,
         {
           method: "DELETE",
-        }
+        },
       );
 
       if (!res.ok) {
@@ -54,7 +101,6 @@ export const useProductStore = create<ProductStore>((set) => ({
       }
 
       const result = await res.json();
-      console.log("✅ Product deleted:", result);
 
       return result;
     } catch (e) {
@@ -93,15 +139,21 @@ export const useProductStore = create<ProductStore>((set) => ({
 
       if (!res.ok || !result?.id) {
         throw new Error(
-          result.error || `Failed to create product (status: ${res.status})`
+          result.error || `Failed to create product (status: ${res.status})`,
         );
       }
 
+      const newProduct = {
+        ...result,
+        stock: Number(result.stock || 0),
+        stock_threshold: Number(result.stock_threshold || 0),
+      };
+
       set((state) => ({
-        products: [...state.products, result],
+        products: [...state.products, newProduct],
       }));
 
-      return result;
+      return newProduct;
     } catch (e) {
       console.error("❌ Failed to create product:", e);
       throw e;
@@ -111,7 +163,7 @@ export const useProductStore = create<ProductStore>((set) => ({
   fetchProduct: async (sku: string) => {
     try {
       const res = await fetch(
-        `/api/admin/warehouse/product?search=${encodeURIComponent(sku)}`
+        `/api/admin/warehouse/product?search=${encodeURIComponent(sku)}`,
       );
 
       if (!res.ok) {

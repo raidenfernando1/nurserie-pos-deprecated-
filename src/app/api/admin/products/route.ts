@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
     if (response.length === 0) {
       return NextResponse.json(
         { message: "No products found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -53,13 +53,16 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session || session.user.role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   try {
+    const session = await auth.api.getSession({ headers: await headers() });
+
+    if (!session || session.user.role !== "admin") {
+      console.warn("Unauthorized access attempt");
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await req.json();
+
     const {
       name,
       description,
@@ -72,41 +75,44 @@ export async function POST(req: NextRequest) {
     } = body;
 
     if (!name || !sku || !barcode) {
+      console.warn("Missing required fields");
       return NextResponse.json(
         { error: "Missing required fields: name, sku, or barcode" },
-        { status: 400 }
+        { status: 400 },
       );
     }
-    const insertedProduct = await db`
-  INSERT INTO products (
-    name,
-    description,
-    brand,
-    category,
-    sku,
-    barcode,
-    price,
-    image_url
-  ) VALUES (
-    ${name},
-    ${description},
-    ${brand},
-    ${category},
-    ${sku},
-    ${barcode},
-    ${price},
-    ${
-      image_url?.trim() ||
-      "https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-15.png"
-    }  )
-`;
 
+    const finalImageUrl =
+      image_url?.trim() ||
+      "https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-15.png";
+
+    const insertedProduct = await db`
+      INSERT INTO products (
+        name,
+        description,
+        brand,
+        category,
+        sku,
+        barcode,
+        price,
+        image_url
+      ) VALUES (
+        ${name},
+        ${description},
+        ${brand},
+        ${category},
+        ${sku},
+        ${barcode},
+        ${price},
+        ${finalImageUrl}
+      ) RETURNING *;
+    `;
     return NextResponse.json({ product: insertedProduct }, { status: 201 });
   } catch (e: any) {
     console.error("Error inserting product:", e);
     return NextResponse.json(
       { error: "Failed to create product" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

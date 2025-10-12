@@ -1,62 +1,66 @@
 "use client";
-import React from "react";
-import WarehouseLayout from "./_component/warehouse-layout";
-import Tab from "./_component/table-tab";
-import { useProducts } from "@/hooks/useProducts";
-import { totalStockColumns } from "./_component/table-column";
-import ReusableTable from "./_component/product-container";
-import useWarehouseStore from "@/store/useWarehouse";
-import { useState } from "react";
-import EditProduct from "./_component/popups/edit-product";
-import MoveProduct from "./_component/popups/move-product";
-import DeleteProduct from "./_component/popups/delete-product";
-import AddExistingProduct from "./_component/popups/add-exiting-product";
 
-const TotalWarehouseLayout = () => {
-  const { data } = useProducts();
-  const [editProductPopup, setEditProductPopup] = useState<boolean>(false);
-  const [deleteProductPopup, setDeleteProductPopup] = useState<boolean>(false);
-  const [moveProductPopup, setMoveProductPopup] = useState<boolean>(false);
-  const [isAddExistingProductOpen, setIsAddExistingProductOpen] =
-    useState<boolean>(false);
-  const { warehouseStats } = useWarehouseStore();
+import { useEffect } from "react";
+import ReusableTable from "@/components/reusable-table";
+import { useWarehouseStore } from "@/store/warehouse-store";
+import Tab from "./_components/table-tab";
+import { columns } from "./_components/table-column";
+
+const Warehouse = () => {
+  const { fetchStockedProducts, allStockedProducts, isLoading, error } =
+    useWarehouseStore();
+
+  useEffect(() => {
+    fetchStockedProducts();
+  }, [fetchStockedProducts]);
+
+  const warehouses = Array.from(
+    new Set(allStockedProducts.map((product) => product.warehouse_name)),
+  );
+
+  const categories = Array.from(
+    new Set(allStockedProducts.map((d) => d.category)),
+  );
+
+  if (isLoading) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 font-medium">Loading products...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md">
+          <p className="text-red-800 font-semibold">Error loading products</p>
+          <p className="text-red-600 mt-2">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <>
-      {editProductPopup && (
-        <EditProduct onClose={() => setEditProductPopup(false)} />
-      )}
-      {deleteProductPopup && (
-        <DeleteProduct onClose={() => setDeleteProductPopup(false)} />
-      )}
-      {moveProductPopup && <MoveProduct />}
-      {isAddExistingProductOpen && <AddExistingProduct />}
-      <WarehouseLayout
-        title="Total Stock"
-        companyTotalStock={warehouseStats.company_total_stock}
-        companyTotalProducts={warehouseStats.company_total_products}
-        showActions={false}
-        showAdmin={true}
-        onDeleteProduct={() => setDeleteProductPopup(true)}
-        onEditProduct={() => setEditProductPopup(true)}
-        onMoveProduct={() => setMoveProductPopup(true)}
-        onAddExistingProduct={() => setIsAddExistingProductOpen(true)}
-      >
+    <div className="h-screen p-3 flex flex-col gap-3">
+      <div className="flex-1 min-h-0">
         <ReusableTable
-          data={data ?? []}
-          columns={totalStockColumns}
+          data={allStockedProducts}
+          columns={columns as any}
           tabComponent={(table) => (
             <Tab
               table={table}
-              categories={Array.from(
-                new Set((data ?? []).map((d) => d.category)),
-              )}
+              warehouses={warehouses}
+              categories={categories}
             />
           )}
         />
-      </WarehouseLayout>
-    </>
+      </div>
+    </div>
   );
 };
 
-export default TotalWarehouseLayout;
+export default Warehouse;

@@ -26,6 +26,7 @@ import {
   ChartSpline,
   ChevronDown,
   Handshake,
+  Package,
 } from "lucide-react";
 import { NavUser } from "./navbar-user";
 import useWarehouseStore from "@/store/useWarehouse";
@@ -35,13 +36,12 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import useClient from "@/app/admin/consignments/_store/useClient";
-import useWarehouse from "@/app/admin/warehouse/_lib/useWarehouse";
 
 export const adminItems = [
   { name: "Dashboard", path: "/admin/dashboard", icon: Home },
   { name: "Analytics", path: "/admin/analytics", icon: ChartSpline },
   { name: "Staff", path: "/admin/staff", icon: Users },
-  { name: "Consignments", path: "/admin/consignments", icon: Handshake },
+  { name: "Products", path: "/admin/products", icon: Package },
 ];
 
 export const cashierItems = [
@@ -51,11 +51,10 @@ export const cashierItems = [
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [role, setRole] = useState<string | null>(null);
-  const [activeMenu, setActiveMenu] = useState(""); // e.g., "warehouse" or "consignments"
-  const [activeSubPath, setActiveSubPath] = useState(""); // exact path of sub-item
+  const [activeMenu, setActiveMenu] = useState("");
+  const [activeSubPath, setActiveSubPath] = useState("");
   const [loading, setLoading] = useState(true);
   const [sessionData, setSessionData] = useState<any>(null);
-  const { warehouses } = useWarehouse();
   const { clients } = useClient();
 
   useEffect(() => {
@@ -146,56 +145,28 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       </CollapsibleTrigger>
                       <CollapsibleContent>
                         <SidebarMenuSub>
-                          <SidebarMenuSubItem>
-                            <SidebarMenuSubButton
-                              asChild
-                              isActive={activeSubPath === "/admin/warehouse"}
+                          <SidebarMenuSubButton
+                            asChild
+                            isActive={activeSubPath === "/admin/warehouse"}
+                          >
+                            <Link
+                              href="/admin/warehouse"
+                              onClick={() => {
+                                setActiveMenu("warehouse");
+                                setActiveSubPath("/admin/warehouse");
+                              }}
                             >
-                              <Link
-                                href="/admin/warehouse"
-                                onClick={() => {
-                                  setActiveMenu("warehouse");
-                                  setActiveSubPath("/admin/warehouse");
-                                }}
-                              >
-                                <span>All Stocks</span>
-                              </Link>
+                              <span>All Stocks</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton>
+                              <span className="text-gray-500">
+                                No warehouses
+                              </span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
-
-                          {warehouses && warehouses.length > 0 ? (
-                            warehouses.map((warehouse: any) => (
-                              <SidebarMenuSubItem key={warehouse.warehouse_id}>
-                                <SidebarMenuSubButton
-                                  asChild
-                                  isActive={
-                                    activeSubPath ===
-                                    `/admin/warehouse/${warehouse.warehouse_id}`
-                                  }
-                                >
-                                  <Link
-                                    href={`/admin/warehouse/${warehouse.warehouse_id}`}
-                                    onClick={() => {
-                                      setActiveMenu("warehouse");
-                                      setActiveSubPath(
-                                        `/admin/warehouse/${warehouse.warehouse_id}`,
-                                      );
-                                    }}
-                                  >
-                                    <span>{warehouse.warehouse_name}</span>
-                                  </Link>
-                                </SidebarMenuSubButton>
-                              </SidebarMenuSubItem>
-                            ))
-                          ) : (
-                            <SidebarMenuSubItem>
-                              <SidebarMenuSubButton>
-                                <span className="text-gray-500">
-                                  No warehouses
-                                </span>
-                              </SidebarMenuSubButton>
-                            </SidebarMenuSubItem>
-                          )}
                         </SidebarMenuSub>
                       </CollapsibleContent>
                     </SidebarMenuItem>

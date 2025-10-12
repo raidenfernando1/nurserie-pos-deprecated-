@@ -9,7 +9,7 @@ import { db } from "@/lib/db-client";
 
 export async function GET(
   request: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> },
 ) {
   const { id: warehouseID } = await context.params;
 
@@ -20,7 +20,7 @@ export async function GET(
 
   try {
     const [warehouse] = await db`
-      SELECT 
+      SELECT
         id,
         warehouse_name
       FROM warehouse
@@ -30,7 +30,7 @@ export async function GET(
     if (!warehouse) {
       return NextResponse.json(
         { error: "Warehouse not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -60,7 +60,7 @@ export async function GET(
     console.error("GET /api/admin/warehouse/[id]/products error:", e);
     return NextResponse.json(
       { error: "Server error while fetching warehouse products" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

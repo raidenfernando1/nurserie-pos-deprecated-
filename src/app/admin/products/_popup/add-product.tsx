@@ -1,6 +1,11 @@
 "use client";
 
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,24 +27,35 @@ const AddProduct = ({ onClose }: AddProductProps) => {
   const [error, setError] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const [sku, setSku] = useState("");
-  const [barcode, setBarcode] = useState("");
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
-  const [category, setCategory] = useState("");
-  const [brand, setBrand] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
-  const [description, setDescription] = useState("");
+  const [formData, setFormData] = useState({
+    sku: "",
+    barcode: "",
+    name: "",
+    price: "",
+    category: "",
+    brand: "",
+    imageUrl: "",
+    description: "",
+  });
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
+  };
 
   const resetForm = () => {
-    setSku("");
-    setBarcode("");
-    setName("");
-    setPrice("");
-    setCategory("");
-    setBrand("");
-    setImageUrl("");
-    setDescription("");
+    setFormData({
+      sku: "",
+      barcode: "",
+      name: "",
+      price: "",
+      category: "",
+      brand: "",
+      imageUrl: "",
+      description: "",
+    });
     setError(null);
   };
 
@@ -49,31 +65,35 @@ const AddProduct = ({ onClose }: AddProductProps) => {
     setError(null);
 
     try {
-      if (
-        !name.trim() ||
-        !brand.trim() ||
-        !category.trim() ||
-        !sku.trim() ||
-        !price.trim()
-      ) {
+      const {
+        sku,
+        barcode,
+        name,
+        price,
+        category,
+        brand,
+        imageUrl,
+        description,
+      } = formData;
+
+      if (!sku || !barcode || !name || !price || !category || !brand) {
         throw new Error("Please fill in all required fields");
       }
 
       const parsedPrice = parseFloat(price);
-
       if (isNaN(parsedPrice) || parsedPrice < 0) {
         throw new Error("Please enter a valid price");
       }
 
       const productData = {
-        name: name.trim(),
-        description: description.trim(),
-        brand: brand.trim(),
-        category: category.trim(),
         sku: sku.trim(),
         barcode: barcode.trim(),
+        name: name.trim(),
         price: parsedPrice,
+        category: category.trim(),
+        brand: brand.trim(),
         image_url: imageUrl.trim(),
+        description: description.trim(),
       };
 
       await createProduct(productData);
@@ -93,7 +113,9 @@ const AddProduct = ({ onClose }: AddProductProps) => {
           <>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <h2 className="text-xl font-semibold">New Product</h2>
+                <DialogTitle className="text-xl font-semibold">
+                  New Product
+                </DialogTitle>
                 <Badge variant="secondary">Create Product</Badge>
               </div>
             </div>
@@ -113,8 +135,8 @@ const AddProduct = ({ onClose }: AddProductProps) => {
                     <Label htmlFor="sku">SKU</Label>
                     <Input
                       id="sku"
-                      value={sku}
-                      onChange={(e) => setSku(e.target.value)}
+                      value={formData.sku}
+                      onChange={handleChange}
                       placeholder="Enter SKU"
                       required
                       disabled={isLoading}
@@ -124,8 +146,8 @@ const AddProduct = ({ onClose }: AddProductProps) => {
                     <Label htmlFor="barcode">Barcode</Label>
                     <Input
                       id="barcode"
-                      value={barcode}
-                      onChange={(e) => setBarcode(e.target.value)}
+                      value={formData.barcode}
+                      onChange={handleChange}
                       placeholder="Enter barcode"
                       required
                       disabled={isLoading}
@@ -135,8 +157,8 @@ const AddProduct = ({ onClose }: AddProductProps) => {
                     <Label htmlFor="name">Product Name</Label>
                     <Input
                       id="name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
+                      value={formData.name}
+                      onChange={handleChange}
                       placeholder="Enter product name"
                       required
                       disabled={isLoading}
@@ -157,8 +179,8 @@ const AddProduct = ({ onClose }: AddProductProps) => {
                       id="price"
                       type="number"
                       step="0.01"
-                      value={price}
-                      onChange={(e) => setPrice(e.target.value)}
+                      value={formData.price}
+                      onChange={handleChange}
                       placeholder="0.00"
                       required
                       disabled={isLoading}
@@ -168,8 +190,8 @@ const AddProduct = ({ onClose }: AddProductProps) => {
                     <Label htmlFor="category">Category *</Label>
                     <Input
                       id="category"
-                      value={category}
-                      onChange={(e) => setCategory(e.target.value)}
+                      value={formData.category}
+                      onChange={handleChange}
                       placeholder="Enter category"
                       required
                       disabled={isLoading}
@@ -179,20 +201,21 @@ const AddProduct = ({ onClose }: AddProductProps) => {
                     <Label htmlFor="brand">Brand *</Label>
                     <Input
                       id="brand"
-                      value={brand}
-                      onChange={(e) => setBrand(e.target.value)}
+                      value={formData.brand}
+                      onChange={handleChange}
                       placeholder="Enter brand"
                       required
                       disabled={isLoading}
                     />
                   </div>
                 </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="imageUrl">Image URL</Label>
                   <Input
                     id="imageUrl"
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
+                    value={formData.imageUrl}
+                    onChange={handleChange}
                     placeholder="https://example.com/image.jpg"
                     disabled={isLoading}
                   />
@@ -201,8 +224,8 @@ const AddProduct = ({ onClose }: AddProductProps) => {
                   <Label htmlFor="description">Description</Label>
                   <Textarea
                     id="description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
+                    value={formData.description}
+                    onChange={handleChange}
                     placeholder="Enter product description..."
                     rows={3}
                     disabled={isLoading}
@@ -237,7 +260,9 @@ const AddProduct = ({ onClose }: AddProductProps) => {
         ) : (
           <>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">Product Created!</h2>
+              <DialogTitle className="text-xl font-semibold">
+                Product Created!
+              </DialogTitle>
               <Button
                 variant="ghost"
                 size="sm"
