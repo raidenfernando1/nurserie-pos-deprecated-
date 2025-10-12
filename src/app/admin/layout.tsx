@@ -7,6 +7,7 @@ import ProtectedRoute from "@/components/protected-route";
 import { useProducts } from "@/hooks/useProducts";
 import LoadingBar from "@/components/loading-page";
 import useClient from "./consignments/_store/useClient";
+import { AdminSidebar } from "@/components/sidebar/admin-sidebar";
 
 export default function DashboardLayout({
   children,
@@ -22,10 +23,10 @@ export default function DashboardLayout({
 
   return (
     <ProtectedRoute intendedRole="admin">
-      <LoadingBar duration={1500}>
+      <LoadingBar duration={200}>
         <SidebarProvider>
           <div className="flex h-screen w-full overflow-hidden">
-            <AppSidebar />
+            <AdminSidebar />
             <main className="flex flex-1 flex-col overflow-auto">
               {children}
             </main>

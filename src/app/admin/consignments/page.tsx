@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect } from "react";
-import ReusableTable from "../warehouse/_component/product-container";
+import ReusableTable from "@/components/table/reusable-table";
 import ClientTab from "./_components/client-tab";
 import { Columns } from "./_components/client-columns";
 import useClient from "./_store/useClient";
@@ -14,7 +14,7 @@ import ClientHeader from "./_components/client-header";
 const ClientsPage = () => {
   const { clients } = useClient();
   const [popup, setPopup] = useState<"add" | "delete" | "edit" | undefined>(
-    undefined,
+    undefined
   );
   return (
     <>

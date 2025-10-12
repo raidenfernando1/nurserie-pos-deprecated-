@@ -1,13 +1,14 @@
 "use client";
 import { useEffect } from "react";
-import ReusableTable from "@/components/reusable-table";
+import ReusableTable from "@/components/table/reusable-table";
 import useProductsPopups from "./_store/products-popups";
 import { useProductStore } from "@/store/product-store";
-import Header from "./_components/product-header";
+import Header from "@/components/table/table-header";
 import PopupHandler from "./_components/popup-handler";
 import { Button } from "@/components/ui/button";
 import { Trash, Edit } from "lucide-react";
-import Tab from "../../../components/table-tab";
+import Tab from "../../../components/table/table-tab";
+import { Plus } from "lucide-react";
 
 const Products = () => {
   const { fetchAllProducts, products } = useProductStore();
@@ -36,7 +37,10 @@ const Products = () => {
         </div>
       ),
     },
-    { accessorKey: "category", header: "Category" },
+    {
+      accessorKey: "category",
+      header: "Category",
+    },
     {
       accessorKey: "price",
       header: "SRP",
@@ -91,13 +95,33 @@ const Products = () => {
   return (
     <PopupHandler>
       <div className="h-screen p-3 flex flex-col gap-3">
-        <Header />
+        <h1>Products</h1>
         <div className="flex-1 min-h-0">
           <ReusableTable
             data={products}
             columns={Columns}
             tabComponent={(table) => (
-              <Tab table={table} categories={categories} />
+              <Tab
+                table={table}
+                filters={[
+                  {
+                    columnId: "category",
+                    label: "Categories",
+                    options: categories,
+                    placeholder: "All Categories",
+                  },
+                ]}
+                actions={
+                  <>
+                    <Button
+                      variant="outline"
+                      onClick={() => togglePopup("add")}
+                    >
+                      <Plus />
+                    </Button>
+                  </>
+                }
+              />
             )}
           />
         </div>

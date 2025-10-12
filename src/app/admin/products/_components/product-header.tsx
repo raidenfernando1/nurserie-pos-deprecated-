@@ -1,20 +1,17 @@
 import { Card, CardAction, CardContent, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Plus, Trash, Edit } from "lucide-react";
-import useProductsPopups from "../_store/products-popups";
+import { ReactNode } from "react";
 
-const Header = () => {
-  const { togglePopup } = useProductsPopups();
+interface HeaderProps {
+  title?: string;
+  actions?: ReactNode;
+}
 
+const Header = ({ title = "Products", actions }: HeaderProps) => {
   return (
     <Card>
       <CardContent className="flex items-center justify-between">
-        <CardTitle>Products</CardTitle>
-        <CardAction className="flex gap-3">
-          <Button variant="outline" onClick={() => togglePopup("add")}>
-            <Plus />
-          </Button>
-        </CardAction>
+        <CardTitle>{title}</CardTitle>
+        <CardAction className="flex gap-3">{actions}</CardAction>
       </CardContent>
     </Card>
   );

@@ -13,7 +13,7 @@ interface WarehouseState {
   isLoading: boolean;
   error: string | null;
   fetchStockedProducts: () => Promise<Product[]>;
-  fetchWarehouseStock: () => void;
+  fetchWarehouseStock: (warehouseID: string) => Promise<void>;
 }
 
 export const useWarehouseStore = create<WarehouseState>((set) => ({
@@ -22,7 +22,7 @@ export const useWarehouseStore = create<WarehouseState>((set) => ({
   isLoading: false,
   error: null,
 
-  fetchWarehouseStock: async ({ warehouseID }: { warehouseID: string }) => {
+  fetchWarehouseStock: async (warehouseID) => {
     set({ isLoading: true, error: null });
 
     try {

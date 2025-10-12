@@ -1,8 +1,14 @@
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { ReactNode } from "react";
 
-const Tab = ({ table, categories }: { table: any; categories: string[] }) => {
+interface TabProps {
+  table: any;
+  categories: string[];
+  actions?: ReactNode;
+}
+
+const Tab = ({ table, categories, actions }: TabProps) => {
   const pageIndex = table.getState().pagination.pageIndex + 1;
   const pageCount = table.getPageCount();
 
@@ -15,7 +21,6 @@ const Tab = ({ table, categories }: { table: any; categories: string[] }) => {
           onChange={(e) => table.setGlobalFilter(e.target.value)}
         />
       </div>
-
       <Button asChild variant="outline">
         <select
           className="bg-inherit"
@@ -33,6 +38,7 @@ const Tab = ({ table, categories }: { table: any; categories: string[] }) => {
           ))}
         </select>
       </Button>
+      {actions && <div className="flex gap-3">{actions}</div>}
     </div>
   );
 };
