@@ -1,12 +1,6 @@
 import { create } from "zustand";
 
-type PopupType =
-  | "add"
-  | "edit"
-  | "move"
-  | "make-warehouse"
-  | "delete-warehouse"
-  | null;
+type PopupType = "add-product" | "move-product" | null;
 
 interface PopupStore {
   activePopup: PopupType;

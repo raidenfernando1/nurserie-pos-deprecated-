@@ -29,22 +29,7 @@ async function fetchWarehouseProducts({
   return res.json();
 }
 
-async function createWarehouseProduct({
-  productData,
-}: {
-  productData: {
-    name: string;
-    description?: string;
-    brand: string;
-    category: string;
-    sku: string;
-    barcode?: string;
-    price: number;
-    image_url?: string;
-    initial_stock: number;
-    stock_threshold: number;
-  };
-}): Promise<any> {
+async function createWarehouseProduct(productData: any): Promise<any> {
   const res = await fetch(`/api/admin/warehouse/${warehouseID}/products`, {
     method: "POST",
     headers: {

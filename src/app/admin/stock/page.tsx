@@ -1,13 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import ReusableTable from "@/components/table/reusable-table";
-import Tab from "../../../../components/table/table-tab";
-import React from "react";
+import { useWarehouseStore } from "@/store/warehouse-store";
+import Tab from "../../../components/table/table-tab";
 import StatusBadge from "@/components/table/status-badge";
 import LoadingBar from "@/components/loading-page";
-import PopupHandler from "./_components/popup-handler";
-import { usePopup } from "./_store/usePopup";
 
 const columns = [
   {
@@ -21,16 +19,19 @@ const columns = [
         />
         <div className="flex flex-col gap-0.5">
           <div className="flex flex-col">
-            <span className="font-semibold ">{row.original.name}</span>
+            <span className="font-semibold ">{row.original.product_name}</span>
             <StatusBadge
               stock={row.original.stock}
               threshold={row.original.stock_threshold}
             />
           </div>
+          {row.original.brand && (
+            <span className="text-xs ">{row.original.brand}</span>
+          )}
         </div>
       </div>
     ),
-    accessorFn: (row: any) => row.name,
+    accessorFn: (row: any) => row.product_name,
     filterFn: "includesString" as const,
   },
 
@@ -39,7 +40,7 @@ const columns = [
     header: "Category",
     cell: ({ row }: any) => (
       <div className="flex items-center gap-2">
-        <span className="font-medium ">
+        <span className="font-medium">
           {row.original.category || "Uncategorized"}
         </span>
       </div>
@@ -55,7 +56,7 @@ const columns = [
       <div className="flex flex-col">
         <div className="flex items-center gap-1.5">
           <span className="text-xs ">SKU:</span>
-          <span className="font-mono text-sm font-medium">
+          <span className="font-mono text-sm font-medium ">
             {row.original.sku}
           </span>
         </div>
@@ -64,6 +65,15 @@ const columns = [
           <span className="font-mono text-sm ">{row.original.barcode}</span>
         </div>
       </div>
+    ),
+    filterFn: "includesString" as const,
+  },
+
+  {
+    accessorKey: "warehouse_name",
+    header: "Warehouse",
+    cell: ({ row }: any) => (
+      <div className="flex items-center">{row.original.warehouse_name}</div>
     ),
     filterFn: "includesString" as const,
   },
@@ -98,75 +108,71 @@ const columns = [
   },
 ];
 
-export default function WarehousePage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const [products, setProducts] = useState<any[]>([]);
-  const [warehouseData, setWarehouseData] = useState<{
-    warehouse_id: number;
-    warehouse_name: string;
-  } | null>(null);
-  const { id } = React.use(params);
-  const { togglePopup } = usePopup();
+const Stocks = () => {
+  const { fetchStockedProducts, allStockedProducts, isLoading, error } =
+    useWarehouseStore();
 
   useEffect(() => {
-    const fetchWarehouseData = async () => {
-      try {
-        const response = await fetch(`/api/admin/warehouse/${id}`);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch: ${response.status}`);
-        }
-        const data = await response.json();
-
-        setWarehouseData({
-          warehouse_id: data.warehouse.id,
-          warehouse_name: data.warehouse.warehouse_name,
-        });
-
-        setProducts(data.products || []);
-      } catch (error) {
-        console.error("Error fetching warehouse data:", error);
-      }
-    };
-
-    if (id) {
-      fetchWarehouseData();
-    }
-  }, [id]);
+    fetchStockedProducts();
+  }, [fetchStockedProducts]);
 
   const categories = Array.from(
-    new Set(products.map((product) => product.category).filter(Boolean)),
+    new Set(
+      allStockedProducts.map((product) => product.category).filter(Boolean),
+    ),
   );
+
+  const warehouses = Array.from(
+    new Set(
+      allStockedProducts
+        .map((product) => product.warehouse_name)
+        .filter(Boolean),
+    ),
+  );
+
+  if (error) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md">
+          <p className="text-red-800 font-semibold">Error loading products</p>
+          <p className="text-red-600 mt-2">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <LoadingBar>
-      <PopupHandler warehouseID={id}>
-        <div className="h-screen p-3 flex flex-col gap-3">
-          <h1>{warehouseData?.warehouse_name || "Warehouse"}</h1>
-          <button onClick={() => togglePopup("add-product")}>test</button>
-          <div className="flex-1 min-h-0">
-            <ReusableTable
-              data={products}
-              columns={columns as any}
-              tabComponent={(table) => (
-                <Tab
-                  table={table}
-                  filters={[
-                    {
-                      columnId: "category",
-                      label: "Categories",
-                      options: categories,
-                      placeholder: "All Categories",
-                    },
-                  ]}
-                />
-              )}
-            />
-          </div>
+      <div className="h-screen p-3 flex flex-col gap-3">
+        <h1>All stocked products</h1>
+        <div className="flex-1 min-h-0">
+          <ReusableTable
+            data={allStockedProducts}
+            columns={columns as any}
+            tabComponent={(table) => (
+              <Tab
+                table={table}
+                filters={[
+                  {
+                    columnId: "category",
+                    label: "Categories",
+                    options: categories,
+                    placeholder: "All Categories",
+                  },
+                  {
+                    columnId: "warehouse_name",
+                    label: "Warehouses",
+                    options: warehouses,
+                    placeholder: "All Warehouses",
+                  },
+                ]}
+              />
+            )}
+          />
         </div>
-      </PopupHandler>
+      </div>
     </LoadingBar>
   );
-}
+};
+
+export default Stocks;

@@ -62,16 +62,15 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-
     const {
       name,
-      description,
+      description = null,
       brand = "none",
       category,
       sku,
       barcode,
       price = 0,
-      image_url = "https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-15.png",
+      image_url,
     } = body;
 
     if (!name || !sku || !barcode) {
@@ -96,7 +95,8 @@ export async function POST(req: NextRequest) {
         barcode,
         price,
         image_url
-      ) VALUES (
+      )
+      VALUES (
         ${name},
         ${description},
         ${brand},
@@ -105,11 +105,13 @@ export async function POST(req: NextRequest) {
         ${barcode},
         ${price},
         ${finalImageUrl}
-      ) RETURNING *;
+      )
+      RETURNING *;
     `;
-    return NextResponse.json({ product: insertedProduct }, { status: 201 });
+
+    return NextResponse.json({ product: insertedProduct[0] }, { status: 201 });
   } catch (e: any) {
-    console.error("Error inserting product:", e);
+    console.error("❌ Error inserting product:", e);
     return NextResponse.json(
       { error: "Failed to create product" },
       { status: 500 },

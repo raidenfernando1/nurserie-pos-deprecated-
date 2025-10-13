@@ -89,15 +89,15 @@ export function ChangePassword({
           <div className="grid gap-4 py-4">
             <div className="grid gap-3">
               <Label>Cashier ID</Label>
-              <p className="text-sm text-gray-600">{cashier.id}</p>
+              <p className="text-sm">{cashier.id}</p>
             </div>
             <div className="grid gap-3">
               <Label>Full Name</Label>
-              <p className="text-sm text-gray-600">{cashier.name}</p>
+              <p className="text-sm">{cashier.name}</p>
             </div>
             <div className="grid gap-3">
               <Label>Username</Label>
-              <p className="text-sm text-gray-600">{cashier.username}</p>
+              <p className="text-sm">{cashier.username}</p>
             </div>
             <div className="grid gap-3">
               <Label htmlFor="password-input">New Password</Label>

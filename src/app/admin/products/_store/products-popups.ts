@@ -13,7 +13,7 @@ interface PopupStore {
   togglePopup: (type: Exclude<PopupType, null>, product?: Product) => void;
 }
 
-const useProductsPopups = create<PopupStore>((set, get) => ({
+const useWarehousePopups = create<PopupStore>((set, get) => ({
   activePopup: null,
   selectedProduct: null,
 
@@ -26,4 +26,4 @@ const useProductsPopups = create<PopupStore>((set, get) => ({
     }),
 }));
 
-export default useProductsPopups;
+export default useWarehousePopups;

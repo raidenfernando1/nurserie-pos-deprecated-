@@ -3,7 +3,6 @@ import { useEffect } from "react";
 import ReusableTable from "@/components/table/reusable-table";
 import useProductsPopups from "./_store/products-popups";
 import { useProductStore } from "@/store/product-store";
-import Header from "@/components/table/table-header";
 import PopupHandler from "./_components/popup-handler";
 import { Button } from "@/components/ui/button";
 import { Trash, Edit } from "lucide-react";
@@ -29,9 +28,7 @@ const Products = () => {
           <div className="flex flex-col">
             <span className="font-medium">{row.original.name}</span>
             <div className="flex">
-              <span className="text-sm text-gray-500">
-                {row.original.brand}
-              </span>
+              <span className="text-sm">{row.original.brand}</span>
             </div>
           </div>
         </div>
@@ -58,7 +55,7 @@ const Products = () => {
           <div className="flex flex-col">
             <span className="font-medium">{row.original.barcode}</span>
             <div className="flex">
-              <span className="text-sm text-gray-500">{row.original.sku}</span>
+              <span className="text-sm">{row.original.sku}</span>
             </div>
           </div>
         </div>

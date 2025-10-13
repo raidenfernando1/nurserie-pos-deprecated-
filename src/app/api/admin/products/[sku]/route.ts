@@ -17,15 +17,7 @@ export async function GET(
   try {
     const product = await db`
       SELECT
-        id,
-        name,
-        description,
-        brand,
-        category,
-        sku,
-        barcode,
-        price,
-        image_url
+          id, name, description, brand, category, sku, barcode, price, image_url
       FROM products
       WHERE sku = ${sku}
       LIMIT 1

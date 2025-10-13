@@ -1,180 +1,113 @@
 "use client";
 
-import { useEffect } from "react";
-import ReusableTable from "@/components/table/reusable-table";
-import { useWarehouseStore } from "@/store/warehouse-store";
-import Tab from "../../../components/table/table-tab";
-import StatusBadge from "@/components/table/status-badge";
 import LoadingBar from "@/components/loading-page";
+import ReusableTable from "@/components/table/reusable-table";
+import Tab from "@/components/table/table-tab";
 
-export const columns = [
-  {
-    id: "product_info",
-    header: "Product",
-    cell: ({ row }: any) => (
-      <div className="flex items-center gap-3">
-        <img
-          src={row.original.image_url}
-          className="w-12 h-12 object-cover rounded-lg border"
-        />
-        <div className="flex flex-col gap-0.5">
-          <div className="flex flex-col">
-            <span className="font-semibold text-gray-900">
-              {row.original.product_name}
-            </span>
-            <StatusBadge
-              stock={row.original.stock}
-              threshold={row.original.stock_threshold}
-            />
-          </div>
-          {row.original.brand && (
-            <span className="text-xs text-gray-500">{row.original.brand}</span>
-          )}
-        </div>
-      </div>
-    ),
-    accessorFn: (row: any) => row.product_name,
-    filterFn: "includesString" as const,
-  },
+import { ColumnDef } from "@tanstack/react-table";
+import useSWR from "swr";
+import { fetcher } from "@/utils/swrFetcher";
+import { Loader2, Plus } from "lucide-react";
+import PopupHandler from "./_components/popup-handler";
+import { usePopup } from "./_store/usePopup";
+import { Button } from "@/components/ui/button";
 
-  {
-    accessorKey: "category",
-    header: "Category",
-    cell: ({ row }: any) => (
-      <div className="flex items-center gap-2">
-        <span className="font-medium text-gray-700">
-          {row.original.category || "Uncategorized"}
-        </span>
-      </div>
-    ),
-    filterFn: "includesString" as const,
-  },
+type Warehouse = {
+  warehouse_id: number;
+  warehouse_name: string;
+  total_products: string;
+  total_stock: string;
+  products_in_stock: string;
+  low_stock_products: string;
+  out_of_stock_products: string;
+};
 
-  {
-    id: "sku_barcode",
-    header: "SKU / Barcode",
-    accessorFn: (row: any) => `${row.sku} ${row.barcode}`,
-    cell: ({ row }: any) => (
-      <div className="flex flex-col">
-        <div className="flex items-center gap-1.5">
-          <span className="text-xs text-gray-500">SKU:</span>
-          <span className="font-mono text-sm font-medium text-gray-900">
-            {row.original.sku}
-          </span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="text-xs text-gray-500">Barcode:</span>
-          <span className="font-mono text-sm text-gray-600">
-            {row.original.barcode}
-          </span>
-        </div>
-      </div>
-    ),
-    filterFn: "includesString" as const,
-  },
-
+const columns: ColumnDef<Warehouse>[] = [
   {
     accessorKey: "warehouse_name",
     header: "Warehouse",
-    cell: ({ row }: any) => (
-      <div className="flex items-center">{row.original.warehouse_name}</div>
-    ),
-    filterFn: "includesString" as const,
+    cell: ({ row }) => <span>{row.getValue("warehouse_name")}</span>,
   },
 
   {
-    accessorKey: "price",
-    header: "Price",
-    cell: ({ row }: any) => (
-      <span className="font-semibold text-gray-900">
-        {row.original.price ? `₱${row.original.price.toLocaleString()}` : "N/A"}
-      </span>
-    ),
+    accessorKey: "total_products",
+    header: "Total products",
   },
 
   {
-    id: "stock_info",
-    header: "Stock Status",
-    cell: ({ row }: any) => (
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-2">
-          <span>Current: </span>
-          <span>{row.original.stock}</span>
-        </div>
-        <div className="flex items-center">
-          <span>Threshold: </span>
-          <span>{row.original.stock_threshold}</span>
-        </div>
-      </div>
-    ),
-    accessorFn: (row: any) => `${row.stock} ${row.stock_threshold}`,
-    filterFn: "includesString" as const,
+    accessorKey: "total_stock",
+    header: "Total stock",
+  },
+
+  {
+    accessorKey: "products_in_stock",
+    header: "In Stock",
+  },
+
+  {
+    accessorKey: "low_stock_products",
+    header: "Low Stock",
+  },
+
+  {
+    accessorKey: "out_of_stock_products",
+    header: "Out of Stock",
   },
 ];
 
 const Warehouse = () => {
-  const { fetchStockedProducts, allStockedProducts, isLoading, error } =
-    useWarehouseStore();
+  const { data, error, isLoading } = useSWR<{
+    success: boolean;
+    response: Warehouse[];
+  }>("/api/admin/warehouse?full=true", fetcher);
+  const { togglePopup } = usePopup();
 
-  useEffect(() => {
-    fetchStockedProducts();
-  }, [fetchStockedProducts]);
-
-  const categories = Array.from(
-    new Set(
-      allStockedProducts.map((product) => product.category).filter(Boolean)
-    )
-  );
-
-  const warehouses = Array.from(
-    new Set(
-      allStockedProducts
-        .map((product) => product.warehouse_name)
-        .filter(Boolean)
-    )
-  );
-
-  if (error) {
+  if (error)
     return (
-      <div className="h-screen flex items-center justify-center">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md">
-          <p className="text-red-800 font-semibold">Error loading products</p>
-          <p className="text-red-600 mt-2">{error}</p>
-        </div>
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-destructive font-medium">
+          Failed to load warehouses. Please try again later.
+        </p>
       </div>
     );
-  }
+
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+
+  const warehouses = data?.response || [];
 
   return (
     <LoadingBar>
-      <div className="h-screen p-3 flex flex-col gap-3">
-        <h1>All stocked products</h1>
-        <div className="flex-1 min-h-0">
-          <ReusableTable
-            data={allStockedProducts}
-            columns={columns as any}
-            tabComponent={(table) => (
-              <Tab
-                table={table}
-                filters={[
-                  {
-                    columnId: "category",
-                    label: "Categories",
-                    options: categories,
-                    placeholder: "All Categories",
-                  },
-                  {
-                    columnId: "warehouse_name",
-                    label: "Warehouses",
-                    options: warehouses,
-                    placeholder: "All Warehouses",
-                  },
-                ]}
-              />
-            )}
-          />
+      <PopupHandler>
+        <div className="h-screen p-3 flex flex-col gap-3">
+          <h1>Warehouse Overview</h1>
+          <div className="flex-1 min-h-0">
+            <ReusableTable
+              data={warehouses}
+              columns={columns}
+              tabComponent={(table) => (
+                <Tab
+                  table={table}
+                  actions={
+                    <>
+                      <Button
+                        variant="outline"
+                        onClick={() => togglePopup("make-warehouse")}
+                      >
+                        <Plus />
+                      </Button>
+                    </>
+                  }
+                />
+              )}
+            />
+          </div>
         </div>
-      </div>
+      </PopupHandler>
     </LoadingBar>
   );
 };

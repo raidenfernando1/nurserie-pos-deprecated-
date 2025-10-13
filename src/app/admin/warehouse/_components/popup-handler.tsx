@@ -1,22 +1,17 @@
 "use client";
-
-import React, { useEffect } from "react";
-import TestPopup from "../_popups/test-popup";
-import useProductsPopups from "../../products/_store/products-popups";
+import React from "react";
+import { usePopup } from "../_store/usePopup";
+import AddWarehouse from "../_popups/add-warehouse";
 
 const PopupHandler = ({ children }: { children: React.ReactNode }) => {
-  const { activePopup } = useProductsPopups();
+  const { activePopup, closePopup } = usePopup();
 
-  useEffect(() => {
-    console.log(activePopup);
-  }, [activePopup]);
-
-  useEffect(() => {
-    console.log(activePopup);
-  }, []);
   return (
     <>
-      {activePopup === "add-warehouse" && <TestPopup />}
+      {activePopup === "make-warehouse" && (
+        <AddWarehouse onClose={closePopup} />
+      )}
+
       {children}
     </>
   );

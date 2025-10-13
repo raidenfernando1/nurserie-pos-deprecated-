@@ -9,10 +9,13 @@ import { useQuery } from "@tanstack/react-query";
 import LoginForm from "@/components/login-form";
 import { Navbar } from "@/components/navbar";
 import { useState } from "react";
+import { useTheme } from "next-themes";
+import { Sun, Moon } from "lucide-react";
 
 export default function Entry() {
   const [showCashierLogin, setShowCashierLogin] = useState(false);
   const { login } = useAdminAuth();
+  const { theme, setTheme } = useTheme();
 
   const {
     data: health,
@@ -60,6 +63,13 @@ export default function Entry() {
               </Button>
               <Button className="cursor-pointer" onClick={() => login()}>
                 Admin
+              </Button>
+              <Button
+                size="icon"
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                aria-label="Toggle theme"
+              >
+                {theme === "dark" ? <Sun /> : <Moon />}
               </Button>
             </div>
           </div>

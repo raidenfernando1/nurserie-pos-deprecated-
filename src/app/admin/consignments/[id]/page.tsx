@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import ReusableTable from "../../warehouse/_component/product-container";
+import ReusableTable from "../../../../components/product-container";
 import { Columns } from "../[id]/_component/consignment-columns";
 import ClientTab from "../_components/client-tab";
 import { useConsignments } from "../_store/useConsignments";

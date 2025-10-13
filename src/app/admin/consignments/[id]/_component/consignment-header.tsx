@@ -28,7 +28,7 @@ const ClientHeader: React.FC<ClientHeaderProps> = ({
         <div className="flex items-center justify-between">
           {/* Left side - Client Info */}
           <div className="space-y-3">
-            <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
+            <h1 className="text-2xl font-bold">{title}</h1>
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 rounded-full">
                 <div className="w-2 h-2 bg-blue-500 rounded-full"></div>

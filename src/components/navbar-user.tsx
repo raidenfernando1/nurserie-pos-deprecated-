@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { Loader2Icon } from "lucide-react";
-import { ChevronsUpDown, LogOut } from "lucide-react";
+import { ChevronsUpDown, LogOut, Sun, Moon } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { useSession } from "@/utils/getSession";
+import { useTheme } from "next-themes";
+import { Button } from "./ui/button";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -22,9 +24,10 @@ export function NavUser() {
   const { isMobile } = useSidebar();
   const [signingOut, setSigningOut] = useState(false);
   const { userSession, loading } = useSession();
+  const { theme, setTheme } = useTheme();
 
   if (loading || !userSession?.user) {
-    return <div className="p-4 text-sm text-gray-500">Loading user...</div>;
+    return <div className="p-4 text-sm ">Loading user...</div>;
   }
 
   const { name, email, image } = userSession.user;
@@ -49,7 +52,7 @@ export function NavUser() {
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+            className="flex justify-between w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
             side={isMobile ? "bottom" : "right"}
             align="end"
             sideOffset={4}
@@ -80,6 +83,13 @@ export function NavUser() {
                 </>
               )}
             </DropdownMenuItem>
+            <Button
+              size="icon"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? <Sun /> : <Moon />}
+            </Button>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

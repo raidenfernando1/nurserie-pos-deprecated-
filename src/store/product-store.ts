@@ -112,12 +112,21 @@ export const useProductStore = create<ProductStore>((set) => ({
   createProduct: async ({
     name,
     description = null,
-    brand,
+    brand = "none",
     category,
     sku,
     barcode,
     price = 0,
     image_url,
+  }: {
+    name: string;
+    description?: string | null;
+    brand?: string;
+    category?: string;
+    sku: string;
+    barcode: string;
+    price?: number;
+    image_url?: string;
   }) => {
     try {
       const res = await fetch(`/api/admin/products`, {
@@ -135,18 +144,23 @@ export const useProductStore = create<ProductStore>((set) => ({
         }),
       });
 
-      const result = await res.json().catch(() => ({}));
-
-      if (!res.ok || !result?.id) {
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
         throw new Error(
-          result.error || `Failed to create product (status: ${res.status})`,
+          errorData.error || `Failed to create product (HTTP ${res.status})`,
         );
       }
 
+      // ✅ Backend returns { product: [...] } so unwrap it properly
+      const data = await res.json();
+      const product = Array.isArray(data.product)
+        ? data.product[0]
+        : data.product;
+
       const newProduct = {
-        ...result,
-        stock: Number(result.stock || 0),
-        stock_threshold: Number(result.stock_threshold || 0),
+        ...product,
+        stock: Number(product?.stock ?? 0),
+        stock_threshold: Number(product?.stock_threshold ?? 0),
       };
 
       set((state) => ({
@@ -170,6 +184,8 @@ export const useProductStore = create<ProductStore>((set) => ({
         const errorData = await res.json();
         throw new Error(errorData.error || "Failed to fetch product");
       }
+
+      console.log(res);
 
       const product = await res.json();
       return product;
