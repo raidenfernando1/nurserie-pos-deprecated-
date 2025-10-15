@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
     if (response.length === 0) {
       return NextResponse.json(
         { message: "No products found" },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -77,7 +77,27 @@ export async function POST(req: NextRequest) {
       console.warn("Missing required fields");
       return NextResponse.json(
         { error: "Missing required fields: name, sku, or barcode" },
-        { status: 400 },
+        { status: 400 }
+      );
+    }
+
+    // Check for duplicate SKU or barcode
+    const existing = await db`
+      SELECT sku, barcode, name
+      FROM products
+      WHERE sku = ${sku} OR barcode = ${barcode} OR name = ${name}
+      LIMIT 1
+    `;
+    if (existing.length > 0) {
+      const dupField =
+        existing[0].sku === sku
+          ? "SKU"
+          : existing[0].barcode === barcode
+          ? "Barcode"
+          : "Name";
+      return NextResponse.json(
+        { error: `Duplicate ${dupField} detected` },
+        { status: 409 }
       );
     }
 
@@ -112,9 +132,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ product: insertedProduct[0] }, { status: 201 });
   } catch (e: any) {
     console.error("❌ Error inserting product:", e);
+
+    // Handle unique constraint violation if using Postgres
+    if (e?.code === "23505") {
+      return NextResponse.json(
+        { error: "Duplicate product detected" },
+        { status: 409 }
+      );
+    }
+
     return NextResponse.json(
       { error: "Failed to create product" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

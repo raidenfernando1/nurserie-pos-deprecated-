@@ -5,7 +5,7 @@ import { db } from "@/lib/db-client";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { sku: string } },
+  { params }: { params: { sku: string } }
 ) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session || session.user.role !== "admin") {
@@ -36,7 +36,7 @@ export async function GET(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { sku: string } },
+  { params }: { params: { sku: string } }
 ) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session || session.user.role !== "admin") {
@@ -62,14 +62,14 @@ export async function DELETE(
       await db`DELETE FROM products WHERE sku = ${sku}`;
       return NextResponse.json(
         { message: "Product deleted globally" },
-        { status: 200 },
+        { status: 200 }
       );
     }
 
     if (!warehouseId) {
       return NextResponse.json(
         { error: "warehouseId is required for scoped delete" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -80,20 +80,20 @@ export async function DELETE(
 
     return NextResponse.json(
       { message: "Product removed from warehouse" },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (e: any) {
     console.error(e);
     return NextResponse.json(
       { error: "Failed to delete product" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { sku: string } },
+  { params }: { params: { sku: string } }
 ) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
@@ -104,7 +104,7 @@ export async function PATCH(
     if (!userID) {
       return NextResponse.json(
         { error: "Unauthorized - User ID required" },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
@@ -137,7 +137,7 @@ export async function PATCH(
     console.error("Error updating product:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

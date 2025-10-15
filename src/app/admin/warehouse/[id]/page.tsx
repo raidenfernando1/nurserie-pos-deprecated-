@@ -7,7 +7,9 @@ import React from "react";
 import StatusBadge from "@/components/table/status-badge";
 import LoadingBar from "@/components/loading-page";
 import PopupHandler from "./_components/popup-handler";
-import { usePopup } from "./_store/usePopup";
+import { Button } from "@/components/ui/button";
+import { usePopupStore } from "@/store/popup-store";
+import { Plus } from "lucide-react";
 
 const columns = [
   {
@@ -109,7 +111,7 @@ export default function WarehousePage({
     warehouse_name: string;
   } | null>(null);
   const { id } = React.use(params);
-  const { togglePopup } = usePopup();
+  const { openPopup } = usePopupStore();
 
   useEffect(() => {
     const fetchWarehouseData = async () => {
@@ -137,7 +139,7 @@ export default function WarehousePage({
   }, [id]);
 
   const categories = Array.from(
-    new Set(products.map((product) => product.category).filter(Boolean)),
+    new Set(products.map((product) => product.category).filter(Boolean))
   );
 
   return (
@@ -145,7 +147,6 @@ export default function WarehousePage({
       <PopupHandler warehouseID={id}>
         <div className="h-screen p-3 flex flex-col gap-3">
           <h1>{warehouseData?.warehouse_name || "Warehouse"}</h1>
-          <button onClick={() => togglePopup("add-product")}>test</button>
           <div className="flex-1 min-h-0">
             <ReusableTable
               data={products}
@@ -161,6 +162,16 @@ export default function WarehousePage({
                       placeholder: "All Categories",
                     },
                   ]}
+                  actions={
+                    <>
+                      <Button
+                        variant="outline"
+                        onClick={() => openPopup("add-product-warehouse")}
+                      >
+                        <Plus />
+                      </Button>
+                    </>
+                  }
                 />
               )}
             />

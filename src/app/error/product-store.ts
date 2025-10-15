@@ -64,7 +64,6 @@ export const useProductStore = create<ProductStore>((set) => ({
       }
       const updatedProduct = await res.json();
 
-      // Update the product in the store
       set((state) => ({
         products: state.products.map((p) =>
           p.sku === sku ? { ...p, ...updatedProduct } : p
@@ -81,12 +80,12 @@ export const useProductStore = create<ProductStore>((set) => ({
   deleteProduct: async (
     sku: string,
     isGlobal = false,
-    warehouseID?: string
+    warehouseId?: string
   ) => {
     try {
       const query = new URLSearchParams();
       if (isGlobal) query.append("isGlobal", "");
-      if (!isGlobal && warehouseID) query.append("warehouseId", warehouseID);
+      if (!isGlobal && warehouseId) query.append("warehouseId", warehouseId);
 
       const res = await fetch(
         `/api/admin/products/${sku}?${query.toString()}`,
@@ -176,7 +175,9 @@ export const useProductStore = create<ProductStore>((set) => ({
 
   fetchProduct: async (sku: string) => {
     try {
-      const res = await fetch(`/api/admin/products/${encodeURIComponent(sku)}`);
+      const res = await fetch(
+        `/api/admin/warehouse/product?search=${encodeURIComponent(sku)}`
+      );
 
       if (!res.ok) {
         const errorData = await res.json();

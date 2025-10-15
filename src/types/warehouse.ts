@@ -23,10 +23,10 @@ export interface WarehouseWithProducts {
 
 // --- Payloads ---
 export interface AddProductToWarehousePayload {
-  warehouseId: string | number;
+  warehouseID: string | number;
   sku: string;
   stock: number;
-  stockThreshold: number;
+  stock_threshold: number;
 }
 
 // --- API Response Types ---
@@ -34,7 +34,7 @@ export interface ApiWarehouseResponse {
   success: boolean;
   stock: WarehouseStats;
   warehouses: Array<{
-    warehouse_id: number;
+    warehouseID: number;
     warehouse_name: string;
     company_id: number;
     total_stock: string;
@@ -60,6 +60,6 @@ export interface WarehouseStore {
   fetchWarehouses: () => Promise<void>;
   fetchWarehouseProducts: (warehouseId: string) => Promise<void>;
   addProductToWarehouse: (
-    payload: AddProductToWarehousePayload,
+    payload: AddProductToWarehousePayload
   ) => Promise<void>;
 }

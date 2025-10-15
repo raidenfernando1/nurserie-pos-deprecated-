@@ -10,7 +10,7 @@ import { usePopupStore } from "@/store/popup-store";
 
 const Products = () => {
   const { fetchAllProducts, products } = useProductStore();
-  const { togglePopup } = usePopupStore();
+  const { openPopup } = usePopupStore();
 
   const Columns = [
     {
@@ -67,11 +67,17 @@ const Products = () => {
         <div className="flex gap-3">
           <Button
             variant="destructive"
-            onClick={() => togglePopup("delete-product")}
+            onClick={() =>
+              openPopup("delete-product", { product: row.original })
+            }
           >
             <Trash />
           </Button>
-          <Button variant="outline" onClick={() => togglePopup("edit-product")}>
+
+          <Button
+            variant="outline"
+            onClick={() => openPopup("edit-product", { product: row.original })}
+          >
             <Edit />
           </Button>
         </div>
@@ -86,40 +92,38 @@ const Products = () => {
   const categories = Array.from(new Set(products.map((d) => d.category)));
 
   return (
-    <PopupHandler>
-      <div className="h-screen p-3 flex flex-col gap-3">
-        <h1>Products</h1>
-        <div className="flex-1 min-h-0">
-          <ReusableTable
-            data={products}
-            columns={Columns}
-            tabComponent={(table) => (
-              <Tab
-                table={table}
-                filters={[
-                  {
-                    columnId: "category",
-                    label: "Categories",
-                    options: categories,
-                    placeholder: "All Categories",
-                  },
-                ]}
-                actions={
-                  <>
-                    <Button
-                      variant="outline"
-                      onClick={() => togglePopup("add-product")}
-                    >
-                      <Plus />
-                    </Button>
-                  </>
-                }
-              />
-            )}
-          />
-        </div>
+    <div className="h-screen p-3 flex flex-col gap-3">
+      <h1>Products</h1>
+      <div className="flex-1 min-h-0">
+        <ReusableTable
+          data={products}
+          columns={Columns}
+          tabComponent={(table) => (
+            <Tab
+              table={table}
+              filters={[
+                {
+                  columnId: "category",
+                  label: "Categories",
+                  options: categories,
+                  placeholder: "All Categories",
+                },
+              ]}
+              actions={
+                <>
+                  <Button
+                    variant="outline"
+                    onClick={() => openPopup("add-product")}
+                  >
+                    <Plus />
+                  </Button>
+                </>
+              }
+            />
+          )}
+        />
       </div>
-    </PopupHandler>
+    </div>
   );
 };
 

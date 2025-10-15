@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,17 +10,15 @@ import { Separator } from "@/components/ui/separator";
 import { X, Package, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useProductStore } from "@/store/product-store";
+import { usePopupStore } from "@/store/popup-store";
 
-interface AddProductProps {
-  onClose: () => void;
-}
-
-const AddProduct = ({ onClose }: AddProductProps) => {
-  const { createProduct, products } = useProductStore();
+const AddProduct = () => {
+  const { createProduct } = useProductStore();
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const { activePopup, closePopup } = usePopupStore();
 
   const [formData, setFormData] = useState({
     sku: "",
@@ -39,7 +32,7 @@ const AddProduct = ({ onClose }: AddProductProps) => {
   });
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
@@ -107,7 +100,7 @@ const AddProduct = ({ onClose }: AddProductProps) => {
   };
 
   return (
-    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={true} onOpenChange={(open) => !open && closePopup()}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         {!showSuccess ? (
           <>
@@ -263,12 +256,7 @@ const AddProduct = ({ onClose }: AddProductProps) => {
               <DialogTitle className="text-xl font-semibold">
                 Product Created!
               </DialogTitle>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onClose}
-                className="h-8 w-8 p-0"
-              >
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                 <X className="h-4 w-4" />
               </Button>
             </div>
@@ -284,7 +272,7 @@ const AddProduct = ({ onClose }: AddProductProps) => {
             </div>
 
             <div className="flex gap-3">
-              <Button onClick={onClose} className="flex-1">
+              <Button onClick={() => closePopup()} className="flex-1">
                 Done
               </Button>
               <Button

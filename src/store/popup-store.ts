@@ -6,23 +6,21 @@ type Popups =
   | "add-product"
   | "delete-product"
   | "edit-product"
+  | "add-warehouse"
   | null;
 
 interface PopupStore {
   activePopup: Popups;
-  data: Record<string, any> | null;
+  data?: Record<string, any>;
 
-  // functions
+  openPopup: (type: Popups, data?: Record<string, any>) => void;
   closePopup: () => void;
-  togglePopup: (type: Popups) => void;
 }
 
-export const usePopupStore = create<PopupStore>((set, get) => ({
+export const usePopupStore = create<PopupStore>((set) => ({
   activePopup: null,
-  data: null,
+  data: undefined,
 
-  // functions
-  closePopup: () => set({ activePopup: null }),
-  togglePopup: (type) =>
-    set({ activePopup: get().activePopup === type ? null : type }),
+  openPopup: (type, data) => set({ activePopup: type, data }),
+  closePopup: () => set({ activePopup: null, data: undefined }),
 }));
