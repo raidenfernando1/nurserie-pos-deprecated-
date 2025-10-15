@@ -1,17 +1,16 @@
 "use client";
 import { useEffect } from "react";
 import ReusableTable from "@/components/table/reusable-table";
-import useProductsPopups from "./_store/products-popups";
-import { useProductStore } from "@/store/product-store";
-import PopupHandler from "./_components/popup-handler";
+import PopupHandler from "@/components/popup/popup-handler";
 import { Button } from "@/components/ui/button";
-import { Trash, Edit } from "lucide-react";
+import { Trash, Edit, Plus } from "lucide-react";
 import Tab from "../../../components/table/table-tab";
-import { Plus } from "lucide-react";
+import { useProductStore } from "@/store/product-store";
+import { usePopupStore } from "@/store/popup-store";
 
 const Products = () => {
   const { fetchAllProducts, products } = useProductStore();
-  const { togglePopup } = useProductsPopups();
+  const { togglePopup } = usePopupStore();
 
   const Columns = [
     {
@@ -19,7 +18,7 @@ const Products = () => {
       header: "Product",
       cell: ({ row }: any) => (
         <div className="flex items-center gap-3 hover:opacity-80">
-          <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center">
+          <div className="w-10 h-10 cbg-gray-100 rounded flex items-center justify-center">
             <img
               src={row.original.image_url}
               className="object-cover rounded w-full h-full"
@@ -68,14 +67,11 @@ const Products = () => {
         <div className="flex gap-3">
           <Button
             variant="destructive"
-            onClick={() => togglePopup("delete", row.original)}
+            onClick={() => togglePopup("delete-product")}
           >
             <Trash />
           </Button>
-          <Button
-            variant="outline"
-            onClick={() => togglePopup("edit", row.original)}
-          >
+          <Button variant="outline" onClick={() => togglePopup("edit-product")}>
             <Edit />
           </Button>
         </div>
@@ -112,7 +108,7 @@ const Products = () => {
                   <>
                     <Button
                       variant="outline"
-                      onClick={() => togglePopup("add")}
+                      onClick={() => togglePopup("add-product")}
                     >
                       <Plus />
                     </Button>

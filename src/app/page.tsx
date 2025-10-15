@@ -3,7 +3,7 @@
 import { GalleryVerticalEnd } from "lucide-react";
 import React from "react";
 import Head from "next/head";
-import { useAdminAuth } from "@/hooks/useAdmin";
+import { useLoginStore } from "@/store/login-store";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import LoginForm from "@/components/login-form";
@@ -14,7 +14,7 @@ import { Sun, Moon } from "lucide-react";
 
 export default function Entry() {
   const [showCashierLogin, setShowCashierLogin] = useState(false);
-  const { login } = useAdminAuth();
+  const { loginAdmin, fetchSession } = useLoginStore();
   const { theme, setTheme } = useTheme();
 
   const {
@@ -61,7 +61,7 @@ export default function Entry() {
               >
                 Cashier
               </Button>
-              <Button className="cursor-pointer" onClick={() => login()}>
+              <Button className="cursor-pointer" onClick={() => loginAdmin()}>
                 Admin
               </Button>
               <Button

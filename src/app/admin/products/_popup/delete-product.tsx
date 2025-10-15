@@ -12,7 +12,6 @@ import {
 import { Trash2, AlertCircle, Package } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useProductStore } from "@/store/product-store";
-import useProductsPopups from "../_store/products-popups";
 import { Badge } from "@/components/ui/badge";
 
 interface DeleteProductProps {

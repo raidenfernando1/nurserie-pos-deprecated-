@@ -71,13 +71,6 @@ const Warehouse = () => {
       </div>
     );
 
-  if (isLoading)
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-      </div>
-    );
-
   const warehouses = data?.response || [];
 
   return (

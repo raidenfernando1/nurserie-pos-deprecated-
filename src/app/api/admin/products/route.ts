@@ -26,8 +26,7 @@ export async function GET(req: NextRequest) {
             p.sku,
             p.barcode
         FROM products p
-        LEFT JOIN warehouse_products wp ON wp.product_id = p.id
-        LEFT JOIN warehouse w ON wp.warehouse_id = w.id;
+        ORDER BY p.name;
         `
       : await db`
           SELECT
@@ -35,7 +34,8 @@ export async function GET(req: NextRequest) {
             p.name,
             p.sku,
             p.category
-          FROM products p;
+          FROM products p
+          ORDER BY p.name;
         `;
 
     if (response.length === 0) {

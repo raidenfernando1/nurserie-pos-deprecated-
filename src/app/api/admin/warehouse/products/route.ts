@@ -32,7 +32,6 @@ export const POST = async (req: Request) => {
   if (!session || session.user.role !== "admin") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-
   try {
     const body = await req.json();
     const { warehouse_id, sku, stock, stock_threshold } = body;
@@ -44,31 +43,35 @@ export const POST = async (req: Request) => {
       );
     }
 
-    const result = await db`
-      INSERT INTO warehouse_products (warehouse_id, product_id, stock, stock_threshold)
-      SELECT
-        ${warehouse_id},
-        id,
-        ${stock},
-        ${stock_threshold}
-      FROM products
-      WHERE sku = ${sku}
-      ON CONFLICT (warehouse_id, product_id) DO UPDATE
-      SET stock = EXCLUDED.stock,
-          stock_threshold = EXCLUDED.stock_threshold
-      RETURNING *;
+    const productResult = await db`
+      SELECT id FROM products WHERE sku = ${sku}
     `;
 
-    if (result.length === 0) {
+    if (productResult.length === 0) {
       return NextResponse.json(
-        { error: "Product SKU not found" },
+        { error: "Product with SKU not found" },
         { status: 404 },
       );
     }
 
-    return NextResponse.json(result[0]);
+    const product_id = productResult[0].id;
+
+    const warehouseProductResult = await db`
+      INSERT INTO warehouse_products (warehouse_id, product_id, stock, stock_threshold)
+      VALUES (${warehouse_id}, ${product_id}, ${stock}, ${stock_threshold})
+      ON CONFLICT (warehouse_id, product_id)
+      DO UPDATE SET
+        stock = warehouse_products.stock + ${stock},
+        stock_threshold = ${stock_threshold}
+      RETURNING *
+    `;
+
+    return NextResponse.json({
+      success: true,
+      data: warehouseProductResult[0],
+    });
   } catch (error) {
-    console.error(error);
+    console.error("Error adding product to warehouse:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 },

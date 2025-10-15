@@ -1,18 +1,17 @@
 import { useProductStore } from "@/store/product-store";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { useEffect } from "react";
+import ProductContainer from "../_components/product-container";
 
-const AddProduct = ({
-  onClose,
-  warehouseID,
-}: {
-  onClose: () => void;
-  warehouseID: string;
-}) => {
+const AddProduct = ({ onClose }: { onClose: () => void }) => {
   const { fetchProduct } = useProductStore();
 
   return (
-    <h1>
-      <button onClick={() => fetchProduct(warehouseID)}>test</button>
-    </h1>
+    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent>
+        <ProductContainer />
+      </DialogContent>
+    </Dialog>
   );
 };
 

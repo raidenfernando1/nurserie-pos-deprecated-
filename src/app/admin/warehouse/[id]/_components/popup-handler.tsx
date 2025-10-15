@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import AddProduct from "../_popups/add-product-temp";
+import AddProduc1t from "../_popups/add-product";
 import { usePopup } from "../_store/usePopup";
 
 const PopupHandler = ({
@@ -16,7 +16,7 @@ const PopupHandler = ({
   return (
     <>
       {activePopup === "add-product" && (
-        <AddProduct warehouseID={warehouseID} onClose={closePopup} />
+        <AddProduc1t warehouseID={warehouseID} onClose={closePopup} />
       )}
 
       {children}

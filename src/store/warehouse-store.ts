@@ -1,48 +1,116 @@
 import { create } from "zustand";
+import type {
+  Warehouse,
+  WarehouseWithProducts,
+  WarehouseStats,
+  AddProductToWarehousePayload,
+  WarehouseStore as WarehouseStoreType,
+} from "@/types/warehouse";
 import type { Product } from "@/types/product";
 
-interface WarehouseDataProps {
-  id: string;
-  warehouse_name: string;
-  products: Product[];
-}
+// note you changed this types - raiden
+// ai written beware
 
-interface WarehouseState {
-  allStockedProducts: Product[];
-  warehouseSlugStock: WarehouseDataProps[];
-  isLoading: boolean;
-  error: string | null;
-  fetchStockedProducts: () => Promise<Product[]>;
-  fetchWarehouseStock: (warehouseID: string) => Promise<void>;
-}
-
-export const useWarehouseStore = create<WarehouseState>((set) => ({
-  allStockedProducts: [],
-  warehouseSlugStock: [],
+export const useWarehouseStore = create<WarehouseStoreType>((set) => ({
+  warehouses: [],
+  warehouseProducts: [],
+  stockedProducts: [],
+  stats: null,
   isLoading: false,
   error: null,
 
-  fetchWarehouseStock: async (warehouseID) => {
-    set({ isLoading: true, error: null });
+  setWarehouses: (warehouses) => set({ warehouses }),
+  setWarehouseProducts: (data) => set({ warehouseProducts: data }),
+  setStats: (stats) => set({ stats }),
 
+  // Fetch all warehouses
+  fetchWarehouses: async () => {
+    set({ isLoading: true, error: null });
     try {
-      const res = await fetch(`/api/admin/warehouse/${warehouseID}`);
+      const res = await fetch("/api/admin/warehouses");
       if (!res.ok) {
-        const errorBody = await res.json().catch(() => ({}));
-        throw new Error(errorBody.error || `Request failed: ${res.status}`);
+        const errBody = await res.json().catch(() => ({}));
+        throw new Error(errBody.error || `Request failed: ${res.status}`);
       }
 
-      const data: WarehouseDataProps = await res.json();
+      const data = await res.json();
 
+      const warehouses: Warehouse[] = data.warehouses.map((w: any) => ({
+        id: w.warehouse_id,
+        companyId: w.company_id,
+        name: w.warehouse_name,
+        totalStock: Number(w.total_stock),
+        totalProducts: Number(w.total_products),
+      }));
+
+      const stats: WarehouseStats = {
+        companyTotalStock: data.stock.company_total_stock,
+        companyTotalProducts: data.stock.company_total_products,
+      };
+
+      set({ warehouses, stats, isLoading: false });
+    } catch (err) {
       set({
-        warehouseSlugStock: [data],
         isLoading: false,
-        error: null,
+        error: err instanceof Error ? err.message : "Unknown error",
       });
-    } catch (e) {
+    }
+  },
+
+  // Fetch specific warehouse stock + products
+  fetchWarehouseProducts: async (warehouseId) => {
+    set({ isLoading: true, error: null });
+    try {
+      const res = await fetch(`/api/admin/warehouse/${warehouseId}`);
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        throw new Error(errBody.error || `Request failed: ${res.status}`);
+      }
+
+      const data = await res.json();
+      const warehouseProducts: WarehouseWithProducts[] = [
+        {
+          id: String(data.id ?? data.warehouse_id),
+          name: data.name ?? data.warehouse_name,
+          products: data.products || [],
+        },
+      ];
+
+      set({ warehouseProducts, isLoading: false });
+    } catch (err) {
       set({
         isLoading: false,
-        error: e instanceof Error ? e.message : "Unknown error",
+        error: err instanceof Error ? err.message : "Unknown error",
+      });
+    }
+  },
+
+  // Add product to warehouse
+  addProductToWarehouse: async (payload: AddProductToWarehousePayload) => {
+    set({ isLoading: true, error: null });
+    try {
+      const res = await fetch("/api/admin/warehouse/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        throw new Error(errBody.error || `Request failed: ${res.status}`);
+      }
+
+      const data = await res.json();
+
+      // Assuming API returns the updated warehouse object with products
+      set((state) => ({
+        warehouseProducts: [...state.warehouseProducts, data.data],
+        isLoading: false,
+      }));
+    } catch (err) {
+      set({
+        isLoading: false,
+        error: err instanceof Error ? err.message : "Unknown error",
       });
     }
   },
@@ -59,14 +127,8 @@ export const useWarehouseStore = create<WarehouseState>((set) => ({
 
       const data: Product[] = await res.json();
 
-      const allStockedProducts = data.map((p) => ({
-        ...p,
-        stock: Number(p.stock),
-        stock_threshold: Number(p.stock_threshold),
-      }));
-
-      set({ allStockedProducts, isLoading: false });
-      return allStockedProducts;
+      set({ stockedProducts: data, isLoading: false });
+      return data;
     } catch (e: any) {
       console.error("❌ Failed to fetch stocked products:", e);
       set({ error: e.message || "Unknown error", isLoading: false });

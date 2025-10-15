@@ -1,11 +1,38 @@
 import { Product } from "@/types/product";
 
+// --- Core Entities ---
+export interface Warehouse {
+  id: number;
+  companyId: number;
+  name: string;
+  totalStock: number;
+  totalProducts: number;
+}
+
+export interface WarehouseStats {
+  companyTotalStock: number;
+  companyTotalProducts: number;
+}
+
+// --- Complex Structures ---
+export interface WarehouseWithProducts {
+  id: string;
+  name: string;
+  products: Product[];
+}
+
+// --- Payloads ---
+export interface AddProductToWarehousePayload {
+  warehouseId: string | number;
+  sku: string;
+  stock: number;
+  stockThreshold: number;
+}
+
+// --- API Response Types ---
 export interface ApiWarehouseResponse {
   success: boolean;
-  stock: {
-    company_total_stock: number;
-    company_total_products: number;
-  };
+  stock: WarehouseStats;
   warehouses: Array<{
     warehouse_id: number;
     warehouse_name: string;
@@ -15,38 +42,24 @@ export interface ApiWarehouseResponse {
   }>;
 }
 
-export interface WarehouseResponse {
-  warehouses: Warehouse[];
-  totals: WarehouseStats;
-}
-export interface Warehouse {
-  warehouse_id: number;
-  company_id: number;
-  warehouse_name: string;
-  total_stock: number;
-  total_products: number;
-}
-
-export interface WarehouseCard {
-  id: number;
-  name: string;
-}
-
-export interface WarehouseStats {
-  company_total_stock: number;
-  company_total_products: number;
-}
-
+// --- Zustand Store ---
 export interface WarehouseStore {
-  stockCount: number;
-  setStockCount: (value: number) => void;
-
   warehouses: Warehouse[];
-  setWarehouses: (value: Warehouse[]) => void;
+  warehouseProducts: WarehouseWithProducts[];
+  stats: WarehouseStats | null;
+  stockedProducts: Product[];
 
-  warehouseStats: WarehouseStats;
-  setWarehouseStats: (value: WarehouseStats) => void;
+  isLoading: boolean;
+  error: string | null;
 
-  products: Product[];
-  setProducts: (products: Product[]) => void;
+  // --- Actions ---
+  setWarehouses: (warehouses: Warehouse[]) => void;
+  setWarehouseProducts: (data: WarehouseWithProducts[]) => void;
+  setStats: (stats: WarehouseStats) => void;
+
+  fetchWarehouses: () => Promise<void>;
+  fetchWarehouseProducts: (warehouseId: string) => Promise<void>;
+  addProductToWarehouse: (
+    payload: AddProductToWarehousePayload,
+  ) => Promise<void>;
 }

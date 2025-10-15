@@ -4,8 +4,11 @@ import LoadingBar from "@/components/loading-page";
 import CashierTable from "./_component/table";
 import { CreateCashier } from "./_component/create-cashier";
 import ProtectedRoute from "@/components/protected-route";
+import { useProductStore } from "@/store/product-store";
 
 function Staff() {
+  const { deleteProduct } = useProductStore();
+
   return (
     <ProtectedRoute intendedRole="admin">
       <LoadingBar duration={1500}>

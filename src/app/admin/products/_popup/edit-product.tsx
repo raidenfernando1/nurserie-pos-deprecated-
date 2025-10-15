@@ -13,7 +13,6 @@ import { AlertCircle, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useProductStore } from "@/store/product-store";
-import useProductsPopups from "../_store/products-popups";
 
 const EditProduct = ({ onClose }: { onClose: () => void }) => {
   const { selectedProduct } = useProductsPopups();
