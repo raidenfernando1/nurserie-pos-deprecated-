@@ -1,8 +1,8 @@
 import { authClient } from "@/lib/auth-client";
-import useRole from "@/store/useRole";
+
 
 export function useAdminAuth() {
-  const { setRole } = useRole();
+
 
   async function login() {
     try {
@@ -20,7 +20,7 @@ export function useAdminAuth() {
         throw new Error("Logged in user not admin");
       }
 
-      setRole(role);
+      ;
     } catch (e) {
       return false;
     }
