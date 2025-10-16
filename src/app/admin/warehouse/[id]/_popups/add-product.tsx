@@ -56,7 +56,7 @@ const AddWarehouseProduct = () => {
         product.name?.toLowerCase().includes(query) ||
         product.brand?.toLowerCase().includes(query) ||
         product.sku?.toLowerCase().includes(query) ||
-        product.category?.toLowerCase().includes(query),
+        product.category?.toLowerCase().includes(query)
     );
   }, [products, searchQuery]);
 
@@ -157,7 +157,7 @@ const AddWarehouseProduct = () => {
 
   return (
     <Dialog open={true} onOpenChange={(open) => !open && closePopup()}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+      <DialogContent className=" max-h-[90vh] overflow-hidden flex flex-col max-w-2xl">
         {step === 0 && (
           <>
             <div className="flex items-center justify-between">
@@ -395,7 +395,7 @@ const AddWarehouseProduct = () => {
               </div>
             </div>
 
-            <div className="space-y-6 overflow-y-auto flex-1">
+            <div className="space-y-6 overflow-y-auto flex-1 px-5">
               {error && (
                 <div className="p-3 bg-red-50 border border-red-200 rounded-md">
                   <p className="text-sm text-red-600">{error}</p>
