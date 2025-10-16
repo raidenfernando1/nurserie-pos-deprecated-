@@ -13,6 +13,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { ChangePassword } from "./change-password";
 import { DeleteCashier } from "./delete-cashier";
+import { UserManagement } from "./user-status";
 
 const fetchCashiers = async () => {
   const res = await fetch("/api/admin/cashier");
@@ -44,8 +45,9 @@ const CashierTable = () => {
             <TableHead>Name</TableHead>
             <TableHead>Username</TableHead>
             <TableHead>Date Added</TableHead>
-            <TableHead></TableHead>
-            <TableHead></TableHead>
+            <TableHead>Change Password</TableHead>
+            <TableHead>Delete</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -68,6 +70,9 @@ const CashierTable = () => {
               </TableCell>
               <TableCell>
                 <DeleteCashier cashier={cashier} />
+              </TableCell>
+              <TableCell>
+                <UserManagement cashier={cashier} />
               </TableCell>
             </TableRow>
           ))}

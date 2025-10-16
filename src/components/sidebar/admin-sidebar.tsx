@@ -34,7 +34,10 @@ import {
 } from "@/components/ui/collapsible";
 import useClient from "@/app/admin/consignments/_store/useClient";
 import { useSession } from "@/utils/getSession";
+import useSWR from "swr";
 import { fetcher } from "@/utils/swrFetcher";
+import { Card, CardContent } from "../ui/card";
+import { Button } from "../ui/button";
 
 export const adminItems = [
   { name: "Dashboard", path: "/admin/dashboard", icon: Home },
@@ -56,6 +59,7 @@ export function AdminSidebar({
     const fetchWarehouses = async () => {
       try {
         const data = await fetcher("/api/admin/warehouse");
+        console.log("Fetched warehouses:", data);
         setWarehouses(data);
       } catch (error) {
         console.error("Error fetching warehouses:", error);
@@ -73,7 +77,7 @@ export function AdminSidebar({
           <SidebarGroup>
             <SidebarGroupLabel>Oracle POS</SidebarGroupLabel>
             <SidebarGroupContent>
-              <div className="p-4 text-sm ">Loading menu…</div>
+              <div className="p-4 text-sm text-gray-500">Loading menu…</div>
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
@@ -126,14 +130,14 @@ export function AdminSidebar({
                       {/* All Stocks */}
                       <SidebarMenuSubButton
                         asChild
-                        isActive={activeSubPath === "/admin/stock"}
+                        isActive={activeSubPath === "/admin/warehouse"}
                       >
                         <Link
                           className="border-2"
-                          href="/admin/stock"
+                          href="/admin/warehouse"
                           onClick={() => {
-                            setActiveMenu("stock");
-                            setActiveSubPath("/admin/stock");
+                            setActiveMenu("warehouse");
+                            setActiveSubPath("/admin/warehouse");
                           }}
                         >
                           <span>All Stocks</span>
@@ -151,7 +155,7 @@ export function AdminSidebar({
                             setActiveSubPath("/admin/warehouse");
                           }}
                         >
-                          <span>All Warehouses</span>
+                          <span>All Warehoues</span>
                         </Link>
                       </SidebarMenuSubButton>
                       {/* Individual Warehouses */}
@@ -171,7 +175,7 @@ export function AdminSidebar({
                                 onClick={() => {
                                   setActiveMenu("warehouse");
                                   setActiveSubPath(
-                                    `/admin/warehouse/${warehouse.warehouse_id}`,
+                                    `/admin/warehouse/${warehouse.warehouse_id}`
                                   );
                                 }}
                               >
@@ -186,7 +190,7 @@ export function AdminSidebar({
                       ) : (
                         <SidebarMenuSubItem>
                           <SidebarMenuSubButton>
-                            <span>No warehouses</span>
+                            <span className="text-gray-500">No warehouses</span>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       )}
@@ -242,7 +246,7 @@ export function AdminSidebar({
                                 onClick={() => {
                                   setActiveMenu("consignments");
                                   setActiveSubPath(
-                                    `/admin/consignments/${client.client_id}`,
+                                    `/admin/consignments/${client.client_id}`
                                   );
                                 }}
                               >
@@ -256,7 +260,7 @@ export function AdminSidebar({
                       ) : (
                         <SidebarMenuSubItem>
                           <SidebarMenuSubButton>
-                            <span>No clients</span>
+                            <span className="text-gray-500">No clients</span>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       )}

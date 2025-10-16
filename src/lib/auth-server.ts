@@ -58,6 +58,7 @@ export const auth = betterAuth({
     username(),
     admin({
       defaultRole: "cashier",
+      bannedUserMessage: "This account is currently not active. Please contact your administrator to activate your account.",
       adminUserIds: [
         "RKvdVdU77zQF230CKUAY8gr2ujYEVWKq",
         "SrfdQ20gE5uSixwFMserwXMOeNVNxsGl",

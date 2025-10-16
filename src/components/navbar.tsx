@@ -43,36 +43,36 @@ export function Navbar() {
     <NavigationMenu>
       <NavigationMenuList>
         <NavigationMenuItem>
-          <NavigationMenuTrigger>Home</NavigationMenuTrigger>
+          <NavigationMenuTrigger>Brands</NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid gap-3 p-4 w-screen max-w-[85vw] sm:w-[400px] md:w-[500px] lg:w-[500px] sm:grid-cols-1 lg:grid-cols-[.75fr_1fr]">
-              <li className="row-span-1 lg:row-span-3">
-                <NavigationMenuLink asChild>
-                  <a
-                    className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md hover:bg-muted/80 transition-colors"
-                    href="/"
-                  >
-                    <div className="mb-2 mt-4 text-l font-medium">
-                      Oracle Petroleum Corporation
-                    </div>
-                    <p className="text-sm leading-tight text-muted-foreground">
-                      Be part of the No. 1 Toll Blender in the country. With
-                      more than 35+ years of outstanding service. Excelling in
-                      Petroleum and Industrial Chemical expertise.
-                    </p>
-                  </a>
-                </NavigationMenuLink>
-              </li>
-              <ListItem href="https://www.oraclepetroleum.net/" title="WEBSITE">
-                Open our Official Website to know more about us.
+              <ListItem
+                href="https://nurserie.myshopify.com/collections"
+                title="Mushie"
+              >
+                All products are designed in Houston and Sweden by a team of
+                designers led by Mushie.
               </ListItem>
-              <ListItem href="https://platinum-oil.net/" title="PLATINUM">
-                Modern industries thrive on innovative and cutting edge
-                solutions that drive progress and efficiency.
+              <ListItem
+                href="https://nurserie.myshopify.com/collections/frigg-facifiers"
+                title="Frigg"
+              >
+                From baby care tips to sustainable parenting and product
+                insights
               </ListItem>
-              <ListItem href="https://comet-oil.net/" title="COMET">
-                Comet Lubricants provides the most advanced technology in the
-                industry.
+              <ListItem
+                href="https://nurserie.myshopify.com/collections/moonie"
+                title="Moonie"
+              >
+                Moonie is a brand from Poland that creates humming toys with
+                lamps.
+              </ListItem>
+              <ListItem
+                href="https://nurserie.myshopify.com/collections/najell"
+                title="Najell"
+              >
+                Innovative & Empowering Products from Sweden for Parents and
+                Babies.
               </ListItem>
             </ul>
           </NavigationMenuContent>
@@ -122,7 +122,7 @@ function ListItem({
           href={href}
           className={cn(
             "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-            className,
+            className
           )}
         >
           <div className="text-sm font-medium leading-none">{title}</div>
