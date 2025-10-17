@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { NavUser } from "../navbar-user";
 import { useSession } from "@/utils/getSession";
+import { company } from "../data";
 
 export const cashierItems = [
   { name: "Dashboard", path: "/cashier/dashboard", icon: Home },
@@ -45,7 +46,14 @@ export function CashierSidebar({
       <Sidebar>
         <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupLabel>Oracle POS</SidebarGroupLabel>
+            <div>
+              <div className="flex my-2">
+                <SidebarTrigger />
+                <SidebarGroupLabel className="text-lg">
+                  {company.name}
+                </SidebarGroupLabel>
+              </div>
+            </div>
             <SidebarGroupContent>
               <div className="p-4 text-sm text-gray-500">Loading menu…</div>
             </SidebarGroupContent>
@@ -57,11 +65,16 @@ export function CashierSidebar({
 
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarTrigger className="m-2" />
-
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Oracle POS</SidebarGroupLabel>
+          <div>
+            <div className="flex my-2">
+              <SidebarTrigger />
+              <SidebarGroupLabel className="text-lg">
+                {company.name}
+              </SidebarGroupLabel>
+            </div>
+          </div>
           <SidebarGroupContent>
             <SidebarMenu>
               {cashierItems.map((item) => (

@@ -38,6 +38,7 @@ import useSWR from "swr";
 import { fetcher } from "@/utils/swrFetcher";
 import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
+import { company } from "../data";
 
 export const adminItems = [
   { name: "Dashboard", path: "/admin/dashboard", icon: Home },
@@ -75,7 +76,14 @@ export function AdminSidebar({
       <Sidebar>
         <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupLabel>Oracle POS</SidebarGroupLabel>
+            <div>
+              <div className="flex my-2">
+                <SidebarTrigger />
+                <SidebarGroupLabel className="text-lg">
+                  {company.name}
+                </SidebarGroupLabel>
+              </div>
+            </div>
             <SidebarGroupContent>
               <div className="p-4 text-sm text-gray-500">Loading menu…</div>
             </SidebarGroupContent>
@@ -87,11 +95,16 @@ export function AdminSidebar({
 
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarTrigger className="m-2" />
-
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Oracle POS</SidebarGroupLabel>
+          <div>
+            <div className="flex my-2">
+              <SidebarTrigger />
+              <SidebarGroupLabel className="text-lg">
+                {company.name}
+              </SidebarGroupLabel>
+            </div>
+          </div>
           <SidebarGroupContent>
             <SidebarMenu>
               {adminItems.map((item) => (
