@@ -43,7 +43,7 @@ import { company } from "../data";
 export const adminItems = [
   { name: "Dashboard", path: "/admin/dashboard", icon: Home },
   { name: "Analytics", path: "/admin/analytics", icon: ChartSpline },
-  { name: "Staff", path: "/admin/staff", icon: Users },
+  { name: "Users", path: "/admin/users", icon: Users },
   { name: "Products", path: "/admin/products", icon: Package },
 ];
 
