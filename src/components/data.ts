@@ -1,6 +1,4 @@
-
 export const company = {
-    name: "Nurserie",
-    brand: ["MUSHIE", "FRIGG", "MOONIE", "NAJELL"]
-
-}
+  name: "Nurserie",
+  brand: ["MUSHIE", "FRIGG", "MOONIE", "NAJELL"],
+};

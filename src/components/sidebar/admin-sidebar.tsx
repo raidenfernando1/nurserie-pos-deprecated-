@@ -76,14 +76,6 @@ export function AdminSidebar({
       <Sidebar>
         <SidebarContent>
           <SidebarGroup>
-            <div>
-              <div className="flex my-2">
-                <SidebarTrigger />
-                <SidebarGroupLabel className="text-lg">
-                  {company.name}
-                </SidebarGroupLabel>
-              </div>
-            </div>
             <SidebarGroupContent>
               <div className="p-4 text-sm text-gray-500">Loading menu…</div>
             </SidebarGroupContent>
@@ -99,10 +91,12 @@ export function AdminSidebar({
         <SidebarGroup>
           <div>
             <div className="flex my-2">
-              <SidebarTrigger />
-              <SidebarGroupLabel className="text-lg">
-                {company.name}
-              </SidebarGroupLabel>
+              <div className="flex align-center w-full justify-between flex-row-reverse">
+                <SidebarTrigger className="flex" />
+                <SidebarGroupLabel className="text-lg">
+                  {company.name}
+                </SidebarGroupLabel>
+              </div>
             </div>
           </div>
           <SidebarGroupContent>
@@ -168,7 +162,7 @@ export function AdminSidebar({
                             setActiveSubPath("/admin/warehouse");
                           }}
                         >
-                          <span>All Warehoues</span>
+                          <span>All Warehouse</span>
                         </Link>
                       </SidebarMenuSubButton>
                       {/* Individual Warehouses */}
@@ -188,7 +182,7 @@ export function AdminSidebar({
                                 onClick={() => {
                                   setActiveMenu("warehouse");
                                   setActiveSubPath(
-                                    `/admin/warehouse/${warehouse.warehouse_id}`
+                                    `/admin/warehouse/${warehouse.warehouse_id}`,
                                   );
                                 }}
                               >
@@ -259,7 +253,7 @@ export function AdminSidebar({
                                 onClick={() => {
                                   setActiveMenu("consignments");
                                   setActiveSubPath(
-                                    `/admin/consignments/${client.client_id}`
+                                    `/admin/consignments/${client.client_id}`,
                                   );
                                 }}
                               >
