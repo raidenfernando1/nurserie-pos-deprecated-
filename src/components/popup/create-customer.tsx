@@ -149,6 +149,7 @@ const CreateCustomer = () => {
                 variant="outline"
                 className="flex-1"
                 disabled={loading}
+                onClick={() => closePopup()}
               >
                 Cancel
               </Button>
