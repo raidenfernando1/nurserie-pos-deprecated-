@@ -23,7 +23,6 @@ export const useWarehouseStore = create<WarehouseStoreType>((set) => ({
   setWarehouseProducts: (data) => set({ warehouseProducts: data }),
   setStats: (stats) => set({ stats }),
 
-  // Fetch all warehouses
   fetchWarehouses: async () => {
     set({ isLoading: true, error: null });
     try {

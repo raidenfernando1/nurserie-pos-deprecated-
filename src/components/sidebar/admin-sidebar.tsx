@@ -40,6 +40,7 @@ import { fetcher } from "@/utils/swrFetcher";
 import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { company } from "../data";
+import { Separator } from "../ui/separator";
 
 export const adminItems = [
   { name: "Dashboard", path: "/admin/dashboard", icon: Home },
@@ -93,13 +94,14 @@ export function AdminSidebar({
         <SidebarGroup>
           <div>
             <div className="flex my-2">
-              <div className="flex align-center w-full">
+              <div className="flex align-center w-full justify-between flex-row-reverse">
                 <SidebarTrigger />
                 <SidebarGroupLabel className="text-lg pb-1">
                   {company.name}
                 </SidebarGroupLabel>
               </div>
             </div>
+            <Separator orientation="horizontal" className="my-3" />
           </div>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -143,10 +145,10 @@ export function AdminSidebar({
                       >
                         <Link
                           className="border-2"
-                          href="/admin/warehouse"
+                          href="/admin/stock"
                           onClick={() => {
-                            setActiveMenu("warehouse");
-                            setActiveSubPath("/admin/warehouse");
+                            setActiveMenu("stock");
+                            setActiveSubPath("/admin/stock");
                           }}
                         >
                           <span>All Stocks</span>
