@@ -6,9 +6,10 @@ import DeleteProduct from "@/app/admin/products/_popup/delete-product";
 import EditProduct from "@/app/admin/products/_popup/edit-product";
 import { usePopupStore } from "@/store/popup-store";
 import AddProductWarehouse from "@/app/admin/warehouse/[id]/_popups/add-product";
+import CreateCustomer from "@/components/popup/create-customer";
 
 const PopupHandler = ({ children }: { children: React.ReactNode }) => {
-  const { activePopup, closePopup } = usePopupStore();
+  const { activePopup } = usePopupStore();
 
   return (
     <>
@@ -16,6 +17,7 @@ const PopupHandler = ({ children }: { children: React.ReactNode }) => {
       {activePopup === "delete-product" && <DeleteProduct />}
       {activePopup === "edit-product" && <EditProduct />}
       {activePopup === "add-product-warehouse" && <AddProductWarehouse />}
+      {activePopup === "create-customer" && <CreateCustomer />}
 
       {children}
     </>

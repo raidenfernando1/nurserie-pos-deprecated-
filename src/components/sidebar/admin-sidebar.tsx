@@ -25,6 +25,7 @@ import {
   ChevronDown,
   Handshake,
   Package,
+  UserSearch,
 } from "lucide-react";
 import { NavUser } from "../navbar-user";
 import {
@@ -44,6 +45,7 @@ export const adminItems = [
   { name: "Dashboard", path: "/admin/dashboard", icon: Home },
   { name: "Analytics", path: "/admin/analytics", icon: ChartSpline },
   { name: "Users", path: "/admin/users", icon: Users },
+  { name: "Customers", path: "/admin/customers", icon: UserSearch },
   { name: "Products", path: "/admin/products", icon: Package },
 ];
 
@@ -91,9 +93,9 @@ export function AdminSidebar({
         <SidebarGroup>
           <div>
             <div className="flex my-2">
-              <div className="flex align-center w-full justify-between flex-row-reverse">
-                <SidebarTrigger className="flex" />
-                <SidebarGroupLabel className="text-lg">
+              <div className="flex align-center w-full">
+                <SidebarTrigger />
+                <SidebarGroupLabel className="text-lg pb-1">
                   {company.name}
                 </SidebarGroupLabel>
               </div>
@@ -182,7 +184,7 @@ export function AdminSidebar({
                                 onClick={() => {
                                   setActiveMenu("warehouse");
                                   setActiveSubPath(
-                                    `/admin/warehouse/${warehouse.warehouse_id}`,
+                                    `/admin/warehouse/${warehouse.warehouse_id}`
                                   );
                                 }}
                               >
@@ -253,7 +255,7 @@ export function AdminSidebar({
                                 onClick={() => {
                                   setActiveMenu("consignments");
                                   setActiveSubPath(
-                                    `/admin/consignments/${client.client_id}`,
+                                    `/admin/consignments/${client.client_id}`
                                   );
                                 }}
                               >

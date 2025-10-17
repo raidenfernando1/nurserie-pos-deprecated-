@@ -16,11 +16,11 @@ import {
 } from "@/components/ui/sidebar";
 import {
   Home,
-  Users,
   PackageSearch,
   ShoppingBasket,
   CreditCard,
   NotepadText,
+  UserSearch,
 } from "lucide-react";
 import { NavUser } from "../navbar-user";
 import { useSession } from "@/utils/getSession";
@@ -31,7 +31,7 @@ export const cashierItems = [
   { name: "Sales", path: "/cashier/sales", icon: ShoppingBasket },
   { name: "Products", path: "/cashier/products", icon: PackageSearch },
   { name: "Transactions", path: "/cashier/transactions", icon: CreditCard },
-  { name: "Customers", path: "/cashier/customers", icon: Users },
+  { name: "Customers", path: "/cashier/customers", icon: UserSearch },
   { name: "Reports", path: "/cashier/reports", icon: NotepadText },
 ];
 
@@ -46,14 +46,6 @@ export function CashierSidebar({
       <Sidebar>
         <SidebarContent>
           <SidebarGroup>
-            <div>
-              <div className="flex my-2">
-                <SidebarTrigger />
-                <SidebarGroupLabel className="text-lg">
-                  {company.name}
-                </SidebarGroupLabel>
-              </div>
-            </div>
             <SidebarGroupContent>
               <div className="p-4 text-sm text-gray-500">Loading menu…</div>
             </SidebarGroupContent>
@@ -70,7 +62,7 @@ export function CashierSidebar({
           <div>
             <div className="flex my-2">
               <SidebarTrigger />
-              <SidebarGroupLabel className="text-lg">
+              <SidebarGroupLabel className="text-lg pb-1">
                 {company.name}
               </SidebarGroupLabel>
             </div>
