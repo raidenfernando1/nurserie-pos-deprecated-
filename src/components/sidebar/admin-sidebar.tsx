@@ -184,7 +184,7 @@ export function AdminSidebar({
                                 onClick={() => {
                                   setActiveMenu("warehouse");
                                   setActiveSubPath(
-                                    `/admin/warehouse/${warehouse.warehouse_id}`
+                                    `/admin/warehouse/${warehouse.warehouse_id}`,
                                   );
                                 }}
                               >
@@ -255,7 +255,7 @@ export function AdminSidebar({
                                 onClick={() => {
                                   setActiveMenu("consignments");
                                   setActiveSubPath(
-                                    `/admin/consignments/${client.client_id}`
+                                    `/admin/consignments/${client.client_id}`,
                                   );
                                 }}
                               >

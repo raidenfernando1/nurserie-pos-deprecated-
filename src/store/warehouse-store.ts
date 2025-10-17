@@ -27,7 +27,7 @@ export const useWarehouseStore = create<WarehouseStoreType>((set) => ({
   fetchWarehouses: async () => {
     set({ isLoading: true, error: null });
     try {
-      const res = await fetch("/api/admin/warehouses");
+      const res = await fetch("/api/admin/warehouse");
       if (!res.ok) {
         const errBody = await res.json().catch(() => ({}));
         throw new Error(errBody.error || `Request failed: ${res.status}`);
@@ -48,6 +48,7 @@ export const useWarehouseStore = create<WarehouseStoreType>((set) => ({
         companyTotalProducts: data.stock.company_total_products,
       };
 
+      console.log({ warehouses, stats, isLoading: false });
       set({ warehouses, stats, isLoading: false });
     } catch (err) {
       set({

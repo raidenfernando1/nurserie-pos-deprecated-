@@ -24,7 +24,7 @@ const Listener = ({ children }: { children: React.ReactNode }) => {
         if (role === "admin") {
           router.replace("/admin/dashboard");
         } else if (role === "cashier") {
-          router.replace("/cashier");
+          router.replace("/cashier/dashboard");
         }
       } catch (err) {
         console.error("Error checking session:", err);
