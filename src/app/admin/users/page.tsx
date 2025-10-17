@@ -7,7 +7,7 @@ import ProtectedRoute from "@/components/protected-route";
 import { CreateCashier } from "./_component/create-cashier";
 import CashierTable from "./_component/table";
 
-function Staff() {
+function Users() {
   return (
     <ProtectedRoute intendedRole="admin">
       <LoadingBar duration={1500}>
@@ -20,4 +20,4 @@ function Staff() {
   );
 }
 
-export default Staff;
+export default Users;
