@@ -5,14 +5,13 @@ import { db } from "@/lib/db-client";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { sku: string } },
+  { params }: { params: Promise<{ sku: string }> }
 ) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session || session.user.role !== "admin") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-
-  const { sku } = params;
+  const { sku } = await params;
 
   try {
     const product = await db`
@@ -22,11 +21,9 @@ export async function GET(
       WHERE sku = ${sku}
       LIMIT 1
     `;
-
     if (product.length === 0) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
-
     return NextResponse.json(product[0], { status: 200 });
   } catch (error: any) {
     console.error("Error fetching product:", error.message, error.stack);
@@ -36,13 +33,13 @@ export async function GET(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { sku: string } },
+  { params }: { params: Promise<{ sku: string }> }
 ) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session || session.user.role !== "admin") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const sku = params.sku;
+  const sku = await params;
   const { searchParams } = new URL(req.url);
   const isGlobal = searchParams.has("isGlobal");
   const warehouseId = searchParams.get("warehouseId");
@@ -62,14 +59,14 @@ export async function DELETE(
       await db`DELETE FROM products WHERE sku = ${sku}`;
       return NextResponse.json(
         { message: "Product deleted globally" },
-        { status: 200 },
+        { status: 200 }
       );
     }
 
     if (!warehouseId) {
       return NextResponse.json(
         { error: "warehouseId is required for scoped delete" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -80,20 +77,20 @@ export async function DELETE(
 
     return NextResponse.json(
       { message: "Product removed from warehouse" },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (e: any) {
     console.error(e);
     return NextResponse.json(
       { error: "Failed to delete product" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { sku: string } },
+  { params }: { params: Promise<{ sku: string }> }
 ) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
@@ -104,11 +101,11 @@ export async function PATCH(
     if (!userID) {
       return NextResponse.json(
         { error: "Unauthorized - User ID required" },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
-    const sku = params.sku; // Get SKU from URL params
+    const sku = params; // Get SKU from URL params
     const body = await request.json();
     const { name, description, brand, category, price, image_url } = body;
 
@@ -137,7 +134,7 @@ export async function PATCH(
     console.error("Error updating product:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
