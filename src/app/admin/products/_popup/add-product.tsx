@@ -11,14 +11,16 @@ import { X, Package, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useProductStore } from "@/store/product-store";
 import { usePopupStore } from "@/store/popup-store";
+import { createProduct } from "../_action/createProduct";
+import type { CreateProductInput } from "@/types/product";
 
-const AddProduct = () => {
-  const { createProduct } = useProductStore();
+const AddProductPopup = () => {
+  const { setProducts, products } = useProductStore(); // Get current products too
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
-  const { activePopup, closePopup } = usePopupStore();
+  const { closePopup } = usePopupStore();
 
   const [formData, setFormData] = useState({
     sku: "",
@@ -87,9 +89,18 @@ const AddProduct = () => {
         brand: brand.trim(),
         image_url: imageUrl.trim(),
         description: description.trim(),
-      };
+      } as CreateProductInput;
 
-      await createProduct(productData);
+      const result = await createProduct(productData);
+
+      if ("error" in result) {
+        throw new Error(result.error);
+      }
+
+      if (result.success && result.product) {
+        setProducts([...products, result.product]);
+      }
+
       setShowSuccess(true);
     } catch (error) {
       console.error("❌ Error creating product:", error);
@@ -293,4 +304,4 @@ const AddProduct = () => {
   );
 };
 
-export default AddProduct;
+export default AddProductPopup;

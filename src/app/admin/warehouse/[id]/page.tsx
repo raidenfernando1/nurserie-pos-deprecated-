@@ -158,45 +158,41 @@ export default function WarehousePage({
   }, [id]);
 
   const categories = Array.from(
-    new Set(products.map((product) => product.category).filter(Boolean)),
+    new Set(products.map((product) => product.category).filter(Boolean))
   );
 
-  const { fetchWarehouses } = useWarehouseStore();
-
   return (
-    <LoadingBar>
-      <div className="h-screen p-3 flex flex-col gap-3">
-        <h1>{warehouseData?.warehouse_name || "Warehouse"}</h1>
-        <div className="flex-1 min-h-0">
-          <ReusableTable
-            data={products}
-            columns={columns as any}
-            tabComponent={(table) => (
-              <Tab
-                table={table}
-                filters={[
-                  {
-                    columnId: "category",
-                    label: "Categories",
-                    options: categories,
-                    placeholder: "All Categories",
-                  },
-                ]}
-                actions={
-                  <>
-                    <Button
-                      variant="outline"
-                      onClick={() => openPopup("add-product-warehouse")}
-                    >
-                      <Plus />
-                    </Button>
-                  </>
-                }
-              />
-            )}
-          />
-        </div>
+    <div className="h-screen p-3 flex flex-col gap-3">
+      <h1>{warehouseData?.warehouse_name || "Warehouse"}</h1>
+      <div className="flex-1 min-h-0">
+        <ReusableTable
+          data={products}
+          columns={columns as any}
+          tabComponent={(table) => (
+            <Tab
+              table={table}
+              filters={[
+                {
+                  columnId: "category",
+                  label: "Categories",
+                  options: categories,
+                  placeholder: "All Categories",
+                },
+              ]}
+              actions={
+                <>
+                  <Button
+                    variant="outline"
+                    onClick={() => openPopup("add-product-warehouse")}
+                  >
+                    <Plus />
+                  </Button>
+                </>
+              }
+            />
+          )}
+        />
       </div>
-    </LoadingBar>
+    </div>
   );
 }

@@ -21,18 +21,16 @@ export default function DashboardLayout({
 
   return (
     <ProtectedRoute intendedRole="admin">
-      <LoadingBar duration={200}>
-        <SidebarProvider>
-          <PopupHandler>
-            <div className="flex h-screen w-full overflow-hidden">
-              <AdminSidebar />
-              <main className="flex flex-1 flex-col overflow-auto p-4">
-                {children}
-              </main>
-            </div>
-          </PopupHandler>
-        </SidebarProvider>
-      </LoadingBar>
+      <SidebarProvider>
+        <PopupHandler>
+          <div className="flex h-screen w-full overflow-hidden">
+            <AdminSidebar />
+            <main className="flex flex-1 flex-col overflow-auto p-4">
+              {children}
+            </main>
+          </div>
+        </PopupHandler>
+      </SidebarProvider>
     </ProtectedRoute>
   );
 }

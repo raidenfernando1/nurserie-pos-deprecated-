@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -53,6 +53,10 @@ const ReusableTable = <T,>({
   });
   const [globalFilter, setGlobalFilter] = useState<any>([]);
 
+  // Memoize data to prevent unnecessary rerenders
+  const memoizedData = useMemo(() => data, [data]);
+  const memoizedColumns = useMemo(() => columns, [columns]);
+
   const calculatePageSize = () => {
     const viewportHeight = window.innerHeight;
     const tabHeight = tabComponent ? 80 : 0;
@@ -73,9 +77,13 @@ const ReusableTable = <T,>({
     return () => window.removeEventListener("resize", updatePageSize);
   }, []);
 
+  useEffect(() => {
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  }, [memoizedData]);
+
   const table = useReactTable({
-    data,
-    columns,
+    data: memoizedData,
+    columns: memoizedColumns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -128,7 +136,7 @@ const ReusableTable = <T,>({
                           ? null
                           : flexRender(
                               header.column.columnDef.header,
-                              header.getContext(),
+                              header.getContext()
                             )}
                       </TableHead>
                     ))}
@@ -143,7 +151,7 @@ const ReusableTable = <T,>({
                         <TableCell key={cell.id}>
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext(),
+                            cell.getContext()
                           )}
                         </TableCell>
                       ))}

@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,15 +12,16 @@ import {
 import { Trash2, AlertCircle, Package } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { usePopupStore } from "@/store/popup-store";
-import { useProductStore } from "@/store/product-store";
 import { Badge } from "@/components/ui/badge";
+import { deleteProduct } from "../_action/deleteProduct";
+import { useProductStore } from "@/store/product-store";
 
-const DeleteProduct = () => {
+const DeleteProductPopup = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const { data, closePopup } = usePopupStore();
-  const { deleteProduct } = useProductStore();
+  const { removeProduct } = useProductStore();
 
   // Pull product from popup data
   const product = (data as { product: any })?.product;
@@ -29,7 +32,12 @@ const DeleteProduct = () => {
     setError(null);
 
     try {
-      await deleteProduct(product.sku, true);
+      // Call the server action
+      await deleteProduct(product.sku);
+
+      // Remove product from client-side store for instant reactivity
+      removeProduct(product.sku);
+
       closePopup();
     } catch (err: any) {
       setError(err.message || "Failed to delete product.");
@@ -159,4 +167,4 @@ const DeleteProduct = () => {
   );
 };
 
-export default DeleteProduct;
+export default DeleteProductPopup;

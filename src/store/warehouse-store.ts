@@ -23,6 +23,22 @@ export const useWarehouseStore = create<WarehouseStoreType>((set) => ({
   setWarehouseProducts: (data) => set({ warehouseProducts: data }),
   setStats: (stats) => set({ stats }),
 
+  setWarehouse: (warehouse: { id: string; warehouse_name: string }) =>
+    set((state) => ({
+      warehouses: [
+        ...state.warehouses,
+        {
+          warehouse_id: Number(warehouse.id),
+          warehouse_name: warehouse.warehouse_name,
+          total_products: "0",
+          total_stock: "0",
+          products_in_stock: "0",
+          low_stock_products: "0",
+          out_of_stock_products: "0",
+        },
+      ],
+    })),
+
   fetchWarehouses: async () => {
     set({ isLoading: true, error: null });
     try {
@@ -57,7 +73,6 @@ export const useWarehouseStore = create<WarehouseStoreType>((set) => ({
     }
   },
 
-  // Fetch specific warehouse stock + products
   fetchWarehouseProducts: async (warehouseId) => {
     set({ isLoading: true, error: null });
     try {
@@ -85,7 +100,6 @@ export const useWarehouseStore = create<WarehouseStoreType>((set) => ({
     }
   },
 
-  // Add product to warehouse
   addProductToWarehouse: async (payload: AddProductToWarehousePayload) => {
     set({ isLoading: true, error: null });
     try {
@@ -102,7 +116,6 @@ export const useWarehouseStore = create<WarehouseStoreType>((set) => ({
 
       const data = await res.json();
 
-      // Assuming API returns the updated warehouse object with products
       set((state) => ({
         warehouseProducts: [...state.warehouseProducts, data.data],
         isLoading: false,

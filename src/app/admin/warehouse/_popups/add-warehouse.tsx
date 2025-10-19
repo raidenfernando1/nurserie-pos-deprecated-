@@ -7,16 +7,17 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { X, Warehouse, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { usePopupStore } from "@/store/popup-store";
+import addWarehouse from "../_action/addWarehouse";
+import { useWarehouseStore } from "@/store/warehouse-store";
 
-interface AddWarehouseProps {
-  onClose: () => void;
-}
-
-const AddWarehouse = ({ onClose }: AddWarehouseProps) => {
+const AddWarehousePopup = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [warehouseName, setWarehouseName] = useState("");
+  const { closePopup } = usePopupStore();
+  const { setWarehouse } = useWarehouseStore();
 
   const resetForm = () => {
     setWarehouseName("");
@@ -33,18 +34,14 @@ const AddWarehouse = ({ onClose }: AddWarehouseProps) => {
         throw new Error("Please enter a warehouse name");
       }
 
-      const response = await fetch("/api/admin/warehouse", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          warehouse_name: warehouseName.trim(),
-        }),
-      });
+      const result = await addWarehouse({ name: warehouseName });
 
-      if (!response.ok) {
-        throw new Error("Failed to create warehouse");
+      if ("error" in result) {
+        throw new Error(result.error);
+      }
+
+      if (result.success && result.warehouse) {
+        setWarehouse(result.warehouse);
       }
 
       setShowSuccess(true);
@@ -57,7 +54,7 @@ const AddWarehouse = ({ onClose }: AddWarehouseProps) => {
   };
 
   return (
-    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={true} onOpenChange={(open) => !open && closePopup()}>
       <DialogContent className="max-w-md">
         {!showSuccess ? (
           <>
@@ -104,7 +101,7 @@ const AddWarehouse = ({ onClose }: AddWarehouseProps) => {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={onClose}
+                  onClick={() => closePopup()}
                   className="flex-1"
                   disabled={isLoading}
                 >
@@ -122,7 +119,7 @@ const AddWarehouse = ({ onClose }: AddWarehouseProps) => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={onClose}
+                onClick={() => closePopup()}
                 className="h-8 w-8 p-0"
               >
                 <X className="h-4 w-4" />
@@ -140,7 +137,7 @@ const AddWarehouse = ({ onClose }: AddWarehouseProps) => {
             </div>
 
             <div className="flex gap-3">
-              <Button onClick={onClose} className="flex-1">
+              <Button onClick={() => closePopup()} className="flex-1">
                 Done
               </Button>
               <Button
@@ -161,4 +158,4 @@ const AddWarehouse = ({ onClose }: AddWarehouseProps) => {
   );
 };
 
-export default AddWarehouse;
+export default AddWarehousePopup;

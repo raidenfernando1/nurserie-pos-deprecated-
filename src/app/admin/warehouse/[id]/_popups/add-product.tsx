@@ -8,9 +8,10 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ArrowLeft, Search, Package2, Loader2, Scan } from "lucide-react";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useParams } from "next/navigation";
-import { useProductStore } from "@/store/product-store";
 import { useWarehouseStore } from "@/store/warehouse-store";
 import { usePopupStore } from "@/store/popup-store";
+import { fetchProductData } from "../_action/fetchProductData";
+import { fetchAvailableProducts } from "../_action/fetchAvailableProducts";
 
 const AddWarehouseProduct = () => {
   const params = useParams();
@@ -24,22 +25,33 @@ const AddWarehouseProduct = () => {
   const [barcodeInput, setBarcodeInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
+  const [products, setProducts] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const barcodeInputRef = useRef<HTMLInputElement>(null);
 
-  const { fetchAllProducts, fetchProduct, products } = useProductStore();
   const { addProductToWarehouse } = useWarehouseStore();
   const { closePopup } = usePopupStore();
 
   useEffect(() => {
     const loadProducts = async () => {
       setIsLoadingProducts(true);
-      await fetchAllProducts();
-      setIsLoadingProducts(false);
+      try {
+        const res = await fetchAvailableProducts();
+        if (res.success) {
+          setProducts(res.products ?? []);
+        } else {
+          setError(res.error || "Failed to load products");
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Unknown error");
+      } finally {
+        setIsLoadingProducts(false);
+      }
     };
+
     loadProducts();
-  }, [fetchAllProducts]);
+  }, []);
 
   useEffect(() => {
     if (step === 2 && barcodeInputRef.current) {
@@ -49,7 +61,6 @@ const AddWarehouseProduct = () => {
 
   const filteredProducts = useMemo(() => {
     if (!searchQuery.trim()) return products;
-
     const query = searchQuery.toLowerCase();
     return products.filter(
       (product) =>
@@ -61,9 +72,21 @@ const AddWarehouseProduct = () => {
   }, [products, searchQuery]);
 
   const handleProductClick = async (sku: string) => {
-    const productData = await fetchProduct(sku);
-    setSelectedProduct(productData);
-    setStep(1);
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await fetchProductData(sku);
+      if (res.success) {
+        setSelectedProduct(res.product);
+        setStep(1);
+      } else {
+        setError(res.error || "Failed to fetch product details");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown error");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleBack = () => {
@@ -133,7 +156,7 @@ const AddWarehouseProduct = () => {
       await addProductToWarehouse({
         warehouseID: parseInt(warehouseID),
         sku: selectedProduct.sku,
-        stock: stock,
+        stock,
         stock_threshold: parsedThreshold,
       });
 
