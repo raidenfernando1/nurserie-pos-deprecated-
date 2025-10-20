@@ -16,10 +16,11 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { usePopupStore } from "@/store/popup-store";
 import { useProductStore } from "@/store/product-store";
+import { updateProductAction } from "../_action/editProduct";
 
-const EditProduct = () => {
+const EditProductPopup = () => {
   const { data, closePopup } = usePopupStore();
-  const { editProduct } = useProductStore();
+  const updateProductInStore = useProductStore((state) => state.updateProduct);
 
   // Pull product from popup data
   const product = (data as { product: any })?.product;
@@ -39,7 +40,7 @@ const EditProduct = () => {
   const [success, setSuccess] = useState(false);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -52,8 +53,11 @@ const EditProduct = () => {
     setError(null);
     setSuccess(false);
 
+    // Store original product for rollback
+    const originalProduct = { ...product };
+
     try {
-      const updateData: Partial<typeof formData> = {};
+      const updateData: any = {};
 
       if (formData.name && formData.name !== product.name)
         updateData.name = formData.name;
@@ -68,12 +72,28 @@ const EditProduct = () => {
       if (formData.image_url && formData.image_url !== product.image_url)
         updateData.image_url = formData.image_url;
 
-      await editProduct(product.sku, updateData);
+      // Optimistically update the UI immediately
+      updateProductInStore(product.sku, updateData);
 
-      setSuccess(true);
-      setTimeout(() => closePopup(), 2000);
+      // Call server action
+      const result = await updateProductAction(product.sku, updateData);
+
+      if (!result.success) {
+        // Rollback on failure
+        updateProductInStore(product.sku, originalProduct);
+        setError(result.error || "Failed to update product");
+      } else {
+        // Update with server response to ensure data is in sync
+        if (result.product) {
+          updateProductInStore(product.sku, result.product);
+        }
+        setSuccess(true);
+        setTimeout(() => closePopup(), 2000);
+      }
     } catch (err: any) {
       console.error(err);
+      // Rollback on exception
+      updateProductInStore(product.sku, originalProduct);
       setError(err.message || "An error occurred while updating.");
     } finally {
       setSaving(false);
@@ -213,4 +233,4 @@ const EditProduct = () => {
   );
 };
 
-export default EditProduct;
+export default EditProductPopup;
