@@ -8,76 +8,63 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { changePassword } from "../_action/changePassword";
+import { usePopupStore } from "@/store/popup-store";
 
-interface ChangePasswordProps {
-  cashier: {
-    id: string;
-    name: string;
-    username: string;
-    createdAt: string;
-  };
-  onPasswordChanged?: () => void;
+interface ChangePasswordPopupProps {
+  data?: Record<string, any>;
 }
 
-export function ChangePassword({
-  cashier,
-  onPasswordChanged,
-}: ChangePasswordProps) {
+export default function ChangePasswordPopup({
+  data,
+}: ChangePasswordPopupProps) {
+  const { closePopup } = usePopupStore();
   const [newPassword, setNewPassword] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
-  const [open, setOpen] = React.useState(false);
+
+  const cashier = data?.cashier;
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!newPassword.trim()) {
-      alert("Please enter a new password");
+      toast.error("Please enter a new password");
+      return;
+    }
+
+    if (!cashier?.id) {
+      toast.error("Invalid cashier data");
       return;
     }
 
     setIsLoading(true);
-
     try {
-      const response = await fetch("/api/admin/cashier", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "changePassword",
-          cashierID: cashier.id,
-          newPassword,
-        }),
-      });
+      const result = await changePassword(cashier.id, newPassword);
 
-      const data = await response.json();
-
-      if (response.ok) {
+      if (result.data) {
         toast.success("Password changed successfully!");
         setNewPassword("");
-        setOpen(false);
-        onPasswordChanged?.();
-      } else {
-        alert(data.message || "Failed to change password");
+        closePopup();
+        data?.onPasswordChanged?.();
       }
     } catch (error) {
       console.error("Error calling changePassword:", error);
-      toast.error("An error occurred while changing password");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "An error occurred while changing password",
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          Change Password
-        </Button>
-      </DialogTrigger>
+    <Dialog open={true} onOpenChange={(open) => !open && closePopup()}>
       <DialogContent className="sm:max-w-[425px]">
         <form onSubmit={handleChangePassword}>
           <DialogHeader>
@@ -89,15 +76,15 @@ export function ChangePassword({
           <div className="grid gap-4 py-4">
             <div className="grid gap-3">
               <Label>Cashier ID</Label>
-              <p className="text-sm text-gray-600">{cashier.id}</p>
+              <p className="text-sm text-gray-600">{cashier?.id}</p>
             </div>
             <div className="grid gap-3">
               <Label>Full Name</Label>
-              <p className="text-sm text-gray-600">{cashier.name}</p>
+              <p className="text-sm text-gray-600">{cashier?.name}</p>
             </div>
             <div className="grid gap-3">
               <Label>Username</Label>
-              <p className="text-sm text-gray-600">{cashier.username}</p>
+              <p className="text-sm text-gray-600">{cashier?.username}</p>
             </div>
             <div className="grid gap-3">
               <Label htmlFor="password-input">New Password</Label>
@@ -114,7 +101,12 @@ export function ChangePassword({
           </div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button type="button" variant="outline" disabled={isLoading}>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isLoading}
+                onClick={() => closePopup()}
+              >
                 Cancel
               </Button>
             </DialogClose>

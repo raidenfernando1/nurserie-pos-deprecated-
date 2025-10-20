@@ -8,10 +8,11 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ArrowLeft, Search, Package2, Loader2, Scan } from "lucide-react";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useParams } from "next/navigation";
-import { useWarehouseStore } from "@/store/warehouse-store";
 import { usePopupStore } from "@/store/popup-store";
 import { fetchProductData } from "../_action/fetchProductData";
 import { fetchAvailableProducts } from "../_action/fetchAvailableProducts";
+import { addProductToWarehouse } from "../_action/addProductWarehouse";
+import type { AddProductToWarehousePayload } from "@/types/warehouse";
 
 const AddWarehouseProduct = () => {
   const params = useParams();
@@ -30,7 +31,6 @@ const AddWarehouseProduct = () => {
 
   const barcodeInputRef = useRef<HTMLInputElement>(null);
 
-  const { addProductToWarehouse } = useWarehouseStore();
   const { closePopup } = usePopupStore();
 
   useEffect(() => {
@@ -67,7 +67,7 @@ const AddWarehouseProduct = () => {
         product.name?.toLowerCase().includes(query) ||
         product.brand?.toLowerCase().includes(query) ||
         product.sku?.toLowerCase().includes(query) ||
-        product.category?.toLowerCase().includes(query)
+        product.category?.toLowerCase().includes(query),
     );
   }, [products, searchQuery]);
 
@@ -153,13 +153,14 @@ const AddWarehouseProduct = () => {
     setIsLoading(true);
 
     try {
-      await addProductToWarehouse({
-        warehouseID: parseInt(warehouseID),
+      const payload: AddProductToWarehousePayload = {
+        warehouseID: warehouseID,
         sku: selectedProduct.sku,
         stock,
         stock_threshold: parsedThreshold,
-      });
+      };
 
+      await addProductToWarehouse(payload);
       setStep(3);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to add product");

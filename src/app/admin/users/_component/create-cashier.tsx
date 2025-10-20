@@ -116,14 +116,7 @@ export function CreateCashier() {
           </div>
           <div className="grid gap-3">
             <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="Enter password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <Input onChange={(e) => setPassword(e.target.value)} />
           </div>
           {error && <p className="text-red-500 text-sm">{error}</p>}
           {success && (

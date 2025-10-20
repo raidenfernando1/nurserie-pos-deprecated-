@@ -63,7 +63,4 @@ export interface WarehouseStore {
   fetchWarehouses: () => Promise<void>;
   fetchWarehouseProducts: (warehouseId: string) => Promise<void>;
   fetchStockedProducts: () => Promise<Product[]>;
-  addProductToWarehouse: (
-    payload: AddProductToWarehousePayload
-  ) => Promise<void>;
 }

@@ -1,23 +1,24 @@
-"use client";
+import UserTable from "./_component/user-table";
+// actions
+import { getCashiers } from "./_action/fetchUsers";
 
-import LoadingBar from "@/components/loading-page";
+export default async function UsersPage() {
+  const result = await getCashiers();
 
-import ProtectedRoute from "@/components/protected-route";
+  if (!result.success || !result.data) {
+    return (
+      <div className="p-8 text-center">
+        <p className="text-red-500">Error: Failed to load users</p>
+      </div>
+    );
+  }
 
-import { CreateCashier } from "./_component/create-cashier";
-import CashierTable from "./_component/table";
-
-function Users() {
   return (
-    <ProtectedRoute intendedRole="admin">
-      <LoadingBar duration={1500}>
-        <div className="container mx-auto p-4 space-y-4">
-          <CreateCashier />
-          <CashierTable />
-        </div>
-      </LoadingBar>
-    </ProtectedRoute>
+    <div className="h-screen p-3 flex flex-col gap-3">
+      <h1>Users</h1>
+      <div className="flex-1 min-h-0">
+        <UserTable users={result.data} />
+      </div>
+    </div>
   );
 }
-
-export default Users;

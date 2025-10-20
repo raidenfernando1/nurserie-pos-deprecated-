@@ -8,6 +8,7 @@ type Popups =
   | "edit-product"
   | "add-warehouse"
   | "create-customer"
+  | "change-user-password"
   | null;
 
 interface PopupStore {

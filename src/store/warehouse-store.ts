@@ -100,34 +100,6 @@ export const useWarehouseStore = create<WarehouseStoreType>((set) => ({
     }
   },
 
-  addProductToWarehouse: async (payload: AddProductToWarehousePayload) => {
-    set({ isLoading: true, error: null });
-    try {
-      const res = await fetch("/api/admin/warehouse/products", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const errBody = await res.json().catch(() => ({}));
-        throw new Error(errBody.error || `Request failed: ${res.status}`);
-      }
-
-      const data = await res.json();
-
-      set((state) => ({
-        warehouseProducts: [...state.warehouseProducts, data.data],
-        isLoading: false,
-      }));
-    } catch (err) {
-      set({
-        isLoading: false,
-        error: err instanceof Error ? err.message : "Unknown error",
-      });
-    }
-  },
-
   fetchStockedProducts: async () => {
     set({ isLoading: true, error: null });
 

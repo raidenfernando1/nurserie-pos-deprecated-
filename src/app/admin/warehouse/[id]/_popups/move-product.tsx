@@ -15,6 +15,10 @@ import { usePopupStore } from "@/store/popup-store";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  transferProductBetweenWarehouses,
+  type TransferProductPayload,
+} from "../_action/moveProductWarehouse";
 
 const MoveProductWarehouse = () => {
   const [loading, setLoading] = useState(false);
@@ -67,30 +71,24 @@ const MoveProductWarehouse = () => {
       return;
     }
 
+    if (!stockThreshold || Number(stockThreshold) < 0) {
+      setError("Please enter a valid stock threshold");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      const res = await fetch(`/api/admin/warehouse/${id}/move`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          warehouseID: id,
-          productID: product.product_id,
-          to_warehouseID: selectedWarehouse,
-          send_stock: Number(sendStock),
-          stock_threshold: Number(stockThreshold),
-        }),
-      });
+      const payload: TransferProductPayload = {
+        warehouseID: id as string,
+        to_warehouseID: selectedWarehouse,
+        productID: product.product_id,
+        send_stock: Number(sendStock),
+        stock_threshold: Number(stockThreshold),
+      };
 
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.error || "Failed to move product");
-      }
-
-      const responseData = await res.json();
-      console.log("Move response:", responseData);
-
+      await transferProductBetweenWarehouses(payload);
       closePopup();
     } catch (err: any) {
       setError(err.message || "Failed to move product.");
@@ -188,7 +186,9 @@ const MoveProductWarehouse = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="stockThreshold">Stock Threshold (Optional)</Label>
+              <Label htmlFor="stockThreshold">
+                Stock Threshold <span className="text-destructive">*</span>
+              </Label>
               <Input
                 id="stockThreshold"
                 type="number"

@@ -1,5 +1,4 @@
 "use client";
-
 import React from "react";
 import { usePopupStore } from "@/store/popup-store";
 import AddProductWarehouse from "@/app/admin/warehouse/[id]/_popups/add-product";
@@ -9,9 +8,10 @@ import AddWarehousePopup from "@/app/admin/warehouse/_popups/add-warehouse";
 import AddProductPopup from "@/app/admin/products/_popup/add-product";
 import DeleteProductPopup from "@/app/admin/products/_popup/delete-product";
 import EditProductPopup from "@/app/admin/products/_popup/edit-product";
+import ChangePasswordPopup from "@/app/admin/users/_popup/change-password";
 
 const PopupHandler = ({ children }: { children: React.ReactNode }) => {
-  const { activePopup } = usePopupStore();
+  const { activePopup, data } = usePopupStore();
 
   return (
     <>
@@ -22,7 +22,9 @@ const PopupHandler = ({ children }: { children: React.ReactNode }) => {
       {activePopup === "create-customer" && <CreateCustomer />}
       {activePopup === "move-product-warehouse" && <MoveProductWarehouse />}
       {activePopup === "add-warehouse" && <AddWarehousePopup />}
-
+      {activePopup === "change-user-password" && (
+        <ChangePasswordPopup data={data} />
+      )}
       {children}
     </>
   );
