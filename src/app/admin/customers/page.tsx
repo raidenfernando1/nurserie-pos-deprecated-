@@ -32,16 +32,14 @@ const Customers = () => {
     },
     {
       id: "Customer Info",
-      accessorFn: (row) => row.name,
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Customer Info
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
+      accessorFn: (row) => {
+        // Combine all searchable fields into one string
+        const parts = [row.name, row.phone_number, row.email].filter(Boolean); // Remove null/undefined values
+
+        const result = parts.join(" ");
+        console.log("AccessorFn result:", result); // DEBUG: See what's being indexed
+        return result;
+      },
       cell: ({ row }) => {
         const { name, phone_number, email } = row.original;
         return (

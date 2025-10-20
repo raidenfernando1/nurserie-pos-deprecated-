@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import ReusableTable from "@/components/product-container";
 import Tab from "@/components/table/table-tab";
 import { ColumnDef } from "@tanstack/react-table";
@@ -22,6 +22,21 @@ const Customers = () => {
   const [customers, setCustomers] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    async function fetchCustomers() {
+      try {
+        const res = await fetch("/api/customers");
+        if (!res.ok) throw new Error("Failed to fetch customers");
+        const data = await res.json();
+        console.log("Customer data:", data); // DEBUG: Check the data structure
+        setCustomers(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred");
+      }
+    }
+    fetchCustomers();
+  }, []);
+
   if (error) return <div>Error: {error}</div>;
 
   const columns: ColumnDef<any>[] = [
@@ -32,7 +47,14 @@ const Customers = () => {
     },
     {
       id: "Customer Info",
-      accessorFn: (row) => row.name,
+      accessorFn: (row) => {
+        // Combine all searchable fields into one string
+        const parts = [row.name, row.phone_number, row.email].filter(Boolean); // Remove null/undefined values
+
+        const result = parts.join(" ");
+        console.log("AccessorFn result:", result); // DEBUG: See what's being indexed
+        return result;
+      },
       header: ({ column }) => (
         <Button
           variant="ghost"
@@ -146,20 +168,6 @@ const Customers = () => {
     },
   ];
 
-  useEffect(() => {
-    async function fetchCustomers() {
-      try {
-        const res = await fetch("/api/customers");
-        if (!res.ok) throw new Error("Failed to fetch customers");
-        const data = await res.json();
-        setCustomers(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
-      }
-    }
-    fetchCustomers();
-  }, []);
-
   return (
     <ReusableTable
       data={customers}
@@ -167,6 +175,7 @@ const Customers = () => {
       tabComponent={(table) => (
         <Tab
           table={table}
+          searchPlaceholder="Search by name, phone, or email..."
           actions={
             <>
               <Button
