@@ -5,32 +5,6 @@ import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { admin } from "better-auth/plugins";
 import { baseUrl } from "@/components/data";
 
-export function hashPassword(password: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const salt = randomBytes(16);
-    scrypt(password, salt, 64, (err, derivedKey) => {
-      if (err) return reject(err);
-      resolve(salt.toString("hex") + ":" + derivedKey.toString("hex"));
-    });
-  });
-}
-
-export async function verifyPassword(data: {
-  hash: string;
-  password: string;
-}): Promise<boolean> {
-  const { password, hash: stored } = data;
-  const [saltHex, keyHex] = stored.split(":");
-  const salt = Buffer.from(saltHex, "hex");
-  const storedKey = Buffer.from(keyHex, "hex");
-  return new Promise((resolve, reject) => {
-    scrypt(password, salt, storedKey.length, (err, derivedKey) => {
-      if (err) return reject(err);
-      resolve(timingSafeEqual(storedKey, derivedKey));
-    });
-  });
-}
-
 export const auth = betterAuth({
   secret:
     process.env.BETTER_AUTH_SECRET || "development-secret-change-in-production",
@@ -39,10 +13,6 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
-    password: {
-      hash: hashPassword,
-      verify: verifyPassword,
-    },
   },
   user: {
     additionalFields: {
@@ -58,10 +28,7 @@ export const auth = betterAuth({
       defaultRole: "cashier",
       bannedUserMessage:
         "This account is currently not active. Please contact your administrator to activate your account.",
-      adminUserIds: [
-        "RKvdVdU77zQF230CKUAY8gr2ujYEVWKq",
-        "SrfdQ20gE5uSixwFMserwXMOeNVNxsGl",
-      ],
+      adminUserIds: ["RKvdVdU77zQF230CKUAY8gr2ujYEVWKq"],
     }),
   ],
   socialProviders: {

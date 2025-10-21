@@ -12,11 +12,12 @@ import { useState } from "react";
 import { usePopupStore } from "@/store/popup-store";
 import { UserPlus, AlertCircle, CheckCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import createCashier from "@/app/admin/users/_action/createCashier";
 
-const CreateCustomer = () => {
+const CreateCashierPopup = () => {
   const [name, setName] = useState("");
-  const [phone_number, setPhoneNumber] = useState("");
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -30,41 +31,24 @@ const CreateCustomer = () => {
     setSuccess(false);
 
     try {
-      const response = await fetch("/api/customers", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          phone_number,
-          email,
-        }),
+      await createCashier({
+        name,
+        username,
+        password,
       });
-
-      let data: any = null;
-      try {
-        data = await response.json();
-      } catch (jsonErr) {
-        console.error(">>> Failed to parse JSON response:", jsonErr);
-      }
-
-      if (!response.ok) {
-        throw new Error(data?.message || "Unknown error from server");
-      }
 
       setSuccess(true);
       setName("");
-      setPhoneNumber("");
-      setEmail("");
+      setUsername("");
+      setPassword("");
 
       setTimeout(() => {
         closePopup();
+        setSuccess(false);
       }, 2000);
     } catch (err: any) {
       console.error(">>> Error in handleSubmit:", err);
-      setError(err.message || "Failed to create Customer");
+      setError(err.message || "Failed to create cashier");
     } finally {
       setLoading(false);
     }
@@ -80,10 +64,10 @@ const CreateCustomer = () => {
             </div>
             <div className="flex-1">
               <DialogTitle className="text-xl font-semibold">
-                Create New Customer
+                Create New Cashier
               </DialogTitle>
               <DialogDescription className="text-sm mt-1">
-                Add a new customer profile to the system
+                Add a new cashier account to the system
               </DialogDescription>
             </div>
           </div>
@@ -101,7 +85,7 @@ const CreateCustomer = () => {
             <Alert className="animate-in fade-in-50 border-green-500/50 bg-green-500/5">
               <CheckCircle className="h-4 w-4 text-green-500" />
               <AlertDescription className="ml-2 text-green-500">
-                Customer created successfully!
+                Cashier created successfully!
               </AlertDescription>
             </Alert>
           )}
@@ -116,29 +100,34 @@ const CreateCustomer = () => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 disabled={loading}
+                required
               />
             </div>
+
             <div className="grid gap-3">
-              <Label htmlFor="phone_number">Phone Number</Label>
+              <Label htmlFor="username">Username</Label>
               <Input
-                id="phone_number"
-                name="phone_number"
-                placeholder="Enter Phone number"
-                value={phone_number}
-                onChange={(e) => setPhoneNumber(e.target.value)}
+                id="username"
+                name="username"
+                placeholder="Enter Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 disabled={loading}
+                required
               />
             </div>
+
             <div className="grid gap-3">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="password">Password</Label>
               <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="Enter email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id="password"
+                name="password"
+                type="password"
+                placeholder="Enter Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
+                required
               />
             </div>
 
@@ -155,7 +144,7 @@ const CreateCustomer = () => {
               </Button>
               <Button type="submit" className="flex-1 gap-2" disabled={loading}>
                 <UserPlus className="h-4 w-4" />
-                {loading ? "Creating..." : "Create Customer"}
+                {loading ? "Creating..." : "Create Cashier"}
               </Button>
             </div>
           </form>
@@ -165,4 +154,4 @@ const CreateCustomer = () => {
   );
 };
 
-export default CreateCustomer;
+export default CreateCashierPopup;

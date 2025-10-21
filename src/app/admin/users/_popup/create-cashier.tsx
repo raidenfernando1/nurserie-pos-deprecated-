@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import createCashier from "../_action/createCashier";
 
-export function CreateCashier() {
+export function CreateCashierPopup() {
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -30,29 +30,11 @@ export function CreateCashier() {
     setSuccess(false);
 
     try {
-      const response = await fetch("/api/admin/cashier", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          username,
-          password,
-        }),
+      await createCashier({
+        name,
+        username,
+        password,
       });
-
-      let data: any = null;
-      try {
-        data = await response.json();
-      } catch (jsonErr) {
-        console.error(">>> Failed to parse JSON response:", jsonErr);
-      }
-
-      if (!response.ok) {
-        throw new Error(data?.message || "Unknown error from server");
-      }
 
       setSuccess(true);
       setName("");
@@ -74,7 +56,7 @@ export function CreateCashier() {
   const handleOpenChange = (newOpen: boolean) => {
     setOpen(newOpen);
     if (!newOpen) {
-      setName;
+      setName("");
       setUsername("");
       setPassword("");
       setError(null);
@@ -117,7 +99,14 @@ export function CreateCashier() {
           </div>
           <div className="grid gap-3">
             <Label htmlFor="password">Password</Label>
-            <Input onChange={(e) => setPassword(e.target.value)} />
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              placeholder="Enter password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
           </div>
           {error && <p className="text-red-500 text-sm">{error}</p>}
           {success && (

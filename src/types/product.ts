@@ -11,20 +11,20 @@ export interface CreateProductInput {
   description?: string;
 }
 
+// types/product.ts
 export interface Product {
   id: number;
-  name: string;
-  price: number;
-  stock_threshold?: number; // Optional
-  sku: string;
-  stock?: number; // Optional
-  company_id?: number;
-  description?: string;
-  image_url?: string | null;
-  barcode: string;
-  brand: string;
+  warehouse_id: number;
+  product_id: number;
+  stock: number;
+  stock_threshold: number;
+  warehouse_name: string;
+  product_name: string;
   category: string;
-  warehouse_name?: string; // Optional - only present when product is in a warehouse
+  sku: string;
+  barcode: string;
+  price: string;
+  image_url: string;
 }
 
 type ProductUpdateData = Partial<{

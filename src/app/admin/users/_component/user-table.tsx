@@ -3,18 +3,23 @@ import type { ColumnDef } from "@tanstack/react-table";
 import Tab from "@/components/table/table-tab";
 import ReusableTable from "@/components/table/reusable-table";
 import { Button } from "@/components/ui/button";
-import { X, UserPen } from "lucide-react";
+import { UserPen, User } from "lucide-react";
 import { usePopupStore } from "@/store/popup-store";
+import { banUser, unbanUser } from "../_action/userManagement";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 export interface User {
   id: string;
   name: string;
   username: string;
-  dateAdded: string;
+  createdAt: string;
+  banned?: boolean; // Add this to track ban status
 }
 
 const UserTable = ({ users }: { users: User[] }) => {
   const { openPopup } = usePopupStore();
+  const queryClient = useQueryClient();
 
   const columns: ColumnDef<User>[] = [
     {
@@ -34,15 +39,55 @@ const UserTable = ({ users }: { users: User[] }) => {
       header: "Username",
     },
     {
-      accessorKey: "dateAdded",
+      accessorKey: "createdAt",
       header: "Date Added",
-      cell: ({ getValue }) => new Date(getValue() as string).toLocaleString(),
+      cell: ({ getValue }) => {
+        const date = new Date(getValue<string>());
+        return date.toISOString().split("T")[0];
+      },
     },
     {
       accessorKey: "rowCTA",
       header: "",
       cell: ({ row }) => (
-        <div className="flex gap-3">
+        <div className="flex gap-3 justify-end">
+          {!row.original.banned ? (
+            <Button
+              variant="destructive"
+              onClick={async () => {
+                try {
+                  await banUser(row.original.id);
+                  toast.success("User deactivated successfully");
+                  await queryClient.invalidateQueries({
+                    queryKey: ["cashiers"],
+                  });
+                } catch (error: any) {
+                  toast.error(error.message || "Failed to deactivate user");
+                }
+              }}
+            >
+              <User />
+              Deactivate
+            </Button>
+          ) : (
+            <Button
+              variant="success"
+              onClick={async () => {
+                try {
+                  await unbanUser(row.original.id);
+                  toast.success("User activated successfully");
+                  await queryClient.invalidateQueries({
+                    queryKey: ["cashiers"],
+                  });
+                } catch (error: any) {
+                  toast.error(error.message || "Failed to activate user");
+                }
+              }}
+            >
+              <User />
+              Activate
+            </Button>
+          )}
           <Button
             variant="outline"
             onClick={() =>
@@ -52,9 +97,7 @@ const UserTable = ({ users }: { users: User[] }) => {
             }
           >
             <UserPen />
-          </Button>
-          <Button variant="destructive">
-            <X />
+            Change Password
           </Button>
         </div>
       ),
@@ -65,7 +108,22 @@ const UserTable = ({ users }: { users: User[] }) => {
     <ReusableTable
       data={users}
       columns={columns}
-      tabComponent={(table) => <Tab table={table} />}
+      tabComponent={(table) => (
+        <Tab
+          table={table}
+          actions={
+            <>
+              <Button
+                variant="outline"
+                onClick={() => openPopup("admin-create-cashier")}
+              >
+                <User />
+                Create Cashier
+              </Button>
+            </>
+          }
+        />
+      )}
     />
   );
 };

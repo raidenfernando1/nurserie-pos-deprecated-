@@ -9,6 +9,7 @@ type Popups =
   | "add-warehouse"
   | "create-customer"
   | "change-user-password"
+  | "admin-create-cashier"
   | null;
 
 interface PopupStore {

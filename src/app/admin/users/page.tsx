@@ -1,6 +1,9 @@
 import UserTable from "./_component/user-table";
 // actions
 import { getCashiers } from "./_action/fetchUsers";
+import type { User } from "./_component/user-table";
+
+export const dynamic = "force-dynamic"; // ✅ Add this line
 
 export default async function UsersPage() {
   const result = await getCashiers();
@@ -17,7 +20,7 @@ export default async function UsersPage() {
     <div className="h-screen p-3 flex flex-col gap-3">
       <h1>Users</h1>
       <div className="flex-1 min-h-0">
-        <UserTable users={result.data} />
+        <UserTable users={result.data as User[]} />
       </div>
     </div>
   );

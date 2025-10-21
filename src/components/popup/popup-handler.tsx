@@ -9,6 +9,7 @@ import AddProductPopup from "@/app/admin/products/_popup/add-product";
 import DeleteProductPopup from "@/app/admin/products/_popup/delete-product";
 import EditProductPopup from "@/app/admin/products/_popup/edit-product";
 import ChangePasswordPopup from "@/app/admin/users/_popup/change-password";
+import CreateCashierPopup from "@/components/popup/create-customer";
 
 const PopupHandler = ({ children }: { children: React.ReactNode }) => {
   const { activePopup, data } = usePopupStore();
@@ -25,6 +26,7 @@ const PopupHandler = ({ children }: { children: React.ReactNode }) => {
       {activePopup === "change-user-password" && (
         <ChangePasswordPopup data={data} />
       )}
+      {activePopup === "admin-create-cashier" && <CreateCashierPopup />}
       {children}
     </>
   );

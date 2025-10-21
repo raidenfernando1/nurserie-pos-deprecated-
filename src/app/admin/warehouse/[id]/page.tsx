@@ -2,6 +2,8 @@
 import WarehouseTable from "./_components/warehouse-table";
 import { getWarehouseWithProducts } from "./_action/fetchWarehouseData";
 
+export const dynamic = "force-dynamic"; // ✅ Add this line
+
 export default async function WarehousePage({
   params,
 }: {
