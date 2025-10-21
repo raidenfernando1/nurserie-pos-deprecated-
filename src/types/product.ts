@@ -14,12 +14,14 @@ export interface CreateProductInput {
 // types/product.ts
 export interface Product {
   id: number;
+  brand: string;
   warehouse_id: number;
   product_id: number;
   stock: number;
   stock_threshold: number;
   warehouse_name: string;
   product_name: string;
+  product_description: string;
   category: string;
   sku: string;
   barcode: string;

@@ -10,6 +10,7 @@ type Popups =
   | "create-customer"
   | "change-user-password"
   | "admin-create-cashier"
+  | "product-data-view"
   | null;
 
 interface PopupStore {

@@ -2,7 +2,7 @@
 
 import ReusableTable from "@/components/table/reusable-table";
 import { Button } from "@/components/ui/button";
-import { Trash, Edit, Plus } from "lucide-react";
+import { Trash, Edit, Plus, View } from "lucide-react";
 import Tab from "@/components/table/table-tab";
 import { usePopupStore } from "@/store/popup-store";
 
@@ -65,18 +65,27 @@ export default function ProductsTable({ products }: { products: Product[] }) {
       cell: ({ row }: any) => (
         <div className="flex gap-3">
           <Button
+            variant="outline"
+            onClick={() =>
+              openPopup("product-data-view", { product: row.original })
+            }
+          >
+            <View />
+          </Button>
+
+          <Button
+            variant="outline"
+            onClick={() => openPopup("edit-product", { product: row.original })}
+          >
+            <Edit />
+          </Button>
+          <Button
             variant="destructive"
             onClick={() =>
               openPopup("delete-product", { product: row.original })
             }
           >
             <Trash />
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => openPopup("edit-product", { product: row.original })}
-          >
-            <Edit />
           </Button>
         </div>
       ),
