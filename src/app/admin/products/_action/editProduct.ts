@@ -13,6 +13,7 @@ export async function updateProductAction(
     brand?: string;
     category?: string;
     price?: number;
+    cost?: number;
     image_url?: string;
   },
 ) {
@@ -28,7 +29,7 @@ export async function updateProductAction(
       return { error: "Unauthorized - User ID required", success: false };
     }
 
-    const { name, description, brand, category, price, image_url } = data;
+    const { name, description, brand, category, price, image_url, cost } = data;
 
     const result = await db`
       UPDATE products p
@@ -38,6 +39,7 @@ export async function updateProductAction(
           brand = COALESCE(${brand}, p.brand),
           category = COALESCE(${category}, p.category),
           price = COALESCE(${price}, p.price),
+          cost = COALESCE(${cost},p.cost),
           image_url = COALESCE(${image_url}, p.image_url)
       WHERE p.sku = ${sku}
       RETURNING p.*;

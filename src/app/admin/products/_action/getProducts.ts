@@ -29,13 +29,13 @@ export default async function fetchProducts(): Promise<FetchProductsResult> {
       p.category,
       p.image_url,
       p.price,
+      p.cost,
       p.sku,
       p.barcode
     FROM products p
     ORDER BY p.name;
   `;
 
-    console.log(response);
     return response as Product[];
   } catch (err) {
     console.error("fetchProducts error:", err);

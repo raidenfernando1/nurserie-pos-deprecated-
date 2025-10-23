@@ -5,6 +5,7 @@ export interface CreateProductInput {
   barcode: string;
   name: string;
   price: number;
+  cost: number;
   category: string;
   brand: string;
   image_url?: string;

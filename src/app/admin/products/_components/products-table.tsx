@@ -40,11 +40,38 @@ export default function ProductsTable({ products }: { products: Product[] }) {
       accessorKey: "price",
       header: "SRP",
       cell: ({ row }: any) =>
-        `₱${parseFloat(row.original.price).toLocaleString("en-PH", {
+        `${parseFloat(row.original.price).toLocaleString("en-PH", {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         })}`,
     },
+    {
+      accessorKey: "cost",
+      header: "Cost",
+      cell: ({ row }: any) =>
+        `${parseFloat(row.original.cost).toLocaleString("en-PH", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}`,
+    },
+    {
+      accessorKey: "",
+      header: "Difference",
+      cell: ({ row }: any) => {
+        const cost = parseFloat(row.original.cost);
+        const price = parseFloat(row.original.price);
+
+        const difference = price - cost;
+
+        const formatted = difference.toLocaleString("en-PH", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+
+        return formatted;
+      },
+    },
+
     {
       accessorKey: "barcode",
       header: "Barcode / SKU",

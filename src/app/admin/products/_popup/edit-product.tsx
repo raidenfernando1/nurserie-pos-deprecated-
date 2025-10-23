@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, Loader2 } from "lucide-react";
+import { AlertCircle, Loader2, PhilippinePeso } from "lucide-react";
 import { usePopupStore } from "@/store/popup-store";
 import { useProductStore } from "@/store/product-store";
 import { updateProductAction } from "../_action/editProduct";
@@ -22,7 +22,6 @@ const EditProductPopup = () => {
   const { data, closePopup } = usePopupStore();
   const updateProductInStore = useProductStore((state) => state.updateProduct);
 
-  // Pull product from popup data
   const product = (data as { product: any })?.product;
   if (!product) return null;
 
@@ -32,6 +31,7 @@ const EditProductPopup = () => {
     brand: product.brand || "",
     category: product.category || "",
     price: product.price?.toString() || "",
+    cost: product.cost?.toString() || "",
     image_url: product.image_url || "",
   });
 
@@ -69,21 +69,19 @@ const EditProductPopup = () => {
         updateData.category = formData.category;
       if (formData.price && parseFloat(formData.price) !== product.price)
         updateData.price = parseFloat(formData.price);
+      if (formData.cost && parseFloat(formData.cost) !== product.cost)
+        updateData.cost = parseFloat(formData.cost);
       if (formData.image_url && formData.image_url !== product.image_url)
         updateData.image_url = formData.image_url;
 
-      // Optimistically update the UI immediately
       updateProductInStore(product.sku, updateData);
 
-      // Call server action
       const result = await updateProductAction(product.sku, updateData);
 
       if (!result.success) {
-        // Rollback on failure
         updateProductInStore(product.sku, originalProduct);
         setError(result.error || "Failed to update product");
       } else {
-        // Update with server response to ensure data is in sync
         if (result.product) {
           updateProductInStore(product.sku, result.product);
         }
@@ -169,63 +167,70 @@ const EditProductPopup = () => {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="price">Price</Label>
-              <Input
-                id="price"
-                name="price"
-                type="number"
-                step="0.01"
-                value={formData.price}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="image_url">Image URL</Label>
-              <Input
-                id="image_url"
-                name="image_url"
-                value={formData.image_url}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            {formData.image_url && (
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Image Preview</Label>
-                <div className="border rounded-lg p-4 bg-muted/50">
-                  <img
-                    src={formData.image_url}
-                    alt="Product preview"
-                    className="max-h-40 object-contain mx-auto"
-                    onError={(e) => {
-                      e.currentTarget.src = "/placeholder-image.png";
-                    }}
-                  />
-                </div>
+                <Label htmlFor="price">Price</Label>
+                <Input
+                  id="price"
+                  name="price"
+                  step="0.01"
+                  value={formData.price}
+                  onChange={handleInputChange}
+                />
               </div>
-            )}
-
-            <div className="flex gap-2 pt-4">
-              <Button
-                onClick={handleUpdate}
-                disabled={saving}
-                className="flex-1"
-              >
-                {saving ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Updating...
-                  </>
-                ) : (
-                  "Update Product"
-                )}
-              </Button>
-              <Button variant="outline" onClick={closePopup} disabled={saving}>
-                Cancel
-              </Button>
+              <div className="space-y-2">
+                <Label htmlFor="price">Cost</Label>
+                <Input
+                  id="cost"
+                  name="cost"
+                  step="0.01"
+                  value={formData.cost}
+                  onChange={handleInputChange}
+                />
+              </div>
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="image_url">Image URL</Label>
+            <Input
+              id="image_url"
+              name="image_url"
+              value={formData.image_url}
+              onChange={handleInputChange}
+            />
+          </div>
+
+          {formData.image_url && (
+            <div className="space-y-2">
+              <Label>Image Preview</Label>
+              <div className="border rounded-lg p-4 bg-muted/50">
+                <img
+                  src={formData.image_url}
+                  alt="Product preview"
+                  className="max-h-40 object-contain mx-auto"
+                  onError={(e) => {
+                    e.currentTarget.src = "/placeholder-image.png";
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="flex gap-2 pt-4">
+            <Button onClick={handleUpdate} disabled={saving} className="flex-1">
+              {saving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                "Update Product"
+              )}
+            </Button>
+            <Button variant="outline" onClick={closePopup} disabled={saving}>
+              Cancel
+            </Button>
           </div>
         </div>
       </DialogContent>
