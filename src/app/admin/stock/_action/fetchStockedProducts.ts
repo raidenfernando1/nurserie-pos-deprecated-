@@ -13,7 +13,7 @@ const getWarehouseProducts = async () => {
   try {
     const products = await db`
       SELECT wp.id, wp.warehouse_id, wp.product_id, wp.stock, wp.stock_threshold,
-             w.warehouse_name, p.name AS product_name, p.category, p.sku,
+             w.warehouse_name, p.name, p.category, p.sku,
              p.barcode, p.price, p.image_url
       FROM warehouse_products wp
       JOIN warehouse w ON wp.warehouse_id = w.id

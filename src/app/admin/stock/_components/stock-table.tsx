@@ -18,9 +18,7 @@ export default function StockTable({ stocks }: { stocks: any[] }) {
           />
           <div className="flex flex-col gap-0.5">
             <div className="flex flex-col">
-              <span className="font-semibold ">
-                {row.original.product_name}
-              </span>
+              <span className="font-semibold ">{row.original.name}</span>
               <StatusBadge
                 stock={row.original.stock}
                 threshold={row.original.stock_threshold}
@@ -32,7 +30,7 @@ export default function StockTable({ stocks }: { stocks: any[] }) {
           </div>
         </div>
       ),
-      accessorFn: (row: any) => row.product_name,
+      accessorFn: (row: any) => row.name,
       filterFn: "includesString" as const,
     },
 

@@ -71,7 +71,7 @@ const ProductDetailPopup = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <DialogTitle className="text-2xl font-bold">
-                {product.name || product.product_name}
+                {product.name}
               </DialogTitle>
               <Badge variant="secondary" className="font-mono">
                 Product ID: {product.id}
@@ -86,7 +86,7 @@ const ProductDetailPopup = () => {
             <div className="relative w-full max-w-sm aspect-square">
               <img
                 src={product.image_url}
-                alt={product.product_name}
+                alt={product.name}
                 className="w-full h-full object-contain rounded-lg"
               />
             </div>
@@ -95,7 +95,7 @@ const ProductDetailPopup = () => {
           {/* Product Name & Description */}
           <div className="space-y-3">
             <h3 className="text-3xl font-bold tracking-tight">
-              {product.product_name}
+              {product.name}
             </h3>
             {product.product_description && (
               <p className="text-muted-foreground leading-relaxed">

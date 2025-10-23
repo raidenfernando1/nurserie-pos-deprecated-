@@ -7,10 +7,10 @@ type Popups =
   | "delete-product"
   | "edit-product"
   | "add-warehouse"
-  | "create-customer"
   | "change-user-password"
   | "admin-create-cashier"
   | "product-data-view"
+  | "create-customer-popup"
   | null;
 
 interface PopupStore {

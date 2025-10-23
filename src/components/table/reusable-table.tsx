@@ -44,7 +44,7 @@ const ReusableTable = <T,>({
   data,
   columns,
   defaultPageSize = 10,
-  minRows = 5,
+  minRows = 10,
   tabComponent,
 }: ReusableTableProps<T>) => {
   const [pagination, setPagination] = useState({
@@ -136,7 +136,7 @@ const ReusableTable = <T,>({
                           ? null
                           : flexRender(
                               header.column.columnDef.header,
-                              header.getContext()
+                              header.getContext(),
                             )}
                       </TableHead>
                     ))}
@@ -151,7 +151,7 @@ const ReusableTable = <T,>({
                         <TableCell key={cell.id}>
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </TableCell>
                       ))}
