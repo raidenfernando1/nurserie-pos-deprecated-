@@ -1,0 +1,149 @@
+import { NextRequest, NextResponse } from "next/server";
+import { headers } from "next/headers";
+import auth from "@/lib/auth-server";
+import { db } from "@/lib/db-client";
+
+export async function GET(req: NextRequest) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  const { searchParams } = new URL(req.url);
+
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const full = searchParams.get("full") === "true";
+
+  try {
+    const response = full
+      ? await db`
+        SELECT
+            p.id,
+            p.name,
+            p.brand,
+            p.category,
+            p.image_url,
+            p.price,
+            p.sku,
+            p.barcode
+        FROM products p
+        ORDER BY p.name;
+        `
+      : await db`
+          SELECT
+            p.id,
+            p.name,
+            p.sku,
+            p.category
+          FROM products p
+          ORDER BY p.name;
+        `;
+
+    if (response.length === 0) {
+      return NextResponse.json(
+        { message: "No products found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(response, { status: 200 });
+  } catch (error: any) {
+    console.error("Error fetching products:", error.message, error.stack);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const session = await auth.api.getSession({ headers: await headers() });
+
+    if (!session || session.user.role !== "admin") {
+      console.warn("Unauthorized access attempt");
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await req.json();
+    const {
+      name,
+      description = null,
+      brand = "none",
+      category,
+      sku,
+      barcode,
+      price = 0,
+      image_url,
+    } = body;
+
+    if (!name || !sku || !barcode) {
+      console.warn("Missing required fields");
+      return NextResponse.json(
+        { error: "Missing required fields: name, sku, or barcode" },
+        { status: 400 }
+      );
+    }
+
+    // Check for duplicate SKU or barcode
+    const existing = await db`
+      SELECT sku, barcode, name
+      FROM products
+      WHERE sku = ${sku} OR barcode = ${barcode} OR name = ${name}
+      LIMIT 1
+    `;
+    if (existing.length > 0) {
+      const dupField =
+        existing[0].sku === sku
+          ? "SKU"
+          : existing[0].barcode === barcode
+          ? "Barcode"
+          : "Name";
+      return NextResponse.json(
+        { error: `Duplicate ${dupField} detected` },
+        { status: 409 }
+      );
+    }
+
+    const finalImageUrl =
+      image_url?.trim() ||
+      "https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-15.png";
+
+    const insertedProduct = await db`
+      INSERT INTO products (
+        name,
+        description,
+        brand,
+        category,
+        sku,
+        barcode,
+        price,
+        image_url
+      )
+      VALUES (
+        ${name},
+        ${description},
+        ${brand},
+        ${category},
+        ${sku},
+        ${barcode},
+        ${price},
+        ${finalImageUrl}
+      )
+      RETURNING *;
+    `;
+
+    return NextResponse.json({ product: insertedProduct[0] }, { status: 201 });
+  } catch (e: any) {
+    console.error("❌ Error inserting product:", e);
+
+    // Handle unique constraint violation if using Postgres
+    if (e?.code === "23505") {
+      return NextResponse.json(
+        { error: "Duplicate product detected" },
+        { status: 409 }
+      );
+    }
+
+    return NextResponse.json(
+      { error: "Failed to create product" },
+      { status: 500 }
+    );
+  }
+}

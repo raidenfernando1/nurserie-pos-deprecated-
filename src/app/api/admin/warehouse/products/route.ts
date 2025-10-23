@@ -1,53 +1,89 @@
 import { NextResponse } from "next/server";
-import { headers } from "next/headers";
 import auth from "@/lib/auth-server";
 import { db } from "@/lib/db-client";
+import { headers } from "next/headers";
 
-/*
-FOR FETCHING ALL COMPANY WIDE PRODUCTS ALL WAREHOUSES AND ETC
-*/
-export async function GET() {
+export const GET = async (req: Request) => {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
-    const session = await auth.api.getSession({ headers: await headers() });
+    const products = await db`
+      SELECT wp.id, wp.warehouse_id, wp.product_id, wp.stock, wp.stock_threshold, w.warehouse_name, p.name AS product_name ,p.category, p.sku, p.barcode, p.category, p.price, p.image_url
+      FROM warehouse_products wp
+      JOIN warehouse w ON wp.warehouse_id = w.id
+      JOIN products p ON wp.product_id = p.id
+`;
 
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    return NextResponse.json(products);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
+  }
+};
 
-    const adminId = session.user.id;
+export const POST = async (req: Request) => {
+  const session = await auth.api.getSession({ headers: await headers() });
 
-    const response = await db`
-SELECT
-  p.id,
-  p.name,
-  p.brand,
-  p.category,
-  p.image_url,
-  COALESCE(wp.stock, 0) as stock,
-  COALESCE(wp.stock_threshold, 0) as stock_threshold,
-  p.price,
-  p.sku,
-  p.barcode,
-  COALESCE(w.warehouse_name, 'No Warehouse') as warehouse_name,
-  c.company_name
-FROM products p
-JOIN company c ON p.company_id = c.id
-JOIN "user" u ON c.admin_id = u.id
-LEFT JOIN warehouse_products wp ON wp.product_id = p.id
-LEFT JOIN warehouse w ON wp.warehouse_id = w.id
-WHERE u.id = ${adminId};
-    `;
+  if (!session || session.user.role !== "admin") {
+    console.warn("🚫 Unauthorized access attempt");
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-    if (response.length === 0) {
+  try {
+    const body = await req.json();
+
+    const { warehouseID, sku, stock, stock_threshold } = body;
+
+    if (!warehouseID || !sku || stock == null || stock_threshold == null) {
+      console.warn("⚠️ Missing required fields:", {
+        warehouseID,
+        sku,
+        stock,
+        stock_threshold,
+      });
       return NextResponse.json(
-        { message: "No products found in any warehouses" },
-        { status: 404 }
+        { error: "Missing required fields" },
+        { status: 400 },
       );
     }
 
-    return NextResponse.json(response, { status: 200 });
-  } catch (error: any) {
-    console.error("Error fetching products:", error.message, error.stack);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const productResult = await db`
+      SELECT id FROM products WHERE sku = ${sku}
+    `;
+
+    if (productResult.length === 0) {
+      console.warn(`❌ Product with SKU '${sku}' not found`);
+      return NextResponse.json(
+        { error: "Product with SKU not found" },
+        { status: 404 },
+      );
+    }
+
+    const product_id = productResult[0].id;
+
+    const warehouseProductResult = await db`
+      INSERT INTO warehouse_products (warehouse_id, product_id, stock, stock_threshold)
+      VALUES (${warehouseID}, ${product_id}, ${stock}, ${stock_threshold})
+      ON CONFLICT (warehouse_id, product_id)
+      DO UPDATE SET
+        stock = warehouse_products.stock + ${stock},
+        stock_threshold = ${stock_threshold}
+      RETURNING *
+    `;
+    return NextResponse.json({
+      success: true,
+      data: warehouseProductResult[0],
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
   }
-}
+};

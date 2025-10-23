@@ -1,11 +1,11 @@
-import { Geist_Mono } from "next/font/google";
+import { Geist } from "next/font/google";
 import "./globals.css";
 import React from "react";
-import Listener from "./Listener";
+import Listener from "./listener";
 import { Toaster } from "sonner";
+import { ThemeProvider } from "@/components/theme-provider";
 
-const MainFont = Geist_Mono({
-  variable: "--font-geist-sans",
+const geist = Geist({
   subsets: ["latin"],
 });
 
@@ -15,13 +15,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${MainFont.variable} ${MainFont.variable} `}>
-        <Listener>
-          {children}
-          <Toaster />
-        </Listener>
-      </body>
-    </html>
+    <>
+      <html lang="en" suppressHydrationWarning className={geist.className}>
+        <body>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Listener>
+              {children}
+              <Toaster />
+            </Listener>
+          </ThemeProvider>
+        </body>
+      </html>
+    </>
   );
 }

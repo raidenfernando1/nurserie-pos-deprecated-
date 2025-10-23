@@ -1,9 +1,10 @@
-"use client";
-
 import React, { useState } from "react";
 import { Loader2Icon, Settings } from "lucide-react";
-import { ChevronsUpDown, LogOut } from "lucide-react";
+import { EllipsisVertical, LogOut, Sun, Moon } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
+import { useSession } from "@/utils/getSession";
+import { useTheme } from "next-themes";
+import { Button } from "./ui/button";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -20,18 +21,18 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { NavSettings } from "./nav-settings";
 
-export function NavUser({
-  user,
-}: {
-  user: {
-    name: string;
-    email: string;
-    avatar: string;
-  };
-}) {
+export function NavUser() {
   const { isMobile } = useSidebar();
   const [signingOut, setSigningOut] = useState(false);
+  const { userSession, loading } = useSession();
+
+  if (loading || !userSession?.user) {
+    return <div className="p-4 text-sm ">Loading user...</div>;
+  }
+
+  const { name, email, image } = userSession.user;
 
   return (
     <SidebarMenu>
@@ -43,14 +44,14 @@ export function NavUser({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.avatar} alt={user.name} />
+                <AvatarImage src={image} alt={name} />
                 <AvatarFallback className="rounded-lg">CN</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
-                <span className="truncate text-xs">{user.email}</span>
+                <span className="truncate font-medium">{name}</span>
+                <span className="truncate text-xs">{email}</span>
               </div>
-              <ChevronsUpDown className="ml-auto size-4" />
+              <EllipsisVertical className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -62,19 +63,19 @@ export function NavUser({
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
+                  <AvatarImage src={image} alt={name} />
                   <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
+                  <span className="truncate font-medium">{name}</span>
+                  <span className="truncate text-xs">{email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Settings />
-              Settings
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+              <Settings className="mr-2 h-4 w-4" />
+              <NavSettings />
             </DropdownMenuItem>
             <DropdownMenuItem
               disabled={signingOut}

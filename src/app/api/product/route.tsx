@@ -13,7 +13,7 @@ export const DELETE = async (req: Request) => {
   if (role !== "admin") {
     return NextResponse.json(
       { error: "Unauthorized wrong role!" },
-      { status: 401 }
+      { status: 401 },
     );
   }
   const body = await req.json();
@@ -21,14 +21,14 @@ export const DELETE = async (req: Request) => {
   if (!sku) {
     return NextResponse.json(
       { error: "sku unexpected error" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   if (!isGlobal && !warehouseId) {
     return NextResponse.json(
       { error: "warehouseId required for warehouse-specific delete" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -36,13 +36,12 @@ export const DELETE = async (req: Request) => {
     const product = await db`
       SELECT p.id
       FROM products p
-      JOIN company c ON p.company_id = c.id
-      WHERE p.sku = ${sku} AND c.admin_id = ${userID}
+      WHERE p.sku = ${sku}
     `;
     if (product.length === 0) {
       return NextResponse.json(
         { error: "No product found or not authorized to delete" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -52,13 +51,10 @@ export const DELETE = async (req: Request) => {
       await db`
         DELETE FROM products
         WHERE sku = ${sku}
-        AND company_id IN (
-          SELECT id FROM company WHERE admin_id = ${userID}
-        )
       `;
       return NextResponse.json(
         { message: "Product deleted globally" },
-        { status: 200 }
+        { status: 200 },
       );
     } else {
       await db`
@@ -67,13 +63,13 @@ export const DELETE = async (req: Request) => {
         AND warehouse_id = ${warehouseId}
         AND EXISTS (
           SELECT 1 FROM warehouse w
-          JOIN company c ON w.company_id = c.id
-          WHERE w.id = ${warehouseId} AND c.admin_id = ${userID}
+          WHERE w.id = ${warehouseId}
         )
       `;
+
       return NextResponse.json(
         { message: "Product removed from warehouse" },
-        { status: 200 }
+        { status: 200 },
       );
     }
   } catch (e) {

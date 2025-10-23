@@ -15,7 +15,7 @@ export async function DELETE(
     }
 
     const adminID = session.user.id;
-    const { id: cashierID } = await context.params; // ✅ must `await` it now
+    const { id: cashierID } = await context.params;
 
     if (!cashierID) {
       return NextResponse.json(
@@ -38,8 +38,6 @@ export async function DELETE(
         { status: 404 },
       );
     }
-
-    console.log(`Cashier ${cashierID} deleted by admin ${adminID}`);
 
     return NextResponse.json(
       {

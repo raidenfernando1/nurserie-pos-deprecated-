@@ -1,41 +1,35 @@
 "use client";
-import React from "react";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/admin-sidebar";
+
+import React, { useEffect } from "react";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import ProtectedRoute from "@/components/protected-route";
-import { useProducts } from "@/hooks/useProducts";
-import { useWarehouses } from "@/hooks/useWarehouse";
+import LoadingBar from "@/components/loading-page";
+import useClient from "./consignments/_store/useClient";
+import { AdminSidebar } from "@/components/sidebar/admin-sidebar";
+import PopupHandler from "@/components/popup/popup-handler";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { isLoading: productsLoading } = useProducts();
-  const { isLoading: warehousesLoading } = useWarehouses();
+  const { fetchClients } = useClient();
 
-  const isLoading = productsLoading || warehousesLoading;
+  useEffect(() => {
+    fetchClients();
+  }, [fetchClients]);
 
   return (
     <ProtectedRoute intendedRole="admin">
       <SidebarProvider>
-        <div className="flex h-screen w-full overflow-hidden">
-          <AppSidebar />
-          <main className="flex flex-1 flex-col overflow-auto">
-            <div className="sticky top-0 z-10 bg-background">
-              <SidebarTrigger className="m-2" />
-            </div>
-            <div className="flex flex-1 flex-col gap-4 p-4">
-              {isLoading ? (
-                <div className="flex items-center justify-center h-full">
-                  <div className="text-gray-500">Loading dashboard data...</div>
-                </div>
-              ) : (
-                children
-              )}
-            </div>
-          </main>
-        </div>
+        <PopupHandler>
+          <div className="flex h-screen w-full overflow-hidden">
+            <AdminSidebar />
+            <main className="flex flex-1 flex-col overflow-auto p-4">
+              {children}
+            </main>
+          </div>
+        </PopupHandler>
       </SidebarProvider>
     </ProtectedRoute>
   );

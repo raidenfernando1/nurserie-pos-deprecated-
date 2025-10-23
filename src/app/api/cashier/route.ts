@@ -22,7 +22,6 @@ export async function GET() {
         ws.total_stock_amount
         FROM "user" AS cashier
         JOIN "user" AS admin ON cashier.admin_id = admin.id
-        JOIN company c ON c.admin_id = admin.id
         JOIN warehouse w ON w.company_id = c.id
         JOIN warehouse_stock ws ON ws.warehouse_id = w.id
         JOIN product p ON ws.product_id = p.id
@@ -34,7 +33,7 @@ export async function GET() {
     console.error("Error fetching products for cashier:", error);
     return NextResponse.json(
       { error: "Failed to fetch products" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

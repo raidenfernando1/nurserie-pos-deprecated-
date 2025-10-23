@@ -1,8 +1,13 @@
+"use client";
+
 import Image from "next/image";
 import { MoveLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export default function NotFound() {
+  const router = useRouter();
+
   return (
     <div className="min-h-screen flex flex-col justify-center items-center px-6 py-12">
       <Image
@@ -17,11 +22,9 @@ export default function NotFound() {
       <p className="text-xl text-gray-600 text-center mb-6">
         The page you are looking for does not exist.
       </p>
-      <Button asChild>
-        <a href="/" className="inline-flex items-center gap-2">
-          <MoveLeft className="w-5 h-5" />
-          <span>Go back home</span>
-        </a>
+      <Button onClick={() => router.back()}>
+        <MoveLeft className="w-5 h-5" />
+        <span>Go back</span>
       </Button>
     </div>
   );
