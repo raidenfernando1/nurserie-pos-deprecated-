@@ -31,7 +31,6 @@ export const cashierItems = [
   { name: "Dashboard", path: "/cashier/dashboard", icon: Home },
   { name: "Sales", path: "/cashier/sales", icon: ShoppingBasket },
   { name: "Inventory", path: "/cashier/inventory", icon: PackageSearch },
-  { name: "Products", path: "/cashier/products", icon: PackageSearch },
   { name: "Transactions", path: "/cashier/transactions", icon: CreditCard },
   { name: "Customers", path: "/cashier/customers", icon: UserSearch },
   { name: "Reports", path: "/cashier/reports", icon: NotepadText },
