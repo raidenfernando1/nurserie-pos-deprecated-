@@ -22,7 +22,7 @@ const columns: ColumnDef<Product>[] = [
           </div>
         )}
         <div className="flex flex-col gap-0.5">
-          <div className="flex flex-col text-wrap">
+          <div className="flex flex-col text-wrap text-left">
             <span className="font-semibold">{row.original.name}</span>
             <StatusBadge
               stock={row.original.stock || 0}
