@@ -16,7 +16,7 @@ export async function GET() {
     const products = await db`
       SELECT
         ws.product_id,
-        p.name AS product_name,
+        p.name AS name,
         ws.product_variants_id,
         pv.variant_name,
         ws.total_stock_amount

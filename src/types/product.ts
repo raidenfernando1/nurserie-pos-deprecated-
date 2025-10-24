@@ -21,7 +21,7 @@ export interface Product {
   stock: number;
   stock_threshold: number;
   warehouse_name: string;
-  product_name: string;
+  name: string;
   product_description: string;
   category: string;
   sku: string;

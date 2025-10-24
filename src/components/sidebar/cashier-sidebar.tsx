@@ -25,10 +25,12 @@ import {
 import { NavUser } from "../navbar-user";
 import { useSession } from "@/utils/getSession";
 import { company } from "../data";
+import { Separator } from "../ui/separator";
 
 export const cashierItems = [
   { name: "Dashboard", path: "/cashier/dashboard", icon: Home },
   { name: "Sales", path: "/cashier/sales", icon: ShoppingBasket },
+  { name: "Inventory", path: "/cashier/inventory", icon: PackageSearch },
   { name: "Products", path: "/cashier/products", icon: PackageSearch },
   { name: "Transactions", path: "/cashier/transactions", icon: CreditCard },
   { name: "Customers", path: "/cashier/customers", icon: UserSearch },
@@ -60,13 +62,14 @@ export function CashierSidebar({
       <SidebarContent>
         <SidebarGroup>
           <div>
-            <div className="flex my-2">
+            <div className="flex align-center w-full justify-between flex-row-reverse">
               <SidebarTrigger />
               <SidebarGroupLabel className="text-lg pb-1">
                 {company.name}
               </SidebarGroupLabel>
             </div>
           </div>
+          <Separator orientation="horizontal" className="my-3" />
           <SidebarGroupContent>
             <SidebarMenu>
               {cashierItems.map((item) => (
