@@ -30,14 +30,12 @@ const MoveProductWarehouse = () => {
   const [fetchingWarehouses, setFetchingWarehouses] = useState(true);
 
   const { data, closePopup } = usePopupStore();
-  const { id } = useParams(); // Get warehouse ID from URL
+  const { id } = useParams();
 
-  // Pull product from popup data
   const product = (data as { product: any })?.product;
   if (!product) return null;
 
   useEffect(() => {
-    // Fetch warehouses directly
     const loadWarehouses = async () => {
       setFetchingWarehouses(true);
       try {
@@ -236,7 +234,11 @@ const MoveProductWarehouse = () => {
                       selectedWarehouse === warehouse.warehouse_id
                         ? "border-primary bg-primary/5 shadow-sm ring-2 ring-primary/20"
                         : "border-border bg-card hover:border-primary/50"
-                    } ${loading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+                    } ${
+                      loading
+                        ? "opacity-50 cursor-not-allowed"
+                        : "cursor-pointer"
+                    }`}
                   >
                     <div className="flex items-start gap-3">
                       <div

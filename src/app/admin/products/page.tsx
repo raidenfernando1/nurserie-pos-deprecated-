@@ -2,7 +2,7 @@
 import ProductsTable from "./_components/products-table";
 import fetchProducts from "@/app/admin/products/_action/getProducts";
 
-export const dynamic = "force-dynamic"; // ✅ Add this line
+export const dynamic = "force-dynamic";
 
 export default async function ProductsPage() {
   const products = await fetchProducts();

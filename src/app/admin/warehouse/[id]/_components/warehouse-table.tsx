@@ -1,10 +1,20 @@
 "use client";
 import ReusableTable from "@/components/table/reusable-table";
 import { Button } from "@/components/ui/button";
-import { Plus, SendToBack } from "lucide-react";
+import {
+  ArrowBigLeft,
+  Box,
+  Hand,
+  Package,
+  Plus,
+  SendToBack,
+  Trash,
+  Warehouse,
+} from "lucide-react";
 import Tab from "@/components/table/table-tab";
 import { usePopupStore } from "@/store/popup-store";
 import StatusBadge from "@/components/table/status-badge";
+import { deleteProductFromWarehouse } from "../_action/addProductWarehouse";
 
 interface WarehouseProduct {
   warehouse_product_id: string;
@@ -128,7 +138,40 @@ export default function WarehouseTable({
               openPopup("move-product-warehouse", { product: row.original })
             }
           >
-            <SendToBack />
+            <ArrowBigLeft />
+            <Hand />
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() =>
+              openPopup("move-product-warehouse", { product: row.original })
+            }
+          >
+            <ArrowBigLeft />
+            <Warehouse />
+          </Button>
+
+          <Button
+            variant="secondary"
+            onClick={() => {
+              openPopup("add-warehouse-product-stock", {
+                product: row.original,
+              });
+            }}
+          >
+            <Plus />
+            <Package />
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={() => {
+              openPopup("confirm-delete-warehouse-product", {
+                product: row.original,
+              });
+            }}
+          >
+            <Trash />
+            <Package />
           </Button>
         </div>
       ),
@@ -136,7 +179,7 @@ export default function WarehouseTable({
   ];
 
   const categories = Array.from(
-    new Set(products.map((product) => product.category).filter(Boolean)),
+    new Set(products.map((product) => product.category).filter(Boolean))
   );
 
   return (

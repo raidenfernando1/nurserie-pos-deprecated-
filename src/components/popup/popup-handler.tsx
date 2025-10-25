@@ -11,6 +11,8 @@ import EditProductPopup from "@/app/admin/products/_popup/edit-product";
 import ChangePasswordPopup from "@/app/admin/users/_popup/change-password";
 import ProductDetailPopup from "@/app/admin/products/_popup/product-card";
 import CreateCustomerPopup from "./create-costumer";
+import DeleteProductConfirmation from "@/app/admin/warehouse/[id]/_popups/delete-product";
+import AddStockPopup from "@/app/admin/warehouse/[id]/_popups/add-stocks-product";
 
 const PopupHandler = ({ children }: { children: React.ReactNode }) => {
   const { activePopup, data } = usePopupStore();
@@ -29,6 +31,10 @@ const PopupHandler = ({ children }: { children: React.ReactNode }) => {
       {activePopup === "admin-create-cashier" && <CreateCashierPopup />}
       {activePopup === "product-data-view" && <ProductDetailPopup />}
       {activePopup === "create-customer-popup" && <CreateCustomerPopup />}
+      {activePopup === "confirm-delete-warehouse-product" && (
+        <DeleteProductConfirmation />
+      )}
+      {activePopup === "add-warehouse-product-stock" && <AddStockPopup />}
 
       {children}
     </>

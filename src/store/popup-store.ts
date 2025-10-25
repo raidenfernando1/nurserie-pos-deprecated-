@@ -11,6 +11,8 @@ type Popups =
   | "admin-create-cashier"
   | "product-data-view"
   | "create-customer-popup"
+  | "confirm-delete-warehouse-product"
+  | "add-warehouse-product-stock"
   | null;
 
 interface PopupStore {

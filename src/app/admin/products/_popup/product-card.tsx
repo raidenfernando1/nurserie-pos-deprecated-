@@ -30,7 +30,7 @@ const ProductDetailPopup = () => {
       const result = await getAssignedSkus(product.id);
       if (result.success && result.assignedSkus) {
         setAssignedSkus(
-          result.assignedSkus.map((row: any) => row.assigned_sku),
+          result.assignedSkus.map((row: any) => row.assigned_sku)
         );
       } else if (result.error) {
         setError(result.error);
