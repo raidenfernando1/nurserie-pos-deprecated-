@@ -67,14 +67,7 @@ const columns: ColumnDef<Product>[] = [
     ),
     filterFn: "includesString" as const,
   },
-  {
-    accessorKey: "warehouse_name",
-    header: "Source Warehouse",
-    cell: ({ row }) => (
-      <div className="flex items-center">{row.original.warehouse_name}</div>
-    ),
-    filterFn: "includesString" as const,
-  },
+
   {
     accessorKey: "price",
     header: "Price",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import {
   Sidebar,
@@ -33,14 +33,24 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import useClient from "@/app/admin/consignments/_store/useClient";
-import { useSession } from "@/utils/getSession";
-import useSWR from "swr";
-import { fetcher } from "@/utils/swrFetcher";
-import { Card, CardContent } from "../ui/card";
-import { Button } from "../ui/button";
-import { company } from "../data";
 import { Separator } from "../ui/separator";
+import { company } from "../data";
+
+// Define types
+interface WarehouseData {
+  warehouse_id: number;
+  warehouse_name: string;
+}
+
+interface ClientData {
+  client_id: number;
+  client_name: string;
+}
+
+interface AdminSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  clients: ClientData[];
+  warehouses: WarehouseData[];
+}
 
 export const adminItems = [
   { name: "Dashboard", path: "/admin/dashboard", icon: Home },
@@ -50,46 +60,12 @@ export const adminItems = [
   { name: "Products", path: "/admin/products", icon: Package },
 ];
 
-export function AdminSidebar({
-  ...props
-}: React.ComponentProps<typeof Sidebar>) {
+export function AdminSidebar({ clients, warehouses }: AdminSidebarProps) {
   const [activeMenu, setActiveMenu] = useState("");
   const [activeSubPath, setActiveSubPath] = useState("/admin/dashboard");
-  const [warehouses, setWarehouses] = useState<any>(null);
-  const { clients } = useClient();
-  const { loading } = useSession();
-
-  useEffect(() => {
-    const fetchWarehouses = async () => {
-      try {
-        const data = await fetcher("/api/admin/warehouse");
-        console.log("Fetched warehouses:", data);
-        setWarehouses(data);
-      } catch (error) {
-        console.error("Error fetching warehouses:", error);
-        setWarehouses("Error fetching data");
-      }
-    };
-
-    fetchWarehouses();
-  }, []);
-
-  if (loading) {
-    return (
-      <Sidebar>
-        <SidebarContent>
-          <SidebarGroup>
-            <SidebarGroupContent>
-              <div className="p-4 text-sm text-gray-500">Loading menu…</div>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        </SidebarContent>
-      </Sidebar>
-    );
-  }
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="icon">
       <SidebarContent>
         <SidebarGroup>
           <div>
@@ -103,8 +79,10 @@ export function AdminSidebar({
             </div>
             <Separator orientation="horizontal" className="my-3" />
           </div>
+
           <SidebarGroupContent>
             <SidebarMenu>
+              {/* Static admin items */}
               {adminItems.map((item) => (
                 <SidebarMenuItem key={item.path}>
                   <SidebarMenuButton
@@ -126,7 +104,7 @@ export function AdminSidebar({
                 </SidebarMenuItem>
               ))}
 
-              {/* Warehouses */}
+              {/* Warehouses Section */}
               <Collapsible defaultOpen className="group/collapsible">
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild>
@@ -136,43 +114,45 @@ export function AdminSidebar({
                       <ChevronDown className="ml-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
                     </SidebarMenuButton>
                   </CollapsibleTrigger>
+
                   <CollapsibleContent>
                     <SidebarMenuSub>
-                      {/* All Stocks */}
-                      <SidebarMenuSubButton
-                        asChild
-                        isActive={activeSubPath === "/admin/warehouse"}
-                      >
-                        <Link
-                          className="border-2"
-                          href="/admin/stock"
-                          onClick={() => {
-                            setActiveMenu("stock");
-                            setActiveSubPath("/admin/stock");
-                          }}
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={activeSubPath === "/admin/stock"}
                         >
-                          <span>All Stocks</span>
-                        </Link>
-                      </SidebarMenuSubButton>
-                      <SidebarMenuSubButton
-                        asChild
-                        isActive={activeSubPath === "/admin/warehouse"}
-                      >
-                        <Link
-                          className="border-2"
-                          href="/admin/warehouse"
-                          onClick={() => {
-                            setActiveMenu("warehouse");
-                            setActiveSubPath("/admin/warehouse");
-                          }}
+                          <Link
+                            href="/admin/stock"
+                            onClick={() => {
+                              setActiveMenu("warehouse");
+                              setActiveSubPath("/admin/stock");
+                            }}
+                          >
+                            <span>All Stocks</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={activeSubPath === "/admin/warehouse"}
                         >
-                          <span>All Warehouse</span>
-                        </Link>
-                      </SidebarMenuSubButton>
-                      {/* Individual Warehouses */}
-                      {warehouses?.response &&
-                      warehouses.response.length > 0 ? (
-                        warehouses.response.map((warehouse: any) => (
+                          <Link
+                            href="/admin/warehouse"
+                            onClick={() => {
+                              setActiveMenu("warehouse");
+                              setActiveSubPath("/admin/warehouse");
+                            }}
+                          >
+                            <span>All Warehouses</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+
+                      {warehouses && warehouses.length > 0 ? (
+                        warehouses.map((warehouse) => (
                           <SidebarMenuSubItem key={warehouse.warehouse_id}>
                             <SidebarMenuSubButton
                               asChild
@@ -190,10 +170,7 @@ export function AdminSidebar({
                                   );
                                 }}
                               >
-                                <span>
-                                  {warehouse.warehouse_name ||
-                                    "Unnamed Warehouse"}
-                                </span>
+                                <span>{warehouse.warehouse_name}</span>
                               </Link>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
@@ -210,7 +187,7 @@ export function AdminSidebar({
                 </SidebarMenuItem>
               </Collapsible>
 
-              {/* Consignments */}
+              {/* Consignments Section */}
               <Collapsible defaultOpen className="group/collapsible">
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild>
@@ -220,13 +197,13 @@ export function AdminSidebar({
                       <ChevronDown className="ml-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
                     </SidebarMenuButton>
                   </CollapsibleTrigger>
+
                   <CollapsibleContent>
                     <SidebarMenuSub>
                       {/* All Clients */}
                       <SidebarMenuSubItem>
                         <SidebarMenuSubButton
                           asChild
-                          className="border-2"
                           isActive={activeSubPath === "/admin/consignments"}
                         >
                           <Link
@@ -243,7 +220,7 @@ export function AdminSidebar({
 
                       {/* Individual Clients */}
                       {clients && clients.length > 0 ? (
-                        clients.map((client: any) => (
+                        clients.map((client) => (
                           <SidebarMenuSubItem key={client.client_id}>
                             <SidebarMenuSubButton
                               asChild
@@ -261,9 +238,7 @@ export function AdminSidebar({
                                   );
                                 }}
                               >
-                                <span>
-                                  {client.client_name || "Unnamed Client"}
-                                </span>
+                                <span>{client.client_name}</span>
                               </Link>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
@@ -283,6 +258,7 @@ export function AdminSidebar({
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
       <SidebarFooter>
         <NavUser />
       </SidebarFooter>

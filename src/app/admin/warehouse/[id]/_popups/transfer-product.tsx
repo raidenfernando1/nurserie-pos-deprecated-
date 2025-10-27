@@ -266,6 +266,7 @@ const TransferToStorePopup = () => {
                 </div>
 
                 {/* Threshold Section */}
+                {/* Threshold Section */}
                 <div className="space-y-2">
                   <Label
                     htmlFor="threshold"
@@ -278,10 +279,11 @@ const TransferToStorePopup = () => {
                     id="threshold"
                     type="number"
                     min="0"
-                    value={threshold}
-                    onChange={(e) =>
-                      setThreshold(parseInt(e.target.value) || 0)
-                    }
+                    value={threshold === 0 ? "" : threshold}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setThreshold(val === "" ? 0 : parseInt(val));
+                    }}
                     placeholder="Enter threshold value..."
                     disabled={isLoading}
                   />

@@ -1,8 +1,7 @@
-// ProductsPage.tsx (server component)
 import StockTable from "./_components/stock-table";
 import getWarehouseProducts from "./_action/fetchStockedProducts";
 
-export const dynamic = "force-dynamic"; // ✅ Add this line
+export const dynamic = "force-dynamic";
 
 export default async function ProductsPage() {
   const stocks = await getWarehouseProducts();

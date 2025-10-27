@@ -49,12 +49,11 @@ export async function transferProductToStore(
 
     const thresholdValue = payload.threshold ?? 0;
 
-    // 3. Update or insert store inventory
+    // 3. Update or insert store inventory (no warehouse_id)
     const [existingStoreInventory] = await db`
       SELECT stock
       FROM store_inventory
       WHERE product_id = ${product.id}
-        AND warehouse_id = ${payload.warehouseID}
         AND store_id = ${payload.storeID}
     `;
 
@@ -65,20 +64,18 @@ export async function transferProductToStore(
         SET stock = stock + ${payload.quantity},
             threshold = ${thresholdValue}
         WHERE product_id = ${product.id}
-          AND warehouse_id = ${payload.warehouseID}
           AND store_id = ${payload.storeID}
       `;
     } else {
       // Insert new inventory record
       await db`
-        INSERT INTO store_inventory (store_id, product_id, stock, threshold, created_at, warehouse_id)
+        INSERT INTO store_inventory (store_id, product_id, stock, threshold, created_at)
         VALUES (
           ${payload.storeID},
           ${product.id},
           ${payload.quantity},
           ${thresholdValue},
-          NOW(),
-          ${payload.warehouseID}
+          NOW()
         )
       `;
     }
@@ -97,7 +94,7 @@ export async function transferProductToStore(
 
     return {
       success: true,
-      message: `Transferred ${payload.quantity} units of ${payload.sku} from warehouse ${payload.warehouseID} to store ${payload.storeID}.`,
+      message: `Transferred ${payload.quantity} units of ${payload.sku} to store ${payload.storeID}.`,
     };
   } catch (error: any) {
     console.error("transferProductToStore error:", error);

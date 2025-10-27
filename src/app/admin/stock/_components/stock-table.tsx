@@ -3,7 +3,6 @@
 import ReusableTable from "@/components/table/reusable-table";
 import Tab from "@/components/table/table-tab";
 import StatusBadge from "@/components/table/status-badge";
-import type { Product } from "@/types/product";
 
 export default function StockTable({ stocks }: { stocks: any[] }) {
   const columns = [
