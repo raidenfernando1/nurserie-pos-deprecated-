@@ -83,9 +83,7 @@ export default function WarehouseTable({
         <div className="flex flex-col">
           <div className="flex items-center gap-1.5">
             <span className="text-xs">SKU:</span>
-            <span className="font-mono text-sm font-medium">
-              {row.original.sku}
-            </span>
+            <span className="text-sm font-medium">{row.original.sku}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="text-xs">Barcode:</span>
@@ -100,7 +98,7 @@ export default function WarehouseTable({
       accessorKey: "price",
       header: "Price",
       cell: ({ row }: any) => (
-        <span className="font-semibold">
+        <span className="font">
           {row.original.price
             ? `₱${row.original.price.toLocaleString()}`
             : "N/A"}
@@ -160,7 +158,6 @@ export default function WarehouseTable({
             }}
           >
             <Plus />
-            <Package />
           </Button>
           <Button
             variant="destructive"
@@ -170,7 +167,6 @@ export default function WarehouseTable({
               });
             }}
           >
-            <Trash />
             <Package />
           </Button>
         </div>
@@ -179,7 +175,7 @@ export default function WarehouseTable({
   ];
 
   const categories = Array.from(
-    new Set(products.map((product) => product.category).filter(Boolean))
+    new Set(products.map((product) => product.category).filter(Boolean)),
   );
 
   return (

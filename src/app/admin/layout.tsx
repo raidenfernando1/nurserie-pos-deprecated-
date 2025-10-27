@@ -25,7 +25,7 @@ export default function DashboardLayout({
         <PopupHandler>
           <div className="flex h-screen w-full overflow-hidden">
             <AdminSidebar />
-            <main className="flex flex-1 flex-col overflow-auto p-4">
+            <main className="flex flex-1 flex-col overflow-auto">
               {children}
             </main>
           </div>
