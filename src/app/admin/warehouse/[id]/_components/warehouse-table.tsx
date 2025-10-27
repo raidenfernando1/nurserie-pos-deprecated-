@@ -1,20 +1,10 @@
 "use client";
 import ReusableTable from "@/components/table/reusable-table";
 import { Button } from "@/components/ui/button";
-import {
-  ArrowBigLeft,
-  Box,
-  Hand,
-  Package,
-  Plus,
-  SendToBack,
-  Trash,
-  Warehouse,
-} from "lucide-react";
+import { ArrowBigLeft, Hand, Package, Plus, Warehouse } from "lucide-react";
 import Tab from "@/components/table/table-tab";
 import { usePopupStore } from "@/store/popup-store";
 import StatusBadge from "@/components/table/status-badge";
-import { deleteProductFromWarehouse } from "../_action/addProductWarehouse";
 
 interface WarehouseProduct {
   warehouse_product_id: string;
@@ -83,9 +73,7 @@ export default function WarehouseTable({
         <div className="flex flex-col">
           <div className="flex items-center gap-1.5">
             <span className="text-xs">SKU:</span>
-            <span className="font-mono text-sm font-medium">
-              {row.original.sku}
-            </span>
+            <span className="text-sm font-medium">{row.original.sku}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="text-xs">Barcode:</span>
@@ -100,7 +88,7 @@ export default function WarehouseTable({
       accessorKey: "price",
       header: "Price",
       cell: ({ row }: any) => (
-        <span className="font-semibold">
+        <span className="font">
           {row.original.price
             ? `₱${row.original.price.toLocaleString()}`
             : "N/A"}
@@ -135,7 +123,10 @@ export default function WarehouseTable({
           <Button
             variant="outline"
             onClick={() =>
-              openPopup("move-product-warehouse", { product: row.original })
+              openPopup("transfer-product-to-store", {
+                product: row.original,
+                storeID: 1,
+              })
             }
           >
             <ArrowBigLeft />
@@ -160,7 +151,6 @@ export default function WarehouseTable({
             }}
           >
             <Plus />
-            <Package />
           </Button>
           <Button
             variant="destructive"
@@ -170,7 +160,6 @@ export default function WarehouseTable({
               });
             }}
           >
-            <Trash />
             <Package />
           </Button>
         </div>
@@ -179,7 +168,7 @@ export default function WarehouseTable({
   ];
 
   const categories = Array.from(
-    new Set(products.map((product) => product.category).filter(Boolean))
+    new Set(products.map((product) => product.category).filter(Boolean)),
   );
 
   return (
