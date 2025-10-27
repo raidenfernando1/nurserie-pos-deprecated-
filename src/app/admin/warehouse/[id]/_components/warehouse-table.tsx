@@ -1,20 +1,10 @@
 "use client";
 import ReusableTable from "@/components/table/reusable-table";
 import { Button } from "@/components/ui/button";
-import {
-  ArrowBigLeft,
-  Box,
-  Hand,
-  Package,
-  Plus,
-  SendToBack,
-  Trash,
-  Warehouse,
-} from "lucide-react";
+import { ArrowBigLeft, Hand, Package, Plus, Warehouse } from "lucide-react";
 import Tab from "@/components/table/table-tab";
 import { usePopupStore } from "@/store/popup-store";
 import StatusBadge from "@/components/table/status-badge";
-import { deleteProductFromWarehouse } from "../_action/addProductWarehouse";
 
 interface WarehouseProduct {
   warehouse_product_id: string;
@@ -133,7 +123,10 @@ export default function WarehouseTable({
           <Button
             variant="outline"
             onClick={() =>
-              openPopup("move-product-warehouse", { product: row.original })
+              openPopup("transfer-product-to-store", {
+                product: row.original,
+                storeID: 1,
+              })
             }
           >
             <ArrowBigLeft />

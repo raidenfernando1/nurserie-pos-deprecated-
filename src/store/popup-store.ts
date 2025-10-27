@@ -13,6 +13,7 @@ type Popups =
   | "create-customer-popup"
   | "confirm-delete-warehouse-product"
   | "add-warehouse-product-stock"
+  | "transfer-product-to-store"
   | null;
 
 interface PopupStore {
