@@ -1,5 +1,5 @@
 import ClientsTable from "./_components/consignment-table";
-import { fetchClients } from "./_actions/fetchClients";
+import fetchClients from "@/app/admin/consignments/_actions/fetchClients";
 
 export const dynamic = "force-dynamic";
 

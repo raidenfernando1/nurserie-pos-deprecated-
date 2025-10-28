@@ -1,42 +1,31 @@
-"use client";
+import ClientConsignmentTable from "./_component/client-consignment-table";
+import fetchClientConsignments from "./_action/fetchClientConsignments";
 
-import React, { useEffect } from "react";
-import ReusableTable from "../../../../components/product-container";
-import { Columns } from "../[id]/_component/consignment-columns";
-import ClientTab from "../_components/client-tab";
-import { useConsignments } from "../_store/useConsignments";
-import ClientHeader from "../_components/client-header";
+export const dynamic = "force-dynamic";
 
-const ClientsPage = ({ params }: { params: Promise<{ id: string }> }) => {
-  const { fetchClientConsignments, isLoading, clientConsignments, clientInfo } =
-    useConsignments();
+export default async function ClientConsignmentPage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const result = await fetchClientConsignments(params.id);
 
-  const { id } = React.use(params);
-
-  useEffect(() => {
-    if (id) {
-      fetchClientConsignments(id);
-    }
-  }, [id, fetchClientConsignments]);
-
-  if (isLoading) return <div>Loading...</div>;
+  if (!result.success) {
+    return (
+      <div className="p-4">
+        <h1 className="text-xl font-semibold text-red-600">
+          {result.error || "Failed to load consignments."}
+        </h1>
+      </div>
+    );
+  }
 
   return (
-    <>
-      <ClientHeader
-        title={clientInfo[0]?.client_name ?? "Unknown Client"}
-        showConsignmentsAction={true}
-        showActions={false}
-      />
-
-      <ReusableTable
-        data={clientConsignments}
-        columns={Columns}
-        tabComponent={(table) => <ClientTab table={table} />}
-        defaultPageSize={10}
-      />
-    </>
+    <div className="h-screen p-3 flex flex-col gap-3">
+      <h1>Consignments for Client #{params.id}</h1>
+      <div className="flex-1 min-h-0">
+        <ClientConsignmentTable products={result.data} />
+      </div>
+    </div>
   );
-};
-
-export default ClientsPage;
+}

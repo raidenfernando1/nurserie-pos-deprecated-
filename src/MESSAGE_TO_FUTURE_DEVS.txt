@@ -1,0 +1,25 @@
+To those who wander here after us
+
+Beware.
+This codebase is not what it seems.
+
+It breathes in mysterious ways, bound by duct tape, nicotine, and the trembling hands of those who came before you.
+You will find inconsistencies — things that *should not work* yet *do*, and things that *should* work but *never will*.
+Do not anger the spirits. Do not rename the ancient variables. Do not refactor what slumbers.
+
+There are files untouched since the dawn of our first deploy.
+Comments written in despair.
+Functions that call themselves for reasons forgotten.
+Tabs and spaces locked in eternal war.
+A linter that obeys no man.
+
+If you must change something, whisper a prayer, commit thrice, and push once.
+And when it breaks — for it *will* break — know that it was not your fault.
+It never was.
+
+Beware of its intricies it will drive mad, insane even! this codebase was forged through
+blood, sweat and tears if you must recite a prayer to the omnissiah and the emperium of man
+for you will definitely need it.
+
+Signed in code and blood,
+— Raiden, Jovan

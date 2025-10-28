@@ -1,7 +1,6 @@
 import { betterAuth } from "better-auth";
 import { username } from "better-auth/plugins";
 import { Pool } from "pg";
-import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { admin } from "better-auth/plugins";
 import { baseUrl } from "@/components/data";
 
