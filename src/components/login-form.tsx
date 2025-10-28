@@ -70,9 +70,9 @@ export default function LoginForm({
       }
 
       toast.success("Login successful!", {
-        description: "Redirecting to dashboard...",
+        description: "Redirecting to Sales...",
       });
-      router.push("/cashier/dashboard");
+      router.push("/cashier/sales");
     } catch (err) {
       console.error(err);
       toast.error("Login Failed", {

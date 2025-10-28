@@ -28,7 +28,6 @@ import { company } from "../data";
 import { Separator } from "../ui/separator";
 
 export const cashierItems = [
-  { name: "Dashboard", path: "/cashier/dashboard", icon: Home },
   { name: "Sales", path: "/cashier/sales", icon: ShoppingBasket },
   { name: "Inventory", path: "/cashier/inventory", icon: PackageSearch },
   { name: "Transactions", path: "/cashier/transactions", icon: CreditCard },
@@ -39,7 +38,7 @@ export const cashierItems = [
 export function CashierSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
-  const [activeSubPath, setActiveSubPath] = useState("/cashier/dashboard");
+  const [activeSubPath, setActiveSubPath] = useState("/cashier/sales");
   const { loading } = useSession();
 
   if (loading) {
